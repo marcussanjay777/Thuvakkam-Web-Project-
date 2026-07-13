@@ -34,7 +34,7 @@ a { text-decoration: none; color: inherit; }
   box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
 .dp-brand { display: flex; align-items: center; gap: 12px; }
-.dp-brand img { height: 32px; filter: brightness(0) invert(1); }
+.dp-brand img { height: 32px; }
 .dp-brand-name { font-size: 14px; font-weight: 700; color: #fff; }
 .dp-brand-sub  { font-size: 11px; color: rgba(255,255,255,0.6); }
 .dp-topbar-right { display: flex; align-items: center; gap: 12px; }
