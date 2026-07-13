@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Donor Login — Thuvakkam SFS</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<div class="dp-auth-wrap">
+
+  <!-- LEFT PANEL -->
+  <div class="dp-auth-left">
+    <img src="../website/assets/logo.webp" alt="Thuvakkam Education" />
+    <div class="dp-auth-left-title">Make a difference in a student's life.</div>
+    <div class="dp-auth-left-sub">Your contribution to the Sponsor for Success programme goes directly towards scholarships, mentoring, and long-term support for students across Tamil Nadu.</div>
+    <div class="dp-auth-left-stats">
+      <div class="dp-auth-stat">
+        <div class="dp-auth-stat-icon"><i class="ti ti-users"></i></div>
+        <div><div class="dp-auth-stat-val">100+</div><div class="dp-auth-stat-lbl">Students supported</div></div>
+      </div>
+      <div class="dp-auth-stat">
+        <div class="dp-auth-stat-icon"><i class="ti ti-map-pin"></i></div>
+        <div><div class="dp-auth-stat-val">8+</div><div class="dp-auth-stat-lbl">Districts reached</div></div>
+      </div>
+      <div class="dp-auth-stat">
+        <div class="dp-auth-stat-icon"><i class="ti ti-calendar"></i></div>
+        <div><div class="dp-auth-stat-val">5+</div><div class="dp-auth-stat-lbl">Years of impact</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="dp-auth-right">
+    <div class="dp-auth-form-card">
+      <div>
+        <div class="dp-auth-title">Welcome back</div>
+        <div class="dp-auth-sub">Sign in to your donor account to view your impact and manage donations.</div>
+      </div>
+
+      <div class="dp-auth-error" id="login-error"></div>
+
+      <div class="dp-field-group">
+        <label class="dp-field-label">Email address</label>
+        <input class="dp-field-input" id="login-email" type="email" placeholder="your@email.com" autocomplete="email" />
+      </div>
+      <div class="dp-field-group">
+        <label class="dp-field-label">Password</label>
+        <input class="dp-field-input" id="login-password" type="password" placeholder="Enter your password" autocomplete="current-password" />
+      </div>
+
+      <button class="dp-auth-btn" id="login-btn" onclick="doLogin()">Sign in</button>
+
+      <div class="dp-auth-link">
+        New donor? <a href="register.html">Create an account</a>
+      </div>
+      <div class="dp-auth-link" style="margin-top:-10px;">
+        <a href="../website/index.html" style="color:var(--grey-400);">← Back to website</a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+  const sb = supabase.createClient(
+    'https://vftexybohuaxngyhwjts.supabase.co',
+    'sb_publishable_vO20BiWyS_VIkhU2DDmw3g_BoGBeCdq'
+  );
+
+  // Already logged in as donor → go to dashboard
+  sb.auth.getSession().then(async ({ data: { session } }) => {
+    if (!session) return;
+    const { data } = await sb.from('donor_accounts').select('id').eq('auth_user_id', session.user.id).maybeSingle();
+    if (data) window.location.href = 'dashboard.html';
+  });
+
+  document.getElementById('login-password').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doLogin();
+  });
+
+  async function doLogin() {
+    const email    = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value;
+    const btn      = document.getElementById('login-btn');
+    const errEl    = document.getElementById('login-error');
+
+    errEl.style.display = 'none';
+    if (!email || !password) { showErr('Please enter your email and password.'); return; }
+
+    btn.disabled    = true;
+    btn.textContent = 'Signing in...';
+
+    const { error } = await sb.auth.signInWithPassword({ email, password });
+    if (error) { showErr('Incorrect email or password.'); btn.disabled = false; btn.textContent = 'Sign in'; return; }
+
+    // Verify it's a donor account
+    const { data: { user } } = await sb.auth.getUser();
+    const { data: donor } = await sb.from('donor_accounts').select('id, email_verified').eq('auth_user_id', user.id).maybeSingle();
+
+    if (!donor) {
+      await sb.auth.signOut();
+      showErr('No donor account found for this email. Please register first.');
+      btn.disabled = false; btn.textContent = 'Sign in';
+      return;
+    }
+
+    window.location.href = 'dashboard.html';
+  }
+
+  function showErr(msg) {
+    const errEl = document.getElementById('login-error');
+    errEl.textContent = msg;
+    errEl.style.display = 'block';
+  }
+</script>
+</body>
+</html>

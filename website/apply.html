@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Apply for SFS 2026 — Thuvakkam Education</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .apply-section {
+      background: var(--white); border: 1px solid var(--grey-100);
+      border-radius: var(--radius-lg); padding: 28px;
+      margin-bottom: 20px; box-shadow: var(--shadow-sm);
+    }
+    .apply-section-title {
+      font-size: 12px; font-weight: 700; color: var(--green-dark);
+      text-transform: uppercase; letter-spacing: 0.08em;
+      margin-bottom: 20px; padding-bottom: 12px;
+      border-bottom: 2px solid var(--green-light);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .apply-section-title i { font-size: 16px; }
+    .form-row  { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .form-row.triple { grid-template-columns: 1fr 1fr 1fr; }
+    .form-fields { display: flex; flex-direction: column; gap: 16px; }
+    .field-group { display: flex; flex-direction: column; gap: 6px; }
+    .field-label { font-size: 12px; font-weight: 600; color: var(--grey-600); }
+    .field-label .req { color: #DC2626; margin-left: 2px; }
+    .field-hint { font-size: 11px; color: var(--grey-400); }
+    .field-input, .field-select, .field-textarea {
+      border: 1px solid var(--grey-200); border-radius: var(--radius-md);
+      padding: 11px 14px; font-size: 14px; font-family: var(--font);
+      color: var(--black); background: var(--white); outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s; width: 100%;
+      box-sizing: border-box;
+    }
+    .field-input:focus, .field-select:focus, .field-textarea:focus {
+      border-color: var(--green-dark); box-shadow: 0 0 0 3px rgba(14,113,98,0.08);
+    }
+    .field-input::placeholder { color: var(--grey-300); }
+    .field-textarea { resize: vertical; min-height: 88px; }
+    .radio-group { display: flex; gap: 20px; flex-wrap: wrap; padding-top: 4px; }
+    .radio-label { display: flex; align-items: center; gap: 7px; font-size: 14px; color: var(--grey-700); cursor: pointer; }
+    .radio-label input[type="radio"] { accent-color: var(--green-dark); width: 15px; height: 15px; }
+
+    /* Document upload rows */
+    .doc-list { display: flex; flex-direction: column; gap: 14px; }
+    .doc-row {
+      display: flex; align-items: flex-start; gap: 14px;
+      padding: 14px; background: var(--grey-50);
+      border: 1px solid var(--grey-100); border-radius: var(--radius-md);
+    }
+    .doc-num {
+      width: 24px; height: 24px; min-width: 24px;
+      background: var(--green-dark); color: var(--white);
+      border-radius: 50%; display: flex; align-items: center;
+      justify-content: center; font-size: 11px; font-weight: 700; margin-top: 2px;
+    }
+    .doc-info { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+    .doc-name { font-size: 13px; font-weight: 600; color: var(--grey-700); }
+    .doc-name .req { color: #DC2626; margin-left: 3px; }
+    .doc-hint { font-size: 11px; color: var(--grey-400); }
+    .doc-file-input {
+      border: 1.5px dashed var(--grey-200); border-radius: var(--radius-md);
+      padding: 10px 14px; font-size: 13px; font-family: var(--font);
+      color: var(--grey-600); background: var(--white); cursor: pointer;
+      width: 100%; box-sizing: border-box;
+    }
+    .doc-file-input:focus { outline: 2px solid var(--green-dark); }
+    .doc-status { font-size: 11px; font-weight: 600; margin-top: 4px; }
+    .doc-status.ok { color: #065F46; }
+    .doc-status.err { color: #991B1B; }
+
+    /* Scholarship conditional */
+    #scholarship-detail-wrap { display: none; }
+
+    /* Submit */
+    .submit-btn {
+      width: 100%; background: var(--green-dark); color: var(--white);
+      border: none; border-radius: var(--radius-md); padding: 15px;
+      font-size: 15px; font-weight: 700; font-family: var(--font);
+      cursor: pointer; transition: background 0.15s;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+    }
+    .submit-btn:hover { background: var(--green-mid); }
+    .submit-btn:disabled { opacity: 0.65; cursor: not-allowed; }
+    .form-error {
+      background: #FEE2E2; border: 1px solid #FCA5A5;
+      border-radius: var(--radius-md); padding: 14px 16px;
+      font-size: 13px; color: #991B1B; margin-bottom: 20px; display: none;
+    }
+    .form-success {
+      background: var(--white); border: 2px solid var(--green-dark);
+      border-radius: var(--radius-lg); padding: 48px 32px;
+      text-align: center; display: none;
+    }
+    .success-icon {
+      width: 64px; height: 64px; background: var(--green-light);
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 20px; font-size: 30px; color: var(--green-dark);
+    }
+    .progress-bar-wrap {
+      background: var(--grey-100); border-radius: 100px;
+      height: 6px; margin-top: 14px; overflow: hidden; display: none;
+    }
+    .progress-bar { height: 100%; background: var(--green-dark); transition: width 0.3s; width: 0%; }
+    .progress-label { font-size: 12px; color: var(--grey-500); margin-top: 6px; text-align: center; }
+
+    .checklist-item {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 12px 0; border-bottom: 1px solid var(--grey-100);
+      font-size: 13px; color: var(--grey-600); line-height: 1.6;
+    }
+    .checklist-item:last-child { border-bottom: none; }
+    .checklist-item i { color: var(--green-dark); font-size: 16px; flex-shrink: 0; margin-top: 2px; }
+    .timeline-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 16px; border-bottom: 1px solid var(--grey-100); font-size: 13px;
+    }
+    .timeline-row:last-child { border-bottom: none; }
+    .timeline-row.hl { background: var(--yellow-light); }
+    @keyframes spin { from { transform:rotate(0deg); } to { transform:rotate(360deg); } }
+    @media (max-width: 900px) { .apply-layout { grid-template-columns: 1fr !important; } .sidebar-sticky { position: static !important; } }
+    @media (max-width: 640px) { .form-row, .form-row.triple { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+  <div class="topnotice">
+    SFS 2026 applications close on 31 August 2026. &nbsp;<a href="#apply-form">Apply now</a>
+  </div>
+
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-brand">
+        <img src="assets/logo.webp" alt="Thuvakkam Education" style="height:38px;width:auto;object-fit:contain;" />
+        <div class="nav-brand-text">
+          <div class="nav-brand-name">Thuvakkam Education</div>
+          <div class="nav-brand-sub">Sponsor for Success</div>
+        </div>
+      </a>
+      <div class="nav-links">
+        <a class="nav-link"        href="index.html">Home</a>
+        <a class="nav-link"        href="impact.html">Impact</a>
+        <a class="nav-link"        href="criteria.html">Selection</a>
+        <a class="nav-link"        href="support.html">Support</a>
+        <a class="nav-link"        href="stories.html">Stories</a>
+        <a class="nav-link active" href="apply.html">Apply</a>
+        <a class="nav-link"        href="sponsor.html">Sponsor</a>
+      </div>
+      <div class="nav-actions">
+        <a href="#apply-form" class="btn-nav-outline">Apply now</a>
+        <a href="../donor-portal/index.html" class="btn-nav-primary">Donate</a>
+        <a href="../student-portal/index.html" class="btn-nav-outline" style="border-color:var(--yellow);color:var(--yellow);">Student Portal</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="page-hero">
+    <div class="page-hero-inner">
+      <div class="section-label-light" style="margin-bottom:8px;">Applications open</div>
+      <div class="page-hero-title">Apply for SFS 2026</div>
+      <div class="page-hero-sub">Fill in the form below. All submissions are reviewed by the committee within 45 days.</div>
+    </div>
+  </div>
+
+  <section class="section">
+    <div class="container">
+      <div class="apply-layout" style="display:grid;grid-template-columns:1fr 300px;gap:40px;align-items:start;" id="apply-form">
+
+        <!-- FORM -->
+        <div>
+          <div class="form-error" id="form-error"></div>
+          <div class="form-success" id="form-success">
+            <div class="success-icon"><i class="ti ti-circle-check"></i></div>
+            <h2 style="font-size:22px;font-weight:800;color:var(--green-dark);letter-spacing:-0.02em;margin-bottom:10px;">Application submitted!</h2>
+            <p style="font-size:14px;color:var(--grey-600);line-height:1.7;max-width:420px;margin:0 auto 20px;">Thank you for applying to SFS 2026. The committee will review your application and contact you within 45 days of the deadline.</p>
+            <p style="font-size:13px;color:var(--grey-400);">Your reference number: <strong id="app-ref" style="color:var(--green-dark);"></strong></p>
+          </div>
+
+          <form id="sfs-form" onsubmit="submitApp(event)" novalidate>
+
+            <!-- REFERRAL -->
+            <div class="apply-section">
+              <div class="apply-section-title"><i class="ti ti-users"></i> Referral details</div>
+              <div class="form-fields">
+                <div class="form-row">
+                  <div class="field-group">
+                    <label class="field-label">Referred by <span class="req">*</span></label>
+                    <input class="field-input" name="referred_by" type="text" placeholder="Name of person who referred you" required />
+                  </div>
+                  <div class="field-group">
+                    <label class="field-label">Referrer phone no. <span class="req">*</span></label>
+                    <input class="field-input" name="referrer_phone" type="tel" placeholder="+91 XXXXXXXXXX" required />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- STUDENT DETAILS -->
+            <div class="apply-section">
+              <div class="apply-section-title"><i class="ti ti-user"></i> Student details</div>
+              <div class="form-fields">
+                <div class="form-row">
+                  <div class="field-group">
+                    <label class="field-label">First name <span class="req">*</span></label>
+                    <input class="field-input" name="first_name" type="text" placeholder="As on Aadhaar" required />
+                  </div>
+                  <div class="field-group">
+                    <label class="field-label">Last name <span class="req">*</span></label>
+                    <input class="field-input" name="last_name" type="text" placeholder="As on Aadhaar" required />
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="field-group">
+                    <label class="field-label">Date of birth <span class="req">*</span></label>
+                    <input class="field-input" name="dob" type="date" required />
+                  </div>
+                  <div class="field-group">
+                    <label class="field-label">Gender <span class="req">*</span></label>
+                    <div class="radio-group">
+                      <label class="radio-label"><input type="radio" name="gender" value="Male" required /> Male</label>
+                      <label class="radio-label"><input type="radio" name="gender" value="Female" /> Female</label>
+                      <label class="radio-label"><input type="radio" name="gender" value="Other" /> Other</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="field-group">
+                    <label class="field-label">Father's name <span class="req">*</span></label>
+                    <input class="field-input" name="father_name" type="text" placeholder="Father's full name" required />
+                  </div>
+                  <div class="field-group">
+                    <label class="field-label">Mother's name <span class="req">*</span></label>
+                    <input class="field-input" name="mother_name" type="text" placeholder="Mother's full name" required />
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="field-group">
+                    <label class="field-label">Guardian's name <span class="req">*</span></label>
+                    <input class="field-input" name="guardian_name" type="text" placeholder="Guardian's full name (if different from parents)" required />
+                  </div>
+                  <div class="field-group">
+                    <label class="field-label">Family annual income (Rs.) <span class="req">*</span></label>
+                    <input class="field-input" name="annual_income" type="number" min="0" placeholder="e.g. 120000" required />
+                    <span class="field-hint">Without commas. 1,20,000 → 120000</span>
+                  </div>
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Residential address <span class="req">*</span></label>
+                  <textarea class="field-textarea" name="address" placeholder="House no., Street, Village/Town, PIN code" required></textarea>
+                </div>
+                <div class="form-row">
+                  <div class="field-group">
+                    <label class="field-label">State <span class="req">*</span></label>
+                    <select class="field-select" name="state" required>
+                      <option value="">Select state</option>
+                      <option>Tamil Nadu</option><option>Andhra Pradesh</option><option>Karnataka</option>
+                      <option>Kerala</option><option>Telangana</option><option>Maharashtra</option>
+                      <option>Other</option>
+                    </select>
+                  </div>
+                  <div class="field-group">
+                    <label class="field-label">Parent's / Guardian contact no. <span class="req">*</span></label>
+                    <input class="field-input" name="parent_contact" type="tel" placeholder="+91 XXXXXXXXXX" required />
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="field-group">
+                    <label class="field-label">E-mail ID <span class="req">*</span></label>
+                    <input class="field-input" name="email" type="email" placeholder="student@example.com" required />
+                  </div>
+                  <div class="field-group">
+                    <label class="field-label">Student contact no. (if available)</label>
+                    <input class="field-input" name="student_phone" type="tel" placeholder="+91 XXXXXXXXXX" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- EDUCATION DETAILS -->
+            <div class="apply-section">
+              <div class="apply-section-title"><i class="ti ti-school"></i> Education details</div>
+              <div class="form-fields">
+                <div class="field-group">
+                  <label class="field-label">10th standard school details <span class="req">*</span></label>
+                  <textarea class="field-textarea" name="school_10th" placeholder="School name, board (CBSE/State), year of passing, percentage / CGPA" required style="min-height:72px;"></textarea>
+                </div>
+                <div class="field-group">
+                  <label class="field-label">12th / Diploma school / institute details <span class="req">*</span></label>
+                  <textarea class="field-textarea" name="school_12th" placeholder="School / institute name, board, year of passing (or currently studying), percentage / CGPA" required style="min-height:72px;"></textarea>
+                </div>
+                <div class="field-group">
+                  <label class="field-label">U.G. college details</label>
+                  <textarea class="field-textarea" name="college_ug" placeholder="College name, course, year of joining, current semester (if applicable)" style="min-height:72px;"></textarea>
+                </div>
+                <div class="field-group">
+                  <label class="field-label">P.G. college details</label>
+                  <textarea class="field-textarea" name="college_pg" placeholder="College name, course, year of joining, current semester (if applicable)" style="min-height:72px;"></textarea>
+                </div>
+                <div class="field-group">
+                  <label class="field-label">If others (mention here)</label>
+                  <textarea class="field-textarea" name="other_education" placeholder="Any other educational qualification or course not mentioned above" style="min-height:64px;"></textarea>
+                </div>
+
+                <div class="field-group">
+                  <label class="field-label">Any other scholarship availed? <span class="req">*</span></label>
+                  <div class="radio-group">
+                    <label class="radio-label"><input type="radio" name="other_scholarship" value="Yes" required onchange="toggleScholarship(this)" /> Yes</label>
+                    <label class="radio-label"><input type="radio" name="other_scholarship" value="No" onchange="toggleScholarship(this)" /> No</label>
+                  </div>
+                </div>
+                <div class="field-group" id="scholarship-detail-wrap">
+                  <label class="field-label">If yes, explain in detail <span class="req">*</span></label>
+                  <textarea class="field-textarea" name="scholarship_details" id="scholarship_details" placeholder="Name of scholarship, amount, organisation, year" style="min-height:72px;"></textarea>
+                </div>
+
+                <div class="field-group">
+                  <label class="field-label">Awards / achievements <span class="req">*</span></label>
+                  <textarea class="field-textarea" name="awards" placeholder="Academic or non-academic awards, recognitions, competitions won, etc." required style="min-height:72px;"></textarea>
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Extra-curricular activities <span class="req">*</span></label>
+                  <textarea class="field-textarea" name="extra_curricular" placeholder="Sports, cultural, social activities, NCC, NSS, volunteering, etc." required style="min-height:72px;"></textarea>
+                </div>
+              </div>
+            </div>
+
+            <!-- FAMILY DETAILS -->
+            <div class="apply-section">
+              <div class="apply-section-title"><i class="ti ti-home"></i> Family details</div>
+              <div class="form-fields">
+                <div class="field-group">
+                  <label class="field-label">Tell about your family <span class="req">*</span></label>
+                  <textarea class="field-textarea" name="family_about" placeholder="Describe your family background, number of members, any special circumstances, siblings' education status, etc." required style="min-height:130px;"></textarea>
+                </div>
+              </div>
+            </div>
+
+            <!-- DOCUMENTS -->
+            <div class="apply-section">
+              <div class="apply-section-title"><i class="ti ti-paperclip"></i> Documents required</div>
+              <p style="font-size:12px;color:var(--grey-500);margin-bottom:16px;line-height:1.6;">Upload clear scanned copies or photos. Max 1 MB per file. Accepted formats: PDF, JPG, PNG.</p>
+              <div class="doc-list">
+
+                <div class="doc-row">
+                  <div class="doc-num">1</div>
+                  <div class="doc-info">
+                    <div class="doc-name">Student request letter for support <span class="req">*</span></div>
+                    <input class="doc-file-input" type="file" name="doc_request_letter" accept=".pdf,.jpg,.jpeg,.png" data-label="Request Letter" data-required="true" />
+                    <div class="doc-hint">Upload 1 file. Max 1 MB.</div>
+                    <div class="doc-status" id="status_doc_request_letter"></div>
+                  </div>
+                </div>
+
+                <div class="doc-row">
+                  <div class="doc-num">2</div>
+                  <div class="doc-info">
+                    <div class="doc-name">School / College ID card <span class="req">*</span></div>
+                    <input class="doc-file-input" type="file" name="doc_id_card" accept=".pdf,.jpg,.jpeg,.png" data-label="College ID Card" data-required="true" />
+                    <div class="doc-hint">Upload 1 file. Max 1 MB.</div>
+                    <div class="doc-status" id="status_doc_id_card"></div>
+                  </div>
+                </div>
+
+                <div class="doc-row">
+                  <div class="doc-num">3</div>
+                  <div class="doc-info">
+                    <div class="doc-name">School / College admission proof <span class="req">*</span></div>
+                    <input class="doc-file-input" type="file" name="doc_admission_proof" accept=".pdf,.jpg,.jpeg,.png" data-label="Admission Proof" data-required="true" />
+                    <div class="doc-hint">Upload 1 file. Max 1 MB.</div>
+                    <div class="doc-status" id="status_doc_admission_proof"></div>
+                  </div>
+                </div>
+
+                <div class="doc-row">
+                  <div class="doc-num">4</div>
+                  <div class="doc-info">
+                    <div class="doc-name">10th mark sheet <span class="req">*</span></div>
+                    <input class="doc-file-input" type="file" name="doc_marksheet_10" accept=".pdf,.jpg,.jpeg,.png" data-label="10th Marksheet" data-required="true" />
+                    <div class="doc-hint">Upload 1 file. Max 1 MB.</div>
+                    <div class="doc-status" id="status_doc_marksheet_10"></div>
+                  </div>
+                </div>
+
+                <div class="doc-row">
+                  <div class="doc-num">5</div>
+                  <div class="doc-info">
+                    <div class="doc-name">12th / Diploma marksheet <span class="req">*</span></div>
+                    <input class="doc-file-input" type="file" name="doc_marksheet_12" accept=".pdf,.jpg,.jpeg,.png" data-label="12th/Diploma Marksheet" data-required="true" />
+                    <div class="doc-hint">Upload 1 file. Max 1 MB.</div>
+                    <div class="doc-status" id="status_doc_marksheet_12"></div>
+                  </div>
+                </div>
+
+                <div class="doc-row">
+                  <div class="doc-num">6</div>
+                  <div class="doc-info">
+                    <div class="doc-name">All degree marksheets (till last semester) <span class="req">*</span></div>
+                    <input class="doc-file-input" type="file" name="doc_degree_marksheets" accept=".pdf,.jpg,.jpeg,.png" data-label="Degree Marksheets" data-required="true" multiple />
+                    <div class="doc-hint">Upload up to 10 files. Max 1 MB per file.</div>
+                    <div class="doc-status" id="status_doc_degree_marksheets"></div>
+                  </div>
+                </div>
+
+                <div class="doc-row">
+                  <div class="doc-num">7</div>
+                  <div class="doc-info">
+                    <div class="doc-name">Bonafide certificate / Fees confirmation letter <span class="req">*</span></div>
+                    <input class="doc-file-input" type="file" name="doc_bonafide" accept=".pdf,.jpg,.jpeg,.png" data-label="Bonafide Certificate" data-required="true" />
+                    <div class="doc-hint">Upload 1 file. Max 1 MB.</div>
+                    <div class="doc-status" id="status_doc_bonafide"></div>
+                  </div>
+                </div>
+
+                <div class="doc-row">
+                  <div class="doc-num">8</div>
+                  <div class="doc-info">
+                    <div class="doc-name">Parent's / Guardian and student bank statement (last 6 months) <span class="req">*</span></div>
+                    <input class="doc-file-input" type="file" name="doc_bank_statement" accept=".pdf,.jpg,.jpeg,.png" data-label="Bank Statement" data-required="true" />
+                    <div class="doc-hint">Upload 1 file. Max 1 MB.</div>
+                    <div class="doc-status" id="status_doc_bank_statement"></div>
+                  </div>
+                </div>
+
+                <div class="doc-row">
+                  <div class="doc-num">9</div>
+                  <div class="doc-info">
+                    <div class="doc-name">Parent's / Guardian income certificate <span class="req">*</span></div>
+                    <input class="doc-file-input" type="file" name="doc_income_cert" accept=".pdf,.jpg,.jpeg,.png" data-label="Income Certificate" data-required="true" />
+                    <div class="doc-hint">Upload 1 file. Max 1 MB.</div>
+                    <div class="doc-status" id="status_doc_income_cert"></div>
+                  </div>
+                </div>
+
+                <div class="doc-row">
+                  <div class="doc-num">10</div>
+                  <div class="doc-info">
+                    <div class="doc-name">Student Aadhaar card proof <span class="req">*</span></div>
+                    <input class="doc-file-input" type="file" name="doc_aadhaar" accept=".pdf,.jpg,.jpeg,.png" data-label="Aadhaar Card" data-required="true" />
+                    <div class="doc-hint">Upload 1 file. Max 1 MB.</div>
+                    <div class="doc-status" id="status_doc_aadhaar"></div>
+                  </div>
+                </div>
+
+                <div class="doc-row">
+                  <div class="doc-num">11</div>
+                  <div class="doc-info">
+                    <div class="doc-name">Family ration card proof <span class="req">*</span></div>
+                    <input class="doc-file-input" type="file" name="doc_ration_card" accept=".pdf,.jpg,.jpeg,.png" data-label="Ration Card" data-required="true" />
+                    <div class="doc-hint">Upload 1 file. Max 1 MB.</div>
+                    <div class="doc-status" id="status_doc_ration_card"></div>
+                  </div>
+                </div>
+
+                <div class="doc-row">
+                  <div class="doc-num">12</div>
+                  <div class="doc-info">
+                    <div class="doc-name">LPG (gas cylinder) bill</div>
+                    <input class="doc-file-input" type="file" name="doc_lpg_bill" accept=".pdf,.jpg,.jpeg,.png" data-label="LPG Bill" data-required="false" />
+                    <div class="doc-hint">Upload 1 file. Max 1 MB. (Optional)</div>
+                    <div class="doc-status" id="status_doc_lpg_bill"></div>
+                  </div>
+                </div>
+
+                <div class="doc-row">
+                  <div class="doc-num">13</div>
+                  <div class="doc-info">
+                    <div class="doc-name">House rental receipt</div>
+                    <input class="doc-file-input" type="file" name="doc_rental_receipt" accept=".pdf,.jpg,.jpeg,.png" data-label="House Rental Receipt" data-required="false" />
+                    <div class="doc-hint">Upload 1 file. Max 1 MB. (Optional)</div>
+                    <div class="doc-status" id="status_doc_rental_receipt"></div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- DECLARATION -->
+            <div class="apply-section" style="background:var(--yellow-light);border-color:rgba(245,195,29,0.35);">
+              <div style="display:flex;gap:14px;align-items:flex-start;">
+                <input type="checkbox" id="declaration" required style="width:18px;height:18px;margin-top:2px;flex-shrink:0;accent-color:var(--green-dark);" />
+                <label for="declaration" style="font-size:13px;color:var(--grey-600);line-height:1.7;cursor:pointer;">
+                  I confirm that all information provided in this form is true and accurate. I understand that false information may result in disqualification. I give Thuvakkam Education consent to verify this information and contact me regarding my application.
+                </label>
+              </div>
+            </div>
+
+            <div class="progress-bar-wrap" id="progress-wrap">
+              <div class="progress-bar" id="progress-bar"></div>
+            </div>
+            <div class="progress-label" id="progress-label"></div>
+
+            <button type="submit" class="submit-btn" id="submit-btn" style="margin-top:16px;">
+              <i class="ti ti-send"></i> Submit application
+            </button>
+            <p style="font-size:12px;color:var(--grey-400);text-align:center;margin-top:12px;">
+              A confirmation will appear on this page after submission. Please screenshot it for your records.
+            </p>
+
+          </form>
+        </div>
+
+        <!-- SIDEBAR -->
+        <div class="sidebar-sticky" style="position:sticky;top:80px;display:flex;flex-direction:column;gap:14px;">
+
+          <div style="background:var(--white);border:1px solid var(--grey-100);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-sm);">
+            <div style="background:var(--green-dark);padding:13px 16px;font-size:11px;font-weight:700;color:var(--white);text-transform:uppercase;letter-spacing:0.08em;">Key dates</div>
+            <div class="timeline-row"><span style="color:var(--grey-600);">Applications open</span><strong>01 Jun 2026</strong></div>
+            <div class="timeline-row hl"><span style="color:var(--grey-600);font-weight:600;">Deadline</span><strong style="color:var(--green-dark);">31 Aug 2026</strong></div>
+            <div class="timeline-row"><span style="color:var(--grey-600);">Shortlist</span><strong>30 Sep 2026</strong></div>
+            <div class="timeline-row"><span style="color:var(--grey-600);">Scholarships begin</span><strong>Nov 2026</strong></div>
+          </div>
+
+          <div style="background:var(--white);border:1px solid var(--grey-100);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-sm);">
+            <div style="background:var(--green-dark);padding:13px 16px;font-size:11px;font-weight:700;color:var(--white);text-transform:uppercase;letter-spacing:0.08em;">Keep these ready</div>
+            <div style="padding:0 16px;">
+              <div class="checklist-item"><i class="ti ti-circle-check"></i> Income certificate (Tahsildar)</div>
+              <div class="checklist-item"><i class="ti ti-circle-check"></i> Aadhaar card (student + parent)</div>
+              <div class="checklist-item"><i class="ti ti-circle-check"></i> Latest marksheets (all semesters)</div>
+              <div class="checklist-item"><i class="ti ti-circle-check"></i> School / College bonafide certificate</div>
+              <div class="checklist-item"><i class="ti ti-circle-check"></i> Bank statement (last 6 months)</div>
+              <div class="checklist-item"><i class="ti ti-circle-check"></i> Ration card & LPG bill (if available)</div>
+            </div>
+            <div style="padding:10px 16px;font-size:11px;color:var(--grey-400);border-top:1px solid var(--grey-100);">All documents are uploaded directly with this form.</div>
+          </div>
+
+          <div style="background:var(--grey-50);border:1px solid var(--grey-100);border-radius:var(--radius-lg);padding:16px;">
+            <div style="font-size:13px;font-weight:600;margin-bottom:6px;">Need help?</div>
+            <div style="font-size:13px;color:var(--grey-600);line-height:1.7;">Email <a href="mailto:info@thuvakkam.org" style="color:var(--green-dark);font-weight:600;">info@thuvakkam.org</a> or call <strong>+91 94448 88937</strong></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div>
+          <img src="assets/logo.webp" alt="Thuvakkam Education" style="height:44px;width:auto;object-fit:contain;margin-bottom:10px;display:block;" />
+          <div class="footer-brand-name">Thuvakkam Education</div>
+          <div class="footer-brand-body">Supporting education, opportunity, and long-term student empowerment across Tamil Nadu since 2020.</div>
+          <div class="footer-reg">Reg. No: 131/2014 &nbsp;&middot;&nbsp; Exceeding Limits</div>
+        </div>
+        <div>
+          <div class="footer-col-head">Programme</div>
+          <a class="footer-link" href="impact.html">Impact dashboard</a>
+          <a class="footer-link" href="criteria.html">Selection criteria</a>
+          <a class="footer-link" href="support.html">Support provided</a>
+          <a class="footer-link" href="stories.html">Student stories</a>
+        </div>
+        <div>
+          <div class="footer-col-head">Get involved</div>
+          <a class="footer-link" href="apply.html">Apply for SFS</a>
+          <a class="footer-link" href="sponsor.html">Become a sponsor</a>
+        </div>
+        <div>
+          <div class="footer-col-head">Contact</div>
+          <div class="footer-contact-row"><i class="ti ti-mail"></i> info@thuvakkam.org</div>
+          <div class="footer-contact-row"><i class="ti ti-phone"></i> +91 94448 88937</div>
+          <div class="footer-contact-row"><i class="ti ti-map-pin"></i> Chennai, Tamil Nadu</div>
+        </div>
+      </div>
+      <hr class="footer-divider" />
+      <div class="footer-bottom">
+        <span>&copy; 2026 Thuvakkam Education. All rights reserved.</span>
+        <div style="display:flex;gap:20px;">
+          <a href="#">Privacy policy</a>
+          <a href="#">Terms of use</a>
+          <a href="../portal/index.html">Committee portal</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script>
+    const sb = supabase.createClient(
+      'https://vftexybohuaxngyhwjts.supabase.co',
+      'sb_publishable_vO20BiWyS_VIkhU2DDmw3g_BoGBeCdq'
+    );
+
+    const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1 MB
+
+    function toggleScholarship(radio) {
+      const wrap = document.getElementById('scholarship-detail-wrap');
+      const detail = document.getElementById('scholarship_details');
+      if (radio.value === 'Yes') {
+        wrap.style.display = 'block';
+        detail.required = true;
+      } else {
+        wrap.style.display = 'none';
+        detail.required = false;
+        detail.value = '';
+      }
+    }
+
+    // Live file size validation
+    document.querySelectorAll('.doc-file-input').forEach(input => {
+      input.addEventListener('change', () => validateFile(input));
+    });
+
+    function validateFile(input) {
+      const statusEl = document.getElementById('status_' + input.name);
+      if (!statusEl) return true;
+      if (!input.files.length) { statusEl.textContent = ''; return true; }
+
+      const files = Array.from(input.files);
+      const oversized = files.filter(f => f.size > MAX_FILE_SIZE);
+      if (oversized.length) {
+        statusEl.className = 'doc-status err';
+        statusEl.textContent = `File too large: ${oversized.map(f => f.name).join(', ')} — max 1 MB each.`;
+        input.value = '';
+        return false;
+      }
+      statusEl.className = 'doc-status ok';
+      statusEl.textContent = files.length > 1 ? `${files.length} files selected` : files[0].name;
+      return true;
+    }
+
+    function setProgress(pct, label) {
+      document.getElementById('progress-wrap').style.display = 'block';
+      document.getElementById('progress-bar').style.width = pct + '%';
+      document.getElementById('progress-label').textContent = label;
+    }
+
+    async function uploadDoc(studentId, inputEl) {
+      if (!inputEl.files.length) return [];
+      const files = Array.from(inputEl.files);
+      const label = inputEl.dataset.label;
+      const urls = [];
+      for (const file of files) {
+        const ext  = file.name.split('.').pop();
+        const path = `${studentId}/${inputEl.name}_${Date.now()}.${ext}`;
+        const { data, error } = await sb.storage.from('studen-documents').upload(path, file, { upsert: false });
+        if (error) throw new Error(`Upload failed for ${label}: ${error.message}`);
+        const { data: urlData } = sb.storage.from('studen-documents').getPublicUrl(path);
+        urls.push(urlData.publicUrl);
+      }
+      return urls;
+    }
+
+    async function submitApp(e) {
+      e.preventDefault();
+      const form  = e.target;
+      const btn   = document.getElementById('submit-btn');
+      const errEl = document.getElementById('form-error');
+
+      errEl.style.display = 'none';
+      btn.disabled = true;
+      btn.innerHTML = '<i class="ti ti-loader-2" style="animation:spin 1s linear infinite;display:inline-block;"></i> Submitting...';
+
+      const fd = new FormData(form);
+
+      // Validate required text fields
+      const checks = [
+        [fd.get('referred_by')?.trim(),   'Please enter who referred you.'],
+        [fd.get('referrer_phone')?.trim(), 'Please enter the referrer\'s phone number.'],
+        [fd.get('first_name')?.trim(),     'Please enter your first name.'],
+        [fd.get('last_name')?.trim(),      'Please enter your last name.'],
+        [fd.get('dob'),                    'Please enter your date of birth.'],
+        [fd.get('gender'),                 'Please select your gender.'],
+        [fd.get('father_name')?.trim(),    'Please enter your father\'s name.'],
+        [fd.get('mother_name')?.trim(),    'Please enter your mother\'s name.'],
+        [fd.get('guardian_name')?.trim(),  'Please enter your guardian\'s name.'],
+        [fd.get('annual_income'),          'Please enter your family\'s annual income.'],
+        [fd.get('address')?.trim(),        'Please enter your residential address.'],
+        [fd.get('state'),                  'Please select your state.'],
+        [fd.get('parent_contact')?.trim(), 'Please enter your parent\'s / guardian\'s contact number.'],
+        [fd.get('email')?.trim(),          'Please enter your e-mail ID.'],
+        [fd.get('school_10th')?.trim(),    'Please enter your 10th standard school details.'],
+        [fd.get('school_12th')?.trim(),    'Please enter your 12th / Diploma details.'],
+        [fd.get('other_scholarship'),      'Please select whether you have availed any other scholarship.'],
+        [fd.get('awards')?.trim(),         'Please fill in awards / achievements.'],
+        [fd.get('extra_curricular')?.trim(),'Please fill in extra-curricular activities.'],
+        [fd.get('family_about')?.trim(),   'Please tell us about your family.'],
+      ];
+      for (const [val, msg] of checks) {
+        if (!val) return showErr(msg);
+      }
+      if (!document.getElementById('declaration').checked) return showErr('Please read and accept the declaration.');
+
+      // Validate scholarship detail if Yes
+      if (fd.get('other_scholarship') === 'Yes' && !fd.get('scholarship_details')?.trim())
+        return showErr('Please explain the scholarship details.');
+
+      // Validate required doc uploads & file sizes
+      const requiredDocs = form.querySelectorAll('.doc-file-input[data-required="true"]');
+      for (const inp of requiredDocs) {
+        if (!inp.files.length) return showErr(`Please upload: ${inp.dataset.label}`);
+        if (!validateFile(inp)) return showErr(`File too large: ${inp.dataset.label} — max 1 MB.`);
+      }
+      // Validate optional docs if files were chosen
+      const optionalDocs = form.querySelectorAll('.doc-file-input[data-required="false"]');
+      for (const inp of optionalDocs) {
+        if (inp.files.length && !validateFile(inp)) return showErr(`File too large: ${inp.dataset.label} — max 1 MB.`);
+      }
+
+      try {
+        setProgress(10, 'Saving application...');
+
+        const firstName = fd.get('first_name').trim();
+        const lastName  = fd.get('last_name').trim();
+        const fullName  = `${firstName} ${lastName}`;
+        const initials  = [firstName, lastName].map(w => w[0]?.toUpperCase()).filter(Boolean).join('');
+
+        const { data: student, error: insertErr } = await sb.from('students').insert({
+          name:                fullName,
+          initials,
+          dob:                 fd.get('dob')                          || null,
+          gender:              fd.get('gender')                       || null,
+          father_name:         fd.get('father_name').trim()           || null,
+          mother_name:         fd.get('mother_name').trim()           || null,
+          annual_income:       fd.get('annual_income') ? parseFloat(fd.get('annual_income')) : null,
+          address:             fd.get('address').trim()               || null,
+          phone:               fd.get('parent_contact').trim()        || null,
+          referred_by:         fd.get('referred_by').trim()           || null,
+          referrer_phone:      fd.get('referrer_phone').trim()        || null,
+          guardian_name:       fd.get('guardian_name').trim()         || null,
+          state:               fd.get('state')                        || null,
+          email:               fd.get('email').trim()                 || null,
+          student_phone:       fd.get('student_phone').trim()         || null,
+          school_10th:         fd.get('school_10th').trim()           || null,
+          school_12th:         fd.get('school_12th').trim()           || null,
+          college_ug:          fd.get('college_ug').trim()            || null,
+          college_pg:          fd.get('college_pg').trim()            || null,
+          other_education:     fd.get('other_education').trim()       || null,
+          other_scholarship:   fd.get('other_scholarship')            || null,
+          scholarship_details: fd.get('scholarship_details')?.trim()  || null,
+          awards:              fd.get('awards').trim()                || null,
+          extra_curricular:    fd.get('extra_curricular').trim()      || null,
+          family_about:        fd.get('family_about').trim()          || null,
+          status:              'pending',
+          cycle_year:          2026,
+          applied_on:          new Date().toISOString().slice(0, 10),
+        }).select('id').single();
+
+        if (insertErr) throw new Error(insertErr.message);
+
+        const studentId = student.id;
+        setProgress(25, 'Uploading documents...');
+
+        // Upload all documents
+        const allDocInputs = form.querySelectorAll('.doc-file-input');
+        let uploaded = 0;
+        const docRecords = [];
+
+        for (const inp of allDocInputs) {
+          if (!inp.files.length) { uploaded++; continue; }
+          const urls = await uploadDoc(studentId, inp);
+          for (const url of urls) {
+            docRecords.push({
+              student_id:   studentId,
+              student_name: fullName,
+              type:         inp.dataset.label,
+              file_url:     url,
+              status:       'pending',
+              uploaded_at:  new Date().toISOString(),
+            });
+          }
+          uploaded++;
+          setProgress(25 + Math.round((uploaded / allDocInputs.length) * 70), `Uploading ${inp.dataset.label}...`);
+        }
+
+        if (docRecords.length) {
+          const { error: docErr } = await sb.from('documents').insert(docRecords);
+          if (docErr) console.warn('Document records failed to save:', docErr.message);
+        }
+
+        setProgress(100, 'Done!');
+        form.style.display = 'none';
+        document.getElementById('form-success').style.display = 'block';
+        document.getElementById('app-ref').textContent = 'SFS2026-' + studentId.slice(0, 8).toUpperCase();
+        document.getElementById('form-success').scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+      } catch (err) {
+        showErr('Submission failed: ' + err.message + '. Please try again or contact info@thuvakkam.org');
+      }
+    }
+
+    function showErr(msg) {
+      const errEl = document.getElementById('form-error');
+      const btn   = document.getElementById('submit-btn');
+      errEl.textContent = msg;
+      errEl.style.display = 'block';
+      errEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      btn.disabled = false;
+      btn.innerHTML = '<i class="ti ti-send"></i> Submit application';
+      document.getElementById('progress-wrap').style.display = 'none';
+      document.getElementById('progress-label').textContent = '';
+    }
+  </script>
+  <style>@keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }</style>
+</body>
+</html>

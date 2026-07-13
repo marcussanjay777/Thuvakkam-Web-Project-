@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Documents — Thuvakkam SFS Portal</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="js/client.js"></script>
+</head>
+<body>
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-accent"></div>
+      <div class="topbar-brand">
+        Thuvakkam Education
+        <span>Sponsor for Success &mdash; Internal Portal</span>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <input class="search-input" type="text" placeholder="Search students, schools..." />
+      <div class="topbar-divider"></div>
+      <div class="user-pill">
+        <div class="user-avatar">RK</div>
+        <div class="user-info">
+          <div class="user-name">Ramesh Kumar</div>
+          <div class="user-role">Committee Member</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="nav-section-label">Main</div>
+    <a class="nav-item" href="dashboard.html">
+      <i class="ti ti-layout-dashboard"></i> Overview
+    </a>
+    <a class="nav-item" href="applications.html">
+      <i class="ti ti-file-text"></i> Applications
+    </a>
+    <a class="nav-item" href="selected.html">
+      <i class="ti ti-user-check"></i> Selected Students
+    </a>
+    <a class="nav-item" href="rejected.html"><i class="ti ti-user-x"></i> Rejected</a>
+    <a class="nav-item" href="previous.html">
+      <i class="ti ti-clock-history"></i> Previous Beneficiaries
+    </a>
+
+    <div class="nav-section-label">Reports</div>
+    <a class="nav-item" href="donors.html">
+      <i class="ti ti-heart-handshake"></i> Donor Transparency
+    </a>
+    <a class="nav-item active" href="documents.html">
+      <i class="ti ti-folder"></i> Documents
+    </a>
+
+    <div class="sidebar-footer">
+      <a class="nav-item" href="#" onclick="signOut()"><i class="ti ti-logout"></i> Sign out</a>
+    </div>
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="main">
+    <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;">
+      <div>
+        <div class="page-title">Student Documents</div>
+        <div class="page-subtitle">All uploaded verification documents for SFS 2026 applicants</div>
+      </div>
+      <button class="btn btn-primary"><i class="ti ti-download"></i> Download all</button>
+    </div>
+
+    <!-- Summary row -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;">
+      <div style="background:var(--white);border:1px solid var(--grey-100);border-radius:var(--radius-lg);padding:16px 18px;box-shadow:var(--shadow-sm);">
+        <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--grey-400);margin-bottom:6px;">Total documents</div>
+        <div id="doc-total" style="font-size:26px;font-weight:700;color:var(--green-dark);">—</div>
+      </div>
+      <div style="background:var(--white);border:1px solid var(--grey-100);border-radius:var(--radius-lg);padding:16px 18px;box-shadow:var(--shadow-sm);">
+        <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--grey-400);margin-bottom:6px;">Verified</div>
+        <div id="doc-verified" style="font-size:26px;font-weight:700;color:var(--green-dark);">—</div>
+      </div>
+      <div style="background:var(--white);border:1px solid var(--grey-100);border-radius:var(--radius-lg);padding:16px 18px;box-shadow:var(--shadow-sm);">
+        <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--grey-400);margin-bottom:6px;">Pending review</div>
+        <div id="doc-pending" style="font-size:26px;font-weight:700;color:#92400E;">—</div>
+      </div>
+      <div style="background:var(--white);border:1px solid var(--grey-100);border-radius:var(--radius-lg);padding:16px 18px;box-shadow:var(--shadow-sm);">
+        <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--grey-400);margin-bottom:6px;">Missing / incomplete</div>
+        <div id="doc-incomplete" style="font-size:26px;font-weight:700;color:#991B1B;">—</div>
+      </div>
+    </div>
+
+    <!-- Document list -->
+    <div class="card">
+      <!-- Toolbar -->
+      <div class="table-toolbar">
+        <div class="table-toolbar-left">All documents <span>(142)</span></div>
+        <div class="table-toolbar-right">
+          <select id="filter-type" class="filter-select">
+            <option value="">All document types</option>
+            <option>Income Certificate</option>
+            <option>Aadhaar Card</option>
+            <option>Marksheet</option>
+            <option>Transfer Certificate</option>
+            <option>Community Certificate</option>
+            <option>Bank Passbook</option>
+          </select>
+          <select id="filter-doc-status" class="filter-select">
+            <option value="">All statuses</option>
+            <option value="verified">Verified</option>
+            <option value="pending">Pending</option>
+            <option value="incomplete">Incomplete</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Document rows -->
+      <div class="doc-list" id="doc-list"></div>
+    </div>
+  </main>
+
+<script>
+const iconMap = {
+  'Income Certificate':    'ti-certificate',
+  'Aadhaar Card':          'ti-id',
+  'Marksheet':             'ti-school',
+  'Transfer Certificate':  'ti-file-certificate',
+  'Community Certificate': 'ti-file-description',
+  'Bank Passbook':         'ti-building-bank',
+};
+
+let allDocs = [];
+
+function renderDocs(data) {
+  const list = document.getElementById('doc-list');
+  if (!data.length) { list.innerHTML = '<p class="empty-state">No documents found.</p>'; return; }
+  list.innerHTML = data.map(d => `
+    <div class="doc-row">
+      <div class="doc-left">
+        <div class="doc-icon"><i class="ti ${iconMap[d.type] || 'ti-file'}"></i></div>
+        <div>
+          <div class="doc-name">${d.student_name} &mdash; ${d.type}</div>
+          <div class="doc-meta">Uploaded ${fmtDate(d.uploaded_at)}</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        ${statusBadge(d.status)}
+        <button class="btn btn-outline btn-sm"><i class="ti ti-download"></i> Download</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function applyDocFilters() {
+  const typeFilter   = document.getElementById('filter-type').value;
+  const statusFilter = document.getElementById('filter-doc-status').value;
+  const filtered = allDocs.filter(d =>
+    (!typeFilter   || d.type   === typeFilter) &&
+    (!statusFilter || d.status === statusFilter)
+  );
+  renderDocs(filtered);
+}
+
+async function loadDocuments() {
+  await requireAuth();
+
+  const { data } = await sb.from('documents').select('*').order('uploaded_at', { ascending: false });
+  if (!data) return;
+
+  allDocs = data;
+
+  document.getElementById('doc-total').textContent      = data.length;
+  document.getElementById('doc-verified').textContent   = data.filter(d => d.status === 'verified').length;
+  document.getElementById('doc-pending').textContent    = data.filter(d => d.status === 'pending').length;
+  document.getElementById('doc-incomplete').textContent = data.filter(d => d.status === 'incomplete').length;
+
+  renderDocs(data);
+
+  document.getElementById('filter-type').addEventListener('change', applyDocFilters);
+  document.getElementById('filter-doc-status').addEventListener('change', applyDocFilters);
+}
+
+loadDocuments();
+</script>
+
+</body>
+</html>

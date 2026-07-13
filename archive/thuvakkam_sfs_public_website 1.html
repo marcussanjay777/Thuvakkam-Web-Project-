@@ -1,0 +1,567 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap');
+
+  #site * { box-sizing: border-box; margin: 0; padding: 0; }
+  #site {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--color-text-primary);
+    background: var(--color-background-primary);
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+    border: 0.5px solid var(--color-border-tertiary);
+  }
+
+  .serif { font-family: 'DM Serif Display', serif; }
+
+  .nav {
+    background: var(--color-background-primary);
+    border-bottom: 0.5px solid var(--color-border-tertiary);
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .nav-brand { font-family: 'DM Serif Display', serif; font-size: 18px; color: #042C53; }
+  .nav-links { display: flex; gap: 4px; }
+  .nav-link {
+    background: none; border: none; cursor: pointer;
+    font-size: 12px; font-family: 'DM Sans', sans-serif;
+    color: var(--color-text-secondary); padding: 6px 10px;
+    border-radius: var(--border-radius-md);
+    transition: background 0.15s, color 0.15s;
+  }
+  .nav-link:hover, .nav-link.active { background: var(--color-background-secondary); color: var(--color-text-primary); }
+  .nav-cta {
+    background: #042C53; color: #fff; border: none;
+    padding: 8px 16px; border-radius: var(--border-radius-md);
+    font-size: 12px; font-family: 'DM Sans', sans-serif; font-weight: 500;
+    cursor: pointer;
+  }
+
+  .page { display: none; }
+  .page.active { display: block; }
+
+  .hero {
+    background: #042C53;
+    padding: 60px 40px 50px;
+    text-align: center;
+  }
+  .hero-eyebrow {
+    display: inline-block;
+    background: #185FA5; color: #B5D4F4;
+    font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 4px 14px; border-radius: 99px; margin-bottom: 20px;
+  }
+  .hero-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 44px; color: #fff; line-height: 1.1; margin-bottom: 16px;
+  }
+  .hero-title em { font-style: italic; color: #85B7EB; }
+  .hero-sub { font-size: 15px; color: #85B7EB; max-width: 500px; margin: 0 auto 32px; line-height: 1.7; }
+  .hero-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn-hero-primary {
+    background: #fff; color: #042C53;
+    border: none; padding: 11px 22px; border-radius: var(--border-radius-md);
+    font-size: 13px; font-weight: 500; font-family: 'DM Sans', sans-serif; cursor: pointer;
+  }
+  .btn-hero-outline {
+    background: transparent; color: #B5D4F4;
+    border: 0.5px solid #378ADD; padding: 11px 22px; border-radius: var(--border-radius-md);
+    font-size: 13px; font-family: 'DM Sans', sans-serif; cursor: pointer;
+  }
+  .btn-hero-outline:hover { background: rgba(55,138,221,0.15); }
+  .hero-stats {
+    display: grid; grid-template-columns: repeat(4,1fr);
+    gap: 1px; background: #185FA5;
+    border-top: 1px solid #185FA5; margin-top: 40px;
+  }
+  .hero-stat {
+    background: #042C53; padding: 20px 16px; text-align: center;
+  }
+  .hero-stat-val { font-family: 'DM Serif Display', serif; font-size: 28px; color: #fff; }
+  .hero-stat-label { font-size: 11px; color: #85B7EB; margin-top: 4px; }
+
+  .section { padding: 40px 32px; }
+  .section-alt { background: var(--color-background-secondary); }
+  .section-dark { background: #042C53; }
+  .section-label {
+    font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--color-text-tertiary); margin-bottom: 8px;
+  }
+  .section-title { font-family: 'DM Serif Display', serif; font-size: 26px; color: var(--color-text-primary); margin-bottom: 8px; }
+  .section-title-light { font-family: 'DM Serif Display', serif; font-size: 26px; color: #fff; margin-bottom: 8px; }
+  .section-sub { font-size: 13px; color: var(--color-text-secondary); max-width: 520px; line-height: 1.7; margin-bottom: 28px; }
+  .section-sub-light { font-size: 13px; color: #85B7EB; max-width: 520px; line-height: 1.7; margin-bottom: 28px; }
+
+  .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 14px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 14px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 12px; }
+
+  .card {
+    background: var(--color-background-primary);
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-lg);
+    padding: 20px;
+  }
+  .card-dark {
+    background: #0C447C;
+    border: 0.5px solid #185FA5;
+    border-radius: var(--border-radius-lg);
+    padding: 20px;
+  }
+  .card-icon {
+    width: 36px; height: 36px; border-radius: var(--border-radius-md);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; margin-bottom: 12px;
+  }
+  .card-title { font-weight: 500; font-size: 14px; margin-bottom: 6px; }
+  .card-title-light { font-weight: 500; font-size: 14px; margin-bottom: 6px; color: #fff; }
+  .card-body { font-size: 12px; color: var(--color-text-secondary); line-height: 1.7; }
+  .card-body-light { font-size: 12px; color: #85B7EB; line-height: 1.7; }
+
+  .metric-card {
+    background: var(--color-background-secondary);
+    border-radius: var(--border-radius-md);
+    padding: 16px;
+    text-align: center;
+  }
+  .metric-val { font-family: 'DM Serif Display', serif; font-size: 32px; color: var(--color-text-primary); }
+  .metric-val-light { font-family: 'DM Serif Display', serif; font-size: 32px; color: #fff; }
+  .metric-label { font-size: 11px; color: var(--color-text-secondary); margin-top: 4px; }
+  .metric-label-light { font-size: 11px; color: #85B7EB; margin-top: 4px; }
+
+  .process-steps { display: flex; gap: 0; margin-top: 24px; }
+  .process-step {
+    flex: 1; text-align: center; padding: 16px 12px;
+    background: var(--color-background-primary);
+    border: 0.5px solid var(--color-border-tertiary);
+    position: relative;
+  }
+  .process-step:first-child { border-radius: var(--border-radius-lg) 0 0 var(--border-radius-lg); }
+  .process-step:last-child { border-radius: 0 var(--border-radius-lg) var(--border-radius-lg) 0; }
+  .process-step.highlight { background: #042C53; border-color: #042C53; }
+  .step-num { font-family: 'DM Serif Display', serif; font-size: 20px; color: #185FA5; }
+  .step-num-light { font-family: 'DM Serif Display', serif; font-size: 20px; color: #85B7EB; }
+  .step-name { font-size: 11px; font-weight: 500; color: var(--color-text-primary); margin-top: 4px; }
+  .step-name-light { font-size: 11px; font-weight: 500; color: #fff; margin-top: 4px; }
+
+  .support-pill {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--color-background-primary);
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-md);
+    padding: 12px 14px;
+  }
+  .support-pill i { font-size: 18px; color: #185FA5; }
+  .support-pill span { font-size: 13px; font-weight: 500; }
+
+  .story-card {
+    background: #0C447C;
+    border: 0.5px solid #185FA5;
+    border-radius: var(--border-radius-lg);
+    padding: 20px;
+  }
+  .story-avatar {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: #185FA5; display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Serif Display', serif; font-size: 18px; color: #B5D4F4;
+    margin-bottom: 14px;
+  }
+  .story-quote { font-size: 13px; color: #B5D4F4; line-height: 1.7; font-style: italic; margin-bottom: 14px; }
+  .story-name { font-weight: 500; font-size: 13px; color: #fff; }
+  .story-detail { font-size: 11px; color: #378ADD; }
+
+  .apply-box {
+    background: var(--color-background-secondary);
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-lg);
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .guideline-item {
+    display: flex; align-items: flex-start; gap: 10px;
+    font-size: 13px; color: var(--color-text-secondary);
+    padding: 8px 0; border-bottom: 0.5px solid var(--color-border-tertiary);
+    line-height: 1.6;
+  }
+  .guideline-item:last-child { border-bottom: none; }
+  .guideline-item i { color: #185FA5; font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+  .sponsor-tier {
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-lg);
+    padding: 24px 20px;
+    text-align: center;
+    background: var(--color-background-primary);
+  }
+  .sponsor-tier.featured { border: 2px solid var(--color-border-info); }
+  .tier-badge {
+    display: inline-block; font-size: 10px; font-weight: 500; letter-spacing: 0.08em;
+    text-transform: uppercase; padding: 3px 10px; border-radius: 99px;
+    margin-bottom: 12px;
+  }
+  .tier-name { font-family: 'DM Serif Display', serif; font-size: 20px; margin-bottom: 6px; }
+  .tier-amount { font-size: 22px; font-weight: 500; color: #185FA5; margin-bottom: 4px; }
+  .tier-period { font-size: 11px; color: var(--color-text-secondary); margin-bottom: 16px; }
+  .tier-features { list-style: none; font-size: 12px; color: var(--color-text-secondary); text-align: left; display: flex; flex-direction: column; gap: 8px; }
+  .tier-features li { display: flex; align-items: center; gap: 8px; }
+  .tier-features i { font-size: 14px; color: var(--color-text-success); }
+  .tier-btn { width: 100%; margin-top: 20px; background: #042C53; color: #fff; border: none; padding: 10px; border-radius: var(--border-radius-md); font-size: 13px; font-weight: 500; font-family: 'DM Sans', sans-serif; cursor: pointer; }
+
+  .bar-chart { display: flex; align-items: flex-end; gap: 8px; height: 120px; }
+  .bar-col { display: flex; flex-direction: column; align-items: center; flex: 1; }
+  .bar { border-radius: 3px 3px 0 0; width: 100%; }
+  .bar-lbl { font-size: 10px; color: var(--color-text-tertiary); margin-top: 4px; }
+
+  .district-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 0.5px solid var(--color-border-tertiary); }
+  .district-row:last-child { border-bottom: none; }
+  .district-name { font-size: 13px; font-weight: 500; width: 120px; flex-shrink: 0; }
+  .district-track { flex: 1; background: var(--color-background-secondary); border-radius: 99px; height: 6px; }
+  .district-fill { background: #185FA5; height: 6px; border-radius: 99px; }
+  .district-count { font-size: 12px; color: var(--color-text-secondary); width: 32px; text-align: right; }
+
+  footer {
+    background: #042C53; padding: 32px;
+  }
+  .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 32px; margin-bottom: 24px; }
+  .footer-brand { font-family: 'DM Serif Display', serif; font-size: 18px; color: #fff; margin-bottom: 8px; }
+  .footer-body { font-size: 12px; color: #85B7EB; line-height: 1.7; }
+  .footer-head { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: #378ADD; margin-bottom: 12px; }
+  .footer-link { font-size: 12px; color: #85B7EB; display: block; margin-bottom: 8px; text-decoration: none; cursor: pointer; }
+  .footer-link:hover { color: #fff; }
+  .footer-copy { font-size: 11px; color: #378ADD; border-top: 0.5px solid #185FA5; padding-top: 20px; text-align: center; }
+</style>
+
+<div id="site">
+  <h2 class="sr-only" style="position:absolute;left:-9999px">Thuvakkam Education — Sponsor for Success public website</h2>
+
+  <!-- NAV -->
+  <nav class="nav">
+    <div class="nav-brand">Thuvakkam Education</div>
+    <div class="nav-links">
+      <button class="nav-link active" onclick="goPage('home',this)">Home</button>
+      <button class="nav-link" onclick="goPage('impact',this)">Impact</button>
+      <button class="nav-link" onclick="goPage('criteria',this)">Selection</button>
+      <button class="nav-link" onclick="goPage('support',this)">Support</button>
+      <button class="nav-link" onclick="goPage('stories',this)">Stories</button>
+      <button class="nav-link" onclick="goPage('apply',this)">Apply</button>
+      <button class="nav-link" onclick="goPage('sponsor',this)">Sponsor</button>
+    </div>
+    <button class="nav-cta" onclick="goPage('apply',document.querySelector('.nav-link'))">Apply now →</button>
+  </nav>
+
+  <!-- HOME -->
+  <div id="page-home" class="page active">
+    <div class="hero">
+      <div class="hero-eyebrow">Sponsor for Success · SFS 2026</div>
+      <h1 class="hero-title">Education is the<br><em>foundation</em> of everything.</h1>
+      <p class="hero-sub">Supporting students across Tamil Nadu through scholarships, mentorship, emotional guidance, and long-term monitoring.</p>
+      <div class="hero-btns">
+        <button class="btn-hero-primary" onclick="goPage('apply',document.querySelectorAll('.nav-link')[5])">Apply for SFS →</button>
+        <button class="btn-hero-outline" onclick="goPage('sponsor',document.querySelectorAll('.nav-link')[6])">Become a sponsor</button>
+        <button class="btn-hero-outline" onclick="goPage('impact',document.querySelectorAll('.nav-link')[1])">View impact</button>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat"><div class="hero-stat-val">5+</div><div class="hero-stat-label">Years of support</div></div>
+        <div class="hero-stat"><div class="hero-stat-val">100+</div><div class="hero-stat-label">Students supported</div></div>
+        <div class="hero-stat"><div class="hero-stat-val">20+</div><div class="hero-stat-label">Schools & communities</div></div>
+        <div class="hero-stat"><div class="hero-stat-val">8+</div><div class="hero-stat-label">Districts reached</div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">About SFS</div>
+      <div class="section-title">What is Sponsor for Success?</div>
+      <div class="section-sub">SFS is an educational support initiative by Thuvakkam Education focused on helping students continue their education through scholarships, mentoring, emotional support, and continuous monitoring.</div>
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-icon" style="background:#E6F1FB;color:#185FA5;"><i class="ti ti-book" aria-hidden="true"></i></div>
+          <div class="card-title">Educational barriers</div>
+          <div class="card-body">Many students face interruptions due to financial, social, and geographical challenges that prevent them from completing their education.</div>
+        </div>
+        <div class="card">
+          <div class="card-icon" style="background:#EAF3DE;color:#3B6D11;"><i class="ti ti-coin" aria-hidden="true"></i></div>
+          <div class="card-title">Financial challenges</div>
+          <div class="card-body">Families struggle to support educational expenses including fees, transport, study materials, and digital access tools.</div>
+        </div>
+        <div class="card">
+          <div class="card-icon" style="background:#FAEEDA;color:#633806;"><i class="ti ti-heart" aria-hidden="true"></i></div>
+          <div class="card-title">Continuity support</div>
+          <div class="card-body">SFS focuses on long-term educational continuity and student wellbeing through sustained monitoring and mentoring.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- IMPACT -->
+  <div id="page-impact" class="page">
+    <div class="section section-dark">
+      <div class="section-label" style="color:#378ADD;">SFS impact</div>
+      <div class="section-title-light">Impact dashboard</div>
+      <div class="section-sub-light">Monitoring educational continuity and long-term outcomes</div>
+      <div class="grid-4" style="margin-bottom:28px;">
+        <div style="text-align:center;">
+          <div class="metric-val-light">124</div>
+          <div class="metric-label-light">Active students</div>
+        </div>
+        <div style="text-align:center;">
+          <div class="metric-val-light">48</div>
+          <div class="metric-label-light">Alumni supported</div>
+        </div>
+        <div style="text-align:center;">
+          <div class="metric-val-light">67%</div>
+          <div class="metric-label-light">Girl students</div>
+        </div>
+        <div style="text-align:center;">
+          <div class="metric-val-light">85%</div>
+          <div class="metric-label-light">First-generation learners</div>
+        </div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title" style="margin-bottom:16px;">Year-wise growth</div>
+          <div class="bar-chart" id="impact-chart"></div>
+        </div>
+        <div class="card">
+          <div class="card-title" style="margin-bottom:16px;">District-wise reach</div>
+          <div id="district-list"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CRITERIA -->
+  <div id="page-criteria" class="page">
+    <div class="section">
+      <div class="section-label">Selection</div>
+      <div class="section-title">How students are selected</div>
+      <div class="section-sub">A transparent, student-focused selection process designed to identify the most deserving candidates.</div>
+      <div class="grid-3" style="margin-bottom:28px;">
+        <div class="card">
+          <div class="card-icon" style="background:#E6F1FB;color:#185FA5;"><i class="ti ti-school" aria-hidden="true"></i></div>
+          <div class="card-title">Academic interest</div>
+          <div class="card-body">Student willingness and demonstrated interest toward education continuity and future goals.</div>
+        </div>
+        <div class="card">
+          <div class="card-icon" style="background:#FAEEDA;color:#633806;"><i class="ti ti-home" aria-hidden="true"></i></div>
+          <div class="card-title">Financial need</div>
+          <div class="card-body">Evaluation of family background, annual income, and existing financial challenges they face.</div>
+        </div>
+        <div class="card">
+          <div class="card-icon" style="background:#EAF3DE;color:#3B6D11;"><i class="ti ti-file-check" aria-hidden="true"></i></div>
+          <div class="card-title">Verification</div>
+          <div class="card-body">School and community verification along with thorough documentation review by the committee.</div>
+        </div>
+      </div>
+      <div class="card-title" style="margin-bottom:12px;">Selection process</div>
+      <div class="process-steps">
+        <div class="process-step"><div class="step-num">01</div><div class="step-name">Application</div></div>
+        <div class="process-step"><div class="step-num">02</div><div class="step-name">Screening</div></div>
+        <div class="process-step highlight"><div class="step-num-light">03</div><div class="step-name-light">Verification</div></div>
+        <div class="process-step"><div class="step-num">04</div><div class="step-name">Interview</div></div>
+        <div class="process-step"><div class="step-num">05</div><div class="step-name">Selection</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUPPORT -->
+  <div id="page-support" class="page">
+    <div class="section">
+      <div class="section-label">What we provide</div>
+      <div class="section-title">Support provided through SFS</div>
+      <div class="section-sub">A holistic package of support designed to address educational, financial, emotional, and career needs.</div>
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;">
+        <div class="support-pill"><i class="ti ti-award" aria-hidden="true"></i><span>Scholarship support</span></div>
+        <div class="support-pill"><i class="ti ti-users" aria-hidden="true"></i><span>Mentoring</span></div>
+        <div class="support-pill"><i class="ti ti-briefcase" aria-hidden="true"></i><span>Career guidance</span></div>
+        <div class="support-pill"><i class="ti ti-brain" aria-hidden="true"></i><span>Life skills sessions</span></div>
+        <div class="support-pill"><i class="ti ti-map" aria-hidden="true"></i><span>Exposure visits</span></div>
+        <div class="support-pill"><i class="ti ti-heart" aria-hidden="true"></i><span>Emotional support</span></div>
+        <div class="support-pill"><i class="ti ti-chart-line" aria-hidden="true"></i><span>Monitoring & follow-up</span></div>
+        <div class="support-pill"><i class="ti ti-book" aria-hidden="true"></i><span>Educational materials</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STORIES -->
+  <div id="page-stories" class="page">
+    <div class="section section-dark">
+      <div class="section-label" style="color:#378ADD;">Success stories</div>
+      <div class="section-title-light">Voices from SFS students</div>
+      <div class="section-sub-light">Real stories from students whose lives were transformed through the programme.</div>
+      <div class="grid-3">
+        <div class="story-card">
+          <div class="story-avatar">AK</div>
+          <div class="story-quote">"SFS supported my educational journey and helped me continue my studies with confidence and hope for the future."</div>
+          <div class="story-name">Arun Kumar</div>
+          <div class="story-detail">Class 12 · Chennai</div>
+        </div>
+        <div class="story-card">
+          <div class="story-avatar">ML</div>
+          <div class="story-quote">"The mentoring sessions helped me understand my strengths. I now plan to pursue engineering after school."</div>
+          <div class="story-name">Meena Lakshmi</div>
+          <div class="story-detail">Class 11 · Ramanathapuram</div>
+        </div>
+        <div class="story-card">
+          <div class="story-avatar">PD</div>
+          <div class="story-quote">"My family was unsure about letting me study further. SFS convinced them and gave me the materials I needed."</div>
+          <div class="story-name">Priya Devi</div>
+          <div class="story-detail">Class 10 · Tirunelveli</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- APPLY -->
+  <div id="page-apply" class="page">
+    <div class="section">
+      <div class="section-label">Applications open</div>
+      <div class="section-title">Apply for SFS 2026</div>
+      <div class="section-sub">Please read the eligibility guidelines carefully before submitting your application.</div>
+      <div class="apply-box" style="margin-bottom:20px;">
+        <div class="card-title" style="margin-bottom:12px;"><i class="ti ti-info-circle" aria-hidden="true" style="font-size:16px;vertical-align:-2px;margin-right:6px;color:#185FA5;"></i>Application guidelines</div>
+        <div class="guideline-item"><i class="ti ti-circle-check" aria-hidden="true"></i>Fill all mandatory details carefully and accurately</div>
+        <div class="guideline-item"><i class="ti ti-circle-check" aria-hidden="true"></i>Upload valid supporting documents (income certificate, Aadhaar, marksheet)</div>
+        <div class="guideline-item"><i class="ti ti-circle-check" aria-hidden="true"></i>Ensure school/college name and district are correct</div>
+        <div class="guideline-item"><i class="ti ti-circle-check" aria-hidden="true"></i>All applications go through a verification process</div>
+        <div class="guideline-item"><i class="ti ti-circle-check" aria-hidden="true"></i>Shortlisted students may be contacted for further review</div>
+      </div>
+      <div class="card" style="text-align:center;padding:40px 20px;">
+        <div style="width:52px;height:52px;border-radius:var(--border-radius-lg);background:#E6F1FB;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:24px;color:#185FA5;"><i class="ti ti-external-link" aria-hidden="true"></i></div>
+        <div style="font-family:'DM Serif Display',serif;font-size:18px;margin-bottom:8px;">Application form</div>
+        <div style="font-size:13px;color:var(--color-text-secondary);margin-bottom:20px;">The SFS application is hosted on Google Forms. Click below to open it in a new tab.</div>
+        <a href="https://forms.gle/h55eDVXcFh35RzUdA" style="display:inline-block;background:#042C53;color:#fff;padding:11px 24px;border-radius:var(--border-radius-md);font-size:13px;font-weight:500;text-decoration:none;">Open application form →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- SPONSOR -->
+  <div id="page-sponsor" class="page">
+    <div class="section">
+      <div class="section-label">Support us</div>
+      <div class="section-title">Become a sponsor</div>
+      <div class="section-sub">Support educational continuity and help students across Tamil Nadu move toward a brighter future.</div>
+      <div class="grid-3">
+        <div class="sponsor-tier">
+          <div class="tier-badge" style="background:#E6F1FB;color:#0C447C;">Friend</div>
+          <div class="tier-name">Supporter</div>
+          <div class="tier-amount">₹5,000</div>
+          <div class="tier-period">per year</div>
+          <ul class="tier-features">
+            <li><i class="ti ti-check" aria-hidden="true"></i> Study material kit for 1 student</li>
+            <li><i class="ti ti-check" aria-hidden="true"></i> Annual impact report</li>
+            <li><i class="ti ti-check" aria-hidden="true"></i> Acknowledgement certificate</li>
+          </ul>
+          <button class="tier-btn">Sponsor now</button>
+        </div>
+        <div class="sponsor-tier featured">
+          <div class="tier-badge" style="background:var(--color-background-info);color:var(--color-text-info);">Most popular</div>
+          <div class="tier-name">Champion</div>
+          <div class="tier-amount">₹18,000</div>
+          <div class="tier-period">per year · one full student</div>
+          <ul class="tier-features">
+            <li><i class="ti ti-check" aria-hidden="true"></i> Full scholarship for 1 student</li>
+            <li><i class="ti ti-check" aria-hidden="true"></i> Quarterly progress updates</li>
+            <li><i class="ti ti-check" aria-hidden="true"></i> Personalised thank-you letter</li>
+            <li><i class="ti ti-check" aria-hidden="true"></i> Named in annual report</li>
+          </ul>
+          <button class="tier-btn">Sponsor now</button>
+        </div>
+        <div class="sponsor-tier">
+          <div class="tier-badge" style="background:#EAF3DE;color:#27500A;">CSR partner</div>
+          <div class="tier-name">Patron</div>
+          <div class="tier-amount">₹1,00,000+</div>
+          <div class="tier-period">annual partnership</div>
+          <ul class="tier-features">
+            <li><i class="ti ti-check" aria-hidden="true"></i> Sponsor 5+ students</li>
+            <li><i class="ti ti-check" aria-hidden="true"></i> Co-branded impact reports</li>
+            <li><i class="ti ti-check" aria-hidden="true"></i> Site visit & student interaction</li>
+            <li><i class="ti ti-check" aria-hidden="true"></i> CSR documentation support</li>
+          </ul>
+          <button class="tier-btn">Get in touch</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand">Thuvakkam Education</div>
+        <div class="footer-body">Supporting education, opportunity, and long-term student empowerment across Tamil Nadu since 2020.</div>
+      </div>
+      <div>
+        <div class="footer-head">Quick links</div>
+        <a class="footer-link" onclick="goPage('impact',document.querySelectorAll('.nav-link')[1])">Impact dashboard</a>
+        <a class="footer-link" onclick="goPage('criteria',document.querySelectorAll('.nav-link')[2])">Selection criteria</a>
+        <a class="footer-link" onclick="goPage('apply',document.querySelectorAll('.nav-link')[5])">Apply for SFS</a>
+        <a class="footer-link" onclick="goPage('sponsor',document.querySelectorAll('.nav-link')[6])">Become a sponsor</a>
+      </div>
+      <div>
+        <div class="footer-head">Contact</div>
+        <div class="footer-body" style="display:flex;flex-direction:column;gap:8px;">
+          <span><i class="ti ti-mail" style="font-size:14px;vertical-align:-2px;margin-right:6px;" aria-hidden="true"></i>info@thuvakkam.org</span>
+          <span><i class="ti ti-map-pin" style="font-size:14px;vertical-align:-2px;margin-right:6px;" aria-hidden="true"></i>Chennai, Tamil Nadu</span>
+        </div>
+      </div>
+    </div>
+    <div class="footer-copy">© 2026 Thuvakkam Education. All rights reserved.</div>
+  </footer>
+</div>
+
+<script>
+const chartData = [
+  {yr:'2021',apps:80,sel:28},{yr:'2022',apps:120,sel:42},{yr:'2023',apps:165,sel:58},
+  {yr:'2024',apps:210,sel:76},{yr:'2025',apps:275,sel:96},{yr:'2026',apps:325,sel:112}
+];
+const districts = [
+  {name:'Chennai',count:28},{name:'Ramanathapuram',count:22},{name:'Madurai',count:18},
+  {name:'Tirunelveli',count:15},{name:'Coimbatore',count:12},{name:'Salem',count:10},
+  {name:'Villupuram',count:8},{name:'Thanjavur',count:7}
+];
+
+function renderImpactChart() {
+  const el = document.getElementById('impact-chart');
+  if (!el) return;
+  const max = Math.max(...chartData.map(d=>d.apps));
+  el.innerHTML = chartData.map(d=>`
+    <div class="bar-col">
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:flex-end;flex:1;width:100%;gap:2px;">
+        <div class="bar" style="height:${Math.round((d.apps/max)*100)}px;background:#185FA5;opacity:0.5;"></div>
+        <div class="bar" style="height:${Math.round((d.sel/max)*100)}px;background:#185FA5;margin-top:-${Math.round((d.sel/max)*100)}px;"></div>
+      </div>
+      <div class="bar-lbl">${d.yr}</div>
+    </div>
+  `).join('');
+}
+
+function renderDistricts() {
+  const el = document.getElementById('district-list');
+  if (!el) return;
+  const max = Math.max(...districts.map(d=>d.count));
+  el.innerHTML = districts.map(d=>`
+    <div class="district-row">
+      <div class="district-name">${d.name}</div>
+      <div class="district-track"><div class="district-fill" style="width:${Math.round((d.count/max)*100)}%;"></div></div>
+      <div class="district-count">${d.count}</div>
+    </div>
+  `).join('');
+}
+
+function goPage(id, btn) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  if (btn && btn.classList) btn.classList.add('active');
+  renderImpactChart();
+  renderDistricts();
+}
+
+renderImpactChart();
+renderDistricts();
+</script>

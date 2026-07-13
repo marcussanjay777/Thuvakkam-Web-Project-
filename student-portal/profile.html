@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Profile — Thuvakkam SFS Student Portal</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- TOPBAR -->
+  <header class="sp-topbar">
+    <div class="sp-brand">
+      <img src="../website/assets/logo.webp" alt="Thuvakkam Education" />
+      <div>
+        <div class="sp-brand-text">Thuvakkam Education</div>
+        <div class="sp-brand-sub">Student Portal</div>
+      </div>
+    </div>
+    <div class="sp-topbar-right">
+      <div class="sp-student-chip">
+        <i class="ti ti-user-circle"></i>
+        <span id="topbar-name">Loading...</span>
+      </div>
+      <button class="sp-logout-btn" onclick="doLogout()">
+        <i class="ti ti-logout"></i> Sign out
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main class="sp-main">
+
+    <!-- Profile hero -->
+    <div class="sp-profile-hero" id="profile-hero" style="display:none;">
+      <div class="sp-avatar" id="hero-avatar">--</div>
+      <div style="flex:1;">
+        <div class="sp-hero-name" id="hero-name"></div>
+        <div class="sp-hero-school" id="hero-school"></div>
+        <div class="sp-hero-meta" id="hero-meta"></div>
+      </div>
+    </div>
+
+    <!-- Stats strip -->
+    <div class="sp-stats" id="stats-strip" style="display:none;">
+      <div class="sp-stat-card">
+        <div class="sp-stat-val" id="stat-total">—</div>
+        <div class="sp-stat-lbl">Total records</div>
+      </div>
+      <div class="sp-stat-card">
+        <div class="sp-stat-val" id="stat-month">—</div>
+        <div class="sp-stat-lbl">Added this month</div>
+      </div>
+      <div class="sp-stat-card">
+        <div class="sp-stat-val" id="stat-last">—</div>
+        <div class="sp-stat-lbl">Days since last update</div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="sp-tabs" id="sp-tabs" style="display:none;">
+      <button class="sp-tab active" data-tab="overview">
+        <i class="ti ti-layout-dashboard"></i> Overview
+      </button>
+      <button class="sp-tab" data-tab="grade">
+        <i class="ti ti-book"></i> Grades
+      </button>
+      <button class="sp-tab" data-tab="exam">
+        <i class="ti ti-certificate"></i> Exams
+      </button>
+      <button class="sp-tab" data-tab="olympiad">
+        <i class="ti ti-trophy"></i> Olympiads
+      </button>
+      <button class="sp-tab" data-tab="achievement">
+        <i class="ti ti-award"></i> Achievements
+      </button>
+      <button class="sp-tab" data-tab="extracurricular">
+        <i class="ti ti-star"></i> Extracurricular
+      </button>
+    </div>
+
+    <!-- Tab panes -->
+    <div id="tab-content"></div>
+
+    <!-- Loading state -->
+    <div id="loading-state" style="text-align:center;padding:60px 20px;color:#9CA3AF;">
+      <i class="ti ti-loader-2" style="font-size:32px;display:block;margin-bottom:12px;animation:spin 1s linear infinite;"></i>
+      Loading your profile...
+    </div>
+
+  </main>
+
+  <!-- ADD ENTRY MODAL (injected dynamically) -->
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script>
+    const sb = supabase.createClient(
+      'https://vftexybohuaxngyhwjts.supabase.co',
+      'sb_publishable_vO20BiWyS_VIkhU2DDmw3g_BoGBeCdq'
+    );
+
+    let currentStudent = null;
+    let allUpdates     = [];
+    let activeTab      = 'overview';
+    let editingCategory = null;
+
+    /* ── CATEGORY CONFIG ────────────────────────────────── */
+    const CAT = {
+      grade: {
+        label: 'Grades & Tests',
+        icon: 'ti-book',
+        color: '#2563EB',
+        titleLabel: 'Subject / Test name',
+        titlePh:    'e.g., Physics Mid-term, Unit Test 3 — Chemistry',
+        scoreLabel: 'Score / Grade',
+        scorePh:    'e.g., 92/100, A+, 8.5 CGPA',
+      },
+      exam: {
+        label: 'Competitive Exams',
+        icon: 'ti-certificate',
+        color: '#7C3AED',
+        titleLabel: 'Exam name',
+        titlePh:    'e.g., JEE Main 2025, NEET, CLAT',
+        scoreLabel: 'Score / Rank',
+        scorePh:    'e.g., 285/360, AIR 1204',
+      },
+      olympiad: {
+        label: 'Olympiads',
+        icon: 'ti-trophy',
+        color: '#D97706',
+        titleLabel: 'Olympiad name',
+        titlePh:    'e.g., National Science Olympiad, IMO',
+        scoreLabel: 'Medal / Rank / Score',
+        scorePh:    'e.g., Gold Medal, State Rank 3',
+      },
+      achievement: {
+        label: 'Achievements & Awards',
+        icon: 'ti-award',
+        color: '#059669',
+        titleLabel: 'Award / Achievement title',
+        titlePh:    'e.g., School Topper, District Chess Champion',
+        scoreLabel: 'Issued by / Level',
+        scorePh:    'e.g., State Government, CBSE Board',
+      },
+      extracurricular: {
+        label: 'Extracurricular',
+        icon: 'ti-star',
+        color: '#DC2626',
+        titleLabel: 'Activity / Role',
+        titlePh:    'e.g., Cricket Team Captain, Debate Club Winner',
+        scoreLabel: 'Achievement / Position',
+        scorePh:    'e.g., District Level, Runner-up',
+      },
+    };
+
+    /* ── AUTH GUARD ─────────────────────────────────────── */
+    async function init() {
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session) { window.location.href = 'index.html'; return; }
+
+      const { data: student, error } = await sb.from('students')
+        .select('*').eq('auth_user_id', session.user.id).maybeSingle();
+
+      if (!student || error) {
+        await sb.auth.signOut();
+        window.location.href = 'index.html';
+        return;
+      }
+
+      currentStudent = student;
+      await loadUpdates();
+      renderPage();
+    }
+
+    /* ── LOAD UPDATES ───────────────────────────────────── */
+    async function loadUpdates() {
+      const { data } = await sb.from('student_updates')
+        .select('*')
+        .eq('student_id', currentStudent.id)
+        .order('record_date', { ascending: false, nullsFirst: false });
+      allUpdates = data || [];
+    }
+
+    /* ── RENDER PAGE ────────────────────────────────────── */
+    function renderPage() {
+      document.getElementById('loading-state').style.display = 'none';
+
+      const s = currentStudent;
+      const initials = (s.initials || s.name.slice(0, 2)).toUpperCase();
+
+      document.getElementById('topbar-name').textContent = s.name.split(' ')[0];
+      document.getElementById('hero-avatar').textContent = initials;
+      document.getElementById('hero-name').textContent   = s.name;
+
+      // School/institution line
+      const institution = s.college_ug || s.school_12th || s.school_10th || s.school || '';
+      document.getElementById('hero-school').textContent = institution;
+
+      // Meta chips
+      const metaItems = [
+        s.cycle_year   ? `<div class="sp-meta-chip"><i class="ti ti-calendar"></i> SFS ${s.cycle_year}</div>` : '',
+        s.district     ? `<div class="sp-meta-chip"><i class="ti ti-map-pin"></i> ${s.district}</div>` : '',
+        s.mentor       ? `<div class="sp-meta-chip"><i class="ti ti-user"></i> Mentor: ${s.mentor}</div>` : '',
+        `<div class="sp-badge-selected">Scholarship Recipient</div>`,
+      ].filter(Boolean).join('');
+      document.getElementById('hero-meta').innerHTML = metaItems;
+      document.getElementById('profile-hero').style.display = 'flex';
+
+      // Stats
+      const now        = new Date();
+      const thisMonth  = allUpdates.filter(u => {
+        const d = new Date(u.created_at);
+        return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+      });
+      const lastUpdate = allUpdates[0];
+      const daysSince  = lastUpdate
+        ? Math.floor((now - new Date(lastUpdate.created_at)) / 86400000)
+        : '—';
+
+      document.getElementById('stat-total').textContent = allUpdates.length;
+      document.getElementById('stat-month').textContent = thisMonth.length;
+      document.getElementById('stat-last').textContent  = typeof daysSince === 'number' ? daysSince : '—';
+      document.getElementById('stats-strip').style.display = 'grid';
+      document.getElementById('sp-tabs').style.display = 'flex';
+
+      // Tab switching
+      document.querySelectorAll('.sp-tab').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.sp-tab').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          activeTab = btn.dataset.tab;
+          renderTabContent(activeTab);
+        });
+      });
+
+      renderTabContent('overview');
+    }
+
+    /* ── RENDER TAB CONTENT ─────────────────────────────── */
+    function renderTabContent(tab) {
+      const el = document.getElementById('tab-content');
+
+      if (tab === 'overview') {
+        el.innerHTML = renderOverview();
+        return;
+      }
+
+      const cat    = CAT[tab];
+      const items  = allUpdates.filter(u => u.category === tab);
+      el.innerHTML = `
+        <div class="sp-card">
+          <div class="sp-card-head">
+            <div class="sp-card-title">
+              <i class="ti ${cat.icon}" style="color:${cat.color};"></i>
+              ${cat.label}
+            </div>
+            <button class="sp-add-btn" onclick="openAddModal('${tab}')">
+              <i class="ti ti-plus"></i> Add entry
+            </button>
+          </div>
+          ${items.length
+            ? items.map(u => renderEntry(u, cat)).join('')
+            : `<div class="sp-empty"><i class="ti ${cat.icon}"></i>No ${cat.label.toLowerCase()} recorded yet.<br/>Click "Add entry" to get started.</div>`
+          }
+        </div>`;
+    }
+
+    function renderOverview() {
+      const recent = [...allUpdates].slice(0, 8);
+      const catCounts = Object.keys(CAT).map(k => ({
+        key: k,
+        label: CAT[k].label,
+        icon: CAT[k].icon,
+        color: CAT[k].color,
+        count: allUpdates.filter(u => u.category === k).length,
+      }));
+
+      return `
+        <div class="sp-card" style="margin-bottom:16px;">
+          <div class="sp-card-head">
+            <div class="sp-card-title"><i class="ti ti-chart-bar"></i> Summary by category</div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;padding:16px 20px;">
+            ${catCounts.map(c => `
+              <div style="background:var(--grey-50);border:1px solid var(--grey-100);border-radius:var(--radius-md);padding:14px 16px;cursor:pointer;" onclick="document.querySelector('[data-tab=\\'${c.key}\\']').click()">
+                <div style="font-size:22px;font-weight:800;color:${c.color};">${c.count}</div>
+                <div style="font-size:12px;color:var(--grey-500);margin-top:3px;display:flex;align-items:center;gap:5px;">
+                  <i class="ti ${c.icon}" style="color:${c.color};"></i> ${c.label}
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+        <div class="sp-card">
+          <div class="sp-card-head">
+            <div class="sp-card-title"><i class="ti ti-activity"></i> Recent activity</div>
+          </div>
+          ${recent.length
+            ? recent.map(u => {
+                const cat = CAT[u.category] || { icon: 'ti-file', color: '#6B7280', label: 'Other' };
+                return `
+                  <div class="sp-recent-item">
+                    <div class="sp-entry-icon" style="background:${cat.color}18;">
+                      <i class="ti ${cat.icon}" style="color:${cat.color};"></i>
+                    </div>
+                    <div style="flex:1;">
+                      <div style="font-size:13px;font-weight:600;color:var(--black);">${esc(u.title)}</div>
+                      <div style="font-size:12px;color:var(--grey-400);margin-top:2px;">${cat.label}${u.score ? ' · ' + esc(u.score) : ''}${u.record_date ? ' · ' + fmtDate(u.record_date) : ''}</div>
+                    </div>
+                  </div>`;
+              }).join('')
+            : '<div class="sp-empty"><i class="ti ti-inbox"></i>No records yet. Start adding your achievements!</div>'
+          }
+        </div>`;
+    }
+
+    function renderEntry(u, cat) {
+      return `
+        <div class="sp-entry">
+          <div class="sp-entry-icon" style="background:${cat.color}18;">
+            <i class="ti ${cat.icon}" style="color:${cat.color};"></i>
+          </div>
+          <div class="sp-entry-body">
+            <div class="sp-entry-title">${esc(u.title)}</div>
+            ${u.description ? `<div class="sp-entry-desc">${esc(u.description)}</div>` : ''}
+            <div class="sp-entry-meta">
+              ${u.score ? `<span class="sp-score-badge">${esc(u.score)}</span>` : ''}
+              ${u.record_date ? `<span class="sp-date-lbl"><i class="ti ti-calendar"></i> ${fmtDate(u.record_date)}</span>` : ''}
+              ${u.proof_url ? `<a href="${u.proof_url}" target="_blank" style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:var(--green-dark);text-decoration:none;background:var(--green-light);padding:3px 10px;border-radius:99px;"><i class="ti ti-file-check"></i> View proof</a>` : `<span style="font-size:11px;color:#DC2626;display:inline-flex;align-items:center;gap:4px;"><i class="ti ti-alert-circle"></i> No proof uploaded</span>`}
+            </div>
+          </div>
+          <button class="sp-entry-del" onclick="deleteEntry('${u.id}')" title="Delete">
+            <i class="ti ti-trash"></i>
+          </button>
+        </div>`;
+    }
+
+    /* ── ADD ENTRY MODAL ────────────────────────────────── */
+    function openAddModal(category) {
+      const cat = CAT[category];
+      editingCategory = category;
+
+      const existing = document.getElementById('sp-add-modal');
+      if (existing) existing.remove();
+
+      const modal = document.createElement('div');
+      modal.id = 'sp-add-modal';
+      modal.innerHTML = `
+        <div class="sp-modal-backdrop" onclick="if(event.target===this)closeModal()">
+          <div class="sp-modal">
+            <div class="sp-modal-head">
+              <div class="sp-modal-head-title">
+                <i class="ti ${cat.icon}" style="margin-right:8px;"></i>Add ${cat.label} entry
+              </div>
+              <button class="sp-modal-close" onclick="closeModal()"><i class="ti ti-x"></i></button>
+            </div>
+            <div class="sp-modal-body">
+              <div class="sp-field-group">
+                <label class="sp-field-label" id="modal-title-label">${cat.titleLabel} <span style="color:#DC2626;">*</span></label>
+                <input class="sp-field-input" id="modal-title" type="text" placeholder="${cat.titlePh}" />
+              </div>
+              <div class="sp-field-group">
+                <label class="sp-field-label" id="modal-score-label">${cat.scoreLabel}</label>
+                <input class="sp-field-input" id="modal-score" type="text" placeholder="${cat.scorePh}" />
+              </div>
+              <div class="sp-field-group">
+                <label class="sp-field-label">Date</label>
+                <input class="sp-field-input" id="modal-date" type="date" max="${new Date().toISOString().slice(0,10)}" />
+              </div>
+              <div class="sp-field-group">
+                <label class="sp-field-label">Description <span style="color:var(--grey-400);font-weight:400;">(optional)</span></label>
+                <textarea class="sp-field-textarea" id="modal-desc" placeholder="Any additional details..."></textarea>
+              </div>
+              <div class="sp-field-group">
+                <label class="sp-field-label">Proof / Certificate <span style="color:#DC2626;">*</span></label>
+                <label style="display:flex;align-items:center;gap:10px;padding:11px 14px;border:1.5px dashed var(--grey-200);border-radius:var(--radius-md);cursor:pointer;font-size:13px;color:var(--grey-500);background:var(--grey-50);" id="proof-label-wrap">
+                  <i class="ti ti-upload" style="font-size:18px;color:var(--green-dark);flex-shrink:0;"></i>
+                  <span id="proof-file-label">Upload certificate, photo, or any proof (PDF / JPG / PNG, max 5 MB)</span>
+                  <input type="file" id="modal-proof" accept=".pdf,.jpg,.jpeg,.png" style="display:none;" onchange="updateProofLabel(this)" />
+                </label>
+              </div>
+              <div id="modal-err" style="font-size:13px;color:#991B1B;display:none;"></div>
+            </div>
+            <div class="sp-modal-foot">
+              <button class="sp-btn-cancel" onclick="closeModal()">Cancel</button>
+              <button class="sp-btn-save" id="modal-save-btn" onclick="saveEntry()">
+                <i class="ti ti-check"></i> Save
+              </button>
+            </div>
+          </div>
+        </div>`;
+      document.body.appendChild(modal);
+      document.getElementById('modal-title').focus();
+    }
+
+    function closeModal() {
+      const m = document.getElementById('sp-add-modal');
+      if (m) m.remove();
+      editingCategory = null;
+    }
+
+    function updateProofLabel(input) {
+      const label = document.getElementById('proof-file-label');
+      if (input.files[0]) {
+        label.textContent = input.files[0].name;
+        label.style.color = 'var(--green-dark)';
+      }
+    }
+
+    async function saveEntry() {
+      const title     = document.getElementById('modal-title').value.trim();
+      const score     = document.getElementById('modal-score').value.trim();
+      const date      = document.getElementById('modal-date').value;
+      const desc      = document.getElementById('modal-desc').value.trim();
+      const proofFile = document.getElementById('modal-proof').files[0];
+      const errEl     = document.getElementById('modal-err');
+      const btn       = document.getElementById('modal-save-btn');
+
+      errEl.style.display = 'none';
+      if (!title) {
+        errEl.textContent   = 'Please enter a title.';
+        errEl.style.display = 'block';
+        return;
+      }
+      if (!proofFile) {
+        errEl.textContent   = 'Please upload a proof document or certificate.';
+        errEl.style.display = 'block';
+        return;
+      }
+      if (proofFile.size > 5 * 1024 * 1024) {
+        errEl.textContent   = 'File is too large. Maximum size is 5 MB.';
+        errEl.style.display = 'block';
+        return;
+      }
+
+      btn.disabled  = true;
+      btn.innerHTML = '<i class="ti ti-loader-2" style="animation:spin 0.8s linear infinite;display:inline-block;"></i> Uploading proof...';
+
+      // Upload proof to storage
+      const ext      = proofFile.name.split('.').pop();
+      const path     = `student-proofs/${currentStudent.id}/${editingCategory}_${Date.now()}.${ext}`;
+      const { error: uploadErr } = await sb.storage.from('studen-documents').upload(path, proofFile, { upsert: false });
+      if (uploadErr) {
+        errEl.textContent   = 'Proof upload failed: ' + uploadErr.message;
+        errEl.style.display = 'block';
+        btn.disabled        = false;
+        btn.innerHTML       = '<i class="ti ti-check"></i> Save';
+        return;
+      }
+      const { data: urlData } = sb.storage.from('studen-documents').getPublicUrl(path);
+      const proofUrl = urlData.publicUrl;
+
+      btn.innerHTML = '<i class="ti ti-loader-2" style="animation:spin 0.8s linear infinite;display:inline-block;"></i> Saving...';
+
+      const { data, error } = await sb.from('student_updates').insert({
+        student_id:  currentStudent.id,
+        category:    editingCategory,
+        title,
+        score:       score    || null,
+        description: desc     || null,
+        record_date: date     || null,
+        proof_url:   proofUrl || null,
+      }).select().single();
+
+      if (error) {
+        errEl.textContent   = 'Could not save. Please try again.';
+        errEl.style.display = 'block';
+        btn.disabled        = false;
+        btn.innerHTML       = '<i class="ti ti-check"></i> Save';
+        return;
+      }
+
+      allUpdates.unshift(data);
+      closeModal();
+      renderPage();
+
+      // Re-activate the correct tab
+      const tabBtn = document.querySelector(`[data-tab="${editingCategory}"]`);
+      if (tabBtn) tabBtn.click();
+    }
+
+    /* ── DELETE ENTRY ───────────────────────────────────── */
+    async function deleteEntry(id) {
+      if (!confirm('Delete this entry?')) return;
+      await sb.from('student_updates').delete().eq('id', id);
+      allUpdates = allUpdates.filter(u => u.id !== id);
+      renderPage();
+      const tabBtn = document.querySelector(`[data-tab="${activeTab}"]`);
+      if (tabBtn) { tabBtn.click(); }
+    }
+
+    /* ── LOGOUT ─────────────────────────────────────────── */
+    async function doLogout() {
+      await sb.auth.signOut();
+      window.location.href = 'index.html';
+    }
+
+    /* ── UTILS ──────────────────────────────────────────── */
+    function fmtDate(d) {
+      if (!d) return '';
+      return new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    }
+
+    function esc(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    init();
+  </script>
+  <style>@keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }</style>
+</body>
+</html>

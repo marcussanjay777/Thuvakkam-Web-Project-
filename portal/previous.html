@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Previous Beneficiaries — Thuvakkam SFS Portal</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="js/client.js"></script>
+  <script src="js/profile.js"></script>
+</head>
+<body>
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-accent"></div>
+      <div class="topbar-brand">
+        Thuvakkam Education
+        <span>Sponsor for Success &mdash; Internal Portal</span>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <input class="search-input" type="text" placeholder="Search students, schools..." />
+      <div class="topbar-divider"></div>
+      <div class="user-pill">
+        <div class="user-avatar">RK</div>
+        <div class="user-info">
+          <div class="user-name">Ramesh Kumar</div>
+          <div class="user-role">Committee Member</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="nav-section-label">Main</div>
+    <a class="nav-item" href="dashboard.html">
+      <i class="ti ti-layout-dashboard"></i> Overview
+    </a>
+    <a class="nav-item" href="applications.html">
+      <i class="ti ti-file-text"></i> Applications
+    </a>
+    <a class="nav-item" href="selected.html">
+      <i class="ti ti-user-check"></i> Selected Students
+    </a>
+    <a class="nav-item active" href="previous.html">
+      <i class="ti ti-clock-history"></i> Previous Beneficiaries
+    </a>
+
+    <div class="nav-section-label">Reports</div>
+    <a class="nav-item" href="donors.html">
+      <i class="ti ti-heart-handshake"></i> Donor Transparency
+    </a>
+    <a class="nav-item" href="documents.html">
+      <i class="ti ti-folder"></i> Documents
+    </a>
+
+    <div class="sidebar-footer">
+      <a class="nav-item" href="#" onclick="signOut()"><i class="ti ti-logout"></i> Sign out</a>
+    </div>
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="main">
+    <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;">
+      <div>
+        <div class="page-title">Previous Beneficiaries</div>
+        <div class="page-subtitle">Students supported in past SFS cycles — 2021 to 2025</div>
+      </div>
+      <button class="btn btn-outline" id="export-btn" onclick="exportBeneficiaries()">
+        <i class="ti ti-download"></i> Export list
+      </button>
+    </div>
+
+    <!-- Cycle selector -->
+    <div style="display:flex;gap:8px;margin-bottom:24px;" id="cycle-tabs">
+      <button class="btn btn-primary btn-sm cycle-tab" data-year="all">All cycles</button>
+      <button class="btn btn-outline btn-sm cycle-tab" data-year="2025">2025</button>
+      <button class="btn btn-outline btn-sm cycle-tab" data-year="2024">2024</button>
+      <button class="btn btn-outline btn-sm cycle-tab" data-year="2023">2023</button>
+      <button class="btn btn-outline btn-sm cycle-tab" data-year="2022">2022</button>
+    </div>
+
+    <!-- Cards grid -->
+    <div class="student-grid" id="prev-grid"></div>
+  </main>
+
+<script>
+function renderCards(data) {
+  const grid = document.getElementById('prev-grid');
+  if (!data.length) { grid.innerHTML = '<p class="empty-state">No students found for this cycle.</p>'; return; }
+  grid.innerHTML = data.map(s => `
+    <div class="student-card">
+      <div class="student-card-banner" style="background:var(--grey-200);"></div>
+      <div class="student-card-body">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">
+          <div class="student-initials">${s.initials || s.name.slice(0,2).toUpperCase()}</div>
+          <span style="font-size:11px;font-weight:600;background:var(--grey-50);border:1px solid var(--grey-100);padding:3px 8px;border-radius:4px;color:var(--grey-600);">SFS ${s.cycle_year}</span>
+        </div>
+        <div class="student-name">${s.name}</div>
+        <div class="student-school">${s.school}</div>
+        <div class="student-meta">
+          <div class="student-meta-row"><span class="student-meta-key">District</span><span class="student-meta-val">${s.district}</span></div>
+          <div class="student-meta-row"><span class="student-meta-key">Completed</span><span class="student-meta-val">${s.class}</span></div>
+          ${s.outcome ? `<div class="student-meta-row" style="flex-direction:column;gap:3px;"><span class="student-meta-key">Current status</span><span class="student-meta-val" style="font-size:11px;color:var(--green-mid);">${s.outcome}</span></div>` : ''}
+        </div>
+        <div class="student-card-footer"><button class="btn-view-profile" onclick="openProfile('${s.id}')">View profile</button></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+let currentData = [];
+
+function exportBeneficiaries() {
+  if (!currentData.length) return;
+  const esc     = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
+  const headers = ['Name', 'School', 'District', 'Class', 'Cycle Year', 'Current Status / Outcome'];
+  const rows    = currentData.map(s => [
+    s.name, s.school, s.district, s.class, s.cycle_year, s.outcome
+  ].map(esc).join(','));
+
+  const csv  = '﻿' + [headers.map(esc).join(','), ...rows].join('\r\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const a    = document.createElement('a');
+  a.href     = URL.createObjectURL(blob);
+  const label = document.querySelector('.cycle-tab.btn-primary')?.dataset.year || 'all';
+  a.download = `SFS_Beneficiaries_${label === 'all' ? 'AllCycles' : label}_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+}
+
+async function fetchAndRender(year) {
+  let q = sb.from('students').select('*').lt('cycle_year', 2026).order('cycle_year', { ascending: false });
+  if (year !== 'all') q = q.eq('cycle_year', parseInt(year));
+  const { data } = await q;
+  if (data) { currentData = data; renderCards(data); }
+}
+
+async function loadPrevious() {
+  await requireAuth();
+  await fetchAndRender('all');
+
+  document.getElementById('cycle-tabs').addEventListener('click', function(e) {
+    const btn = e.target.closest('.cycle-tab');
+    if (!btn) return;
+    document.querySelectorAll('.cycle-tab').forEach(b => b.className = 'btn btn-outline btn-sm cycle-tab');
+    btn.className = 'btn btn-primary btn-sm cycle-tab';
+    fetchAndRender(btn.dataset.year);
+  });
+}
+
+loadPrevious();
+</script>
+
+</body>
+</html>

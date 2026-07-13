@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign In — Thuvakkam SFS Portal</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green-dark:  #1E5C38;
+      --green-mid:   #2D7A4F;
+      --yellow:      #F5C31D;
+      --white:       #FFFFFF;
+      --cream:       #F7F6F0;
+      --grey-50:     #F4F4F2;
+      --grey-100:    #EBEBEB;
+      --grey-200:    #D8D8D8;
+      --grey-400:    #9E9E9E;
+      --grey-600:    #555555;
+      --black:       #1A1A1A;
+      --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      --radius-md: 6px;
+      --radius-lg: 10px;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: var(--font);
+      font-size: 14px;
+      color: var(--black);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .login-page {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    /* Left panel */
+    .login-left {
+      background: var(--green-dark);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 48px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .login-left::before {
+      content: '';
+      position: absolute;
+      top: -80px;
+      right: -80px;
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.04);
+    }
+
+    .login-left::after {
+      content: '';
+      position: absolute;
+      bottom: -100px;
+      left: -60px;
+      width: 280px;
+      height: 280px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.03);
+    }
+
+    .left-brand {
+      position: relative;
+      z-index: 1;
+    }
+
+    .brand-name {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--white);
+      letter-spacing: -0.01em;
+    }
+
+    .brand-tagline {
+      font-size: 12px;
+      color: rgba(255,255,255,0.45);
+      margin-top: 4px;
+      letter-spacing: 0.02em;
+    }
+
+    .left-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .left-accent {
+      display: inline-block;
+      width: 40px;
+      height: 4px;
+      background: var(--yellow);
+      border-radius: 2px;
+      margin-bottom: 20px;
+    }
+
+    .left-heading {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--white);
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+
+    .left-body {
+      font-size: 14px;
+      color: rgba(255,255,255,0.55);
+      line-height: 1.7;
+      max-width: 360px;
+    }
+
+    .left-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: rgba(255,255,255,0.1);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-top: 40px;
+    }
+
+    .left-stat {
+      background: rgba(255,255,255,0.05);
+      padding: 18px 16px;
+      text-align: center;
+    }
+
+    .left-stat-val {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--yellow);
+      letter-spacing: -0.02em;
+    }
+
+    .left-stat-label {
+      font-size: 11px;
+      color: rgba(255,255,255,0.45);
+      margin-top: 4px;
+    }
+
+    .left-footer {
+      position: relative;
+      z-index: 1;
+      font-size: 11px;
+      color: rgba(255,255,255,0.25);
+    }
+
+    /* Right panel */
+    .login-right {
+      background: var(--cream);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 48px;
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 380px;
+    }
+
+    .login-card-header {
+      margin-bottom: 32px;
+    }
+
+    .login-card-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--green-dark);
+      letter-spacing: -0.02em;
+    }
+
+    .login-card-sub {
+      font-size: 13px;
+      color: var(--grey-400);
+      margin-top: 6px;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--grey-600);
+      margin-bottom: 7px;
+      letter-spacing: 0.02em;
+    }
+
+    .form-input {
+      width: 100%;
+      background: var(--white);
+      border: 1px solid var(--grey-200);
+      border-radius: var(--radius-md);
+      padding: 10px 14px;
+      font-size: 14px;
+      color: var(--black);
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .form-input:focus {
+      border-color: var(--green-mid);
+      box-shadow: 0 0 0 3px rgba(45,122,79,0.1);
+    }
+
+    .form-input::placeholder {
+      color: var(--grey-200);
+    }
+
+    .form-row-between {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 7px;
+    }
+
+    .form-link {
+      font-size: 12px;
+      color: var(--green-mid);
+      font-weight: 500;
+      text-decoration: none;
+    }
+
+    .form-link:hover {
+      text-decoration: underline;
+    }
+
+    .btn-login {
+      width: 100%;
+      background: var(--green-dark);
+      color: var(--white);
+      border: none;
+      border-radius: var(--radius-md);
+      padding: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: var(--font);
+      cursor: pointer;
+      transition: background 0.15s;
+      margin-top: 8px;
+    }
+
+    .btn-login:hover {
+      background: var(--green-mid);
+    }
+
+    .login-divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 24px 0;
+    }
+
+    .login-divider-line {
+      flex: 1;
+      height: 1px;
+      background: var(--grey-100);
+    }
+
+    .login-divider-text {
+      font-size: 11px;
+      color: var(--grey-400);
+    }
+
+    .login-notice {
+      background: var(--white);
+      border: 1px solid var(--grey-100);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .login-notice i {
+      color: var(--green-mid);
+      font-size: 16px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .login-notice-text {
+      font-size: 12px;
+      color: var(--grey-600);
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+
+<div class="login-page">
+
+  <!-- Left panel -->
+  <div class="login-left">
+    <div class="left-brand">
+      <img src="assets/logo.webp" alt="Thuvakkam Education" style="height:52px;width:auto;object-fit:contain;margin-bottom:10px;display:block;" />
+      <div class="brand-name">Thuvakkam Education</div>
+      <div class="brand-tagline">Reg. No: 131/2014 &nbsp;·&nbsp; Exceeding Limits</div>
+    </div>
+
+    <div class="left-content">
+      <div class="left-accent"></div>
+      <div class="left-heading">Sponsor for<br>Success Portal</div>
+      <div class="left-body">An internal platform for committee members and donors to review applications, monitor student progress, and track fund utilisation across all SFS cycles.</div>
+      <div class="left-stats">
+        <div class="left-stat">
+          <div class="left-stat-val">325</div>
+          <div class="left-stat-label">Applications</div>
+        </div>
+        <div class="left-stat">
+          <div class="left-stat-val">112</div>
+          <div class="left-stat-label">Selected</div>
+        </div>
+        <div class="left-stat">
+          <div class="left-stat-val">24</div>
+          <div class="left-stat-label">Schools</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="left-footer">
+      &copy; 2026 Thuvakkam Education. Internal use only.
+    </div>
+  </div>
+
+  <!-- Right panel -->
+  <div class="login-right">
+    <div class="login-card">
+      <div class="login-card-header">
+        <div class="login-card-title">Sign in to your account</div>
+        <div class="login-card-sub">Enter your committee or donor credentials below.</div>
+      </div>
+
+      <div id="login-error" style="display:none;background:#FEE2E2;border:1px solid #FCA5A5;border-radius:var(--radius-md);padding:10px 14px;font-size:13px;color:#991B1B;margin-bottom:16px;"></div>
+
+      <form onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label class="form-label" for="email">Email address</label>
+          <input class="form-input" id="email" type="email" placeholder="you@thuvakkam.org" required />
+        </div>
+
+        <div class="form-group">
+          <div class="form-row-between">
+            <label class="form-label" for="password" style="margin-bottom:0;">Password</label>
+            <a class="form-link" href="#">Forgot password?</a>
+          </div>
+          <input class="form-input" id="password" type="password" placeholder="Enter your password" required />
+        </div>
+
+        <button type="submit" class="btn-login">Sign in</button>
+      </form>
+
+      <div class="login-divider">
+        <div class="login-divider-line"></div>
+        <div class="login-divider-text">Restricted access</div>
+        <div class="login-divider-line"></div>
+      </div>
+
+      <div class="login-notice">
+        <i class="ti ti-shield-lock"></i>
+        <div class="login-notice-text">This portal is for authorised Thuvakkam committee members and registered donors only. If you need access, contact <strong>info@thuvakkam.org</strong>.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+  const SUPABASE_URL = 'https://vftexybohuaxngyhwjts.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_vO20BiWyS_VIkhU2DDmw3g_BoGBeCdq';
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  // If already logged in, skip to dashboard
+  sb.auth.getSession().then(({ data: { session } }) => {
+    if (session) window.location.href = 'dashboard.html';
+  });
+
+  async function handleLogin(e) {
+    e.preventDefault();
+    const email    = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const errBox   = document.getElementById('login-error');
+    const btn      = e.target.querySelector('button[type="submit"]');
+
+    btn.textContent = 'Signing in…';
+    btn.disabled = true;
+    errBox.style.display = 'none';
+
+    const { error } = await sb.auth.signInWithPassword({ email, password });
+
+    if (error) {
+      errBox.textContent = error.message;
+      errBox.style.display = 'block';
+      btn.textContent = 'Sign in';
+      btn.disabled = false;
+    } else {
+      window.location.href = 'dashboard.html';
+    }
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Applications — Thuvakkam SFS Portal</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="js/client.js"></script>
+  <script src="js/profile.js"></script>
+</head>
+<body>
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-accent"></div>
+      <div class="topbar-brand">
+        Thuvakkam Education
+        <span>Sponsor for Success &mdash; Internal Portal</span>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <input class="search-input" type="text" placeholder="Search students, schools..." />
+      <div class="topbar-divider"></div>
+      <div class="user-pill">
+        <div class="user-avatar">RK</div>
+        <div class="user-info">
+          <div class="user-name">Ramesh Kumar</div>
+          <div class="user-role">Committee Member</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="nav-section-label">Main</div>
+    <a class="nav-item" href="dashboard.html">
+      <i class="ti ti-layout-dashboard"></i> Overview
+    </a>
+    <a class="nav-item active" href="applications.html">
+      <i class="ti ti-file-text"></i> Applications
+    </a>
+    <a class="nav-item" href="selected.html">
+      <i class="ti ti-user-check"></i> Selected Students
+    </a>
+    <a class="nav-item" href="rejected.html"><i class="ti ti-user-x"></i> Rejected</a>
+    <a class="nav-item" href="previous.html">
+      <i class="ti ti-clock-history"></i> Previous Beneficiaries
+    </a>
+
+    <div class="nav-section-label">Reports</div>
+    <a class="nav-item" href="donors.html">
+      <i class="ti ti-heart-handshake"></i> Donor Transparency
+    </a>
+    <a class="nav-item" href="documents.html">
+      <i class="ti ti-folder"></i> Documents
+    </a>
+
+    <div class="sidebar-footer">
+      <a class="nav-item" href="#" onclick="signOut()"><i class="ti ti-logout"></i> Sign out</a>
+    </div>
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="main">
+    <div class="page-header">
+      <div class="page-title">Student Applications</div>
+      <div class="page-subtitle">All applications received for SFS 2026</div>
+    </div>
+
+    <!-- Status summary -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px;">
+      <div style="background:var(--white);border:1px solid var(--grey-100);border-radius:var(--radius-lg);padding:16px 20px;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow-sm);">
+        <div style="width:40px;height:40px;border-radius:var(--radius-md);background:var(--status-pending-bg);display:flex;align-items:center;justify-content:center;">
+          <i class="ti ti-clock" style="font-size:20px;color:var(--status-pending-txt);"></i>
+        </div>
+        <div>
+          <div id="count-pending" style="font-size:22px;font-weight:700;color:var(--black);letter-spacing:-0.02em;">—</div>
+          <div style="font-size:12px;color:var(--grey-400);margin-top:2px;">Pending review</div>
+        </div>
+      </div>
+      <div style="background:var(--white);border:1px solid var(--grey-100);border-radius:var(--radius-lg);padding:16px 20px;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow-sm);">
+        <div style="width:40px;height:40px;border-radius:var(--radius-md);background:var(--status-selected-bg);display:flex;align-items:center;justify-content:center;">
+          <i class="ti ti-circle-check" style="font-size:20px;color:var(--status-selected-txt);"></i>
+        </div>
+        <div>
+          <div id="count-selected" style="font-size:22px;font-weight:700;color:var(--black);letter-spacing:-0.02em;">—</div>
+          <div style="font-size:12px;color:var(--grey-400);margin-top:2px;">Selected</div>
+        </div>
+      </div>
+      <div style="background:var(--white);border:1px solid var(--grey-100);border-radius:var(--radius-lg);padding:16px 20px;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow-sm);">
+        <div style="width:40px;height:40px;border-radius:var(--radius-md);background:var(--status-rejected-bg);display:flex;align-items:center;justify-content:center;">
+          <i class="ti ti-circle-x" style="font-size:20px;color:var(--status-rejected-txt);"></i>
+        </div>
+        <div>
+          <div id="count-rejected" style="font-size:22px;font-weight:700;color:var(--black);letter-spacing:-0.02em;">—</div>
+          <div style="font-size:12px;color:var(--grey-400);margin-top:2px;">Not shortlisted</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Table card -->
+    <div class="card">
+      <!-- Toolbar -->
+      <div class="table-toolbar">
+        <div class="table-toolbar-left">
+          All applications <span id="result-count">(—)</span>
+        </div>
+        <div class="table-toolbar-right">
+          <button class="btn btn-outline btn-sm"><i class="ti ti-filter"></i> Filter</button>
+          <button class="btn btn-outline btn-sm" data-action="export-csv"><i class="ti ti-download"></i> Export CSV</button>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="filter-bar">
+        <input id="search-input" class="search-input" type="text" placeholder="Search by name or school..." style="width:220px;" />
+        <select id="filter-status" class="filter-select">
+          <option value="">All statuses</option>
+          <option value="pending">Pending</option>
+          <option value="selected">Selected</option>
+          <option value="rejected">Not shortlisted</option>
+        </select>
+        <select id="filter-district" class="filter-select">
+          <option value="">All districts</option>
+          <option>Chennai</option>
+          <option>Madurai</option>
+          <option>Coimbatore</option>
+          <option>Tirunelveli</option>
+          <option>Salem</option>
+          <option>Ramanathapuram</option>
+          <option>Villupuram</option>
+          <option>Thanjavur</option>
+        </select>
+        <select id="filter-class" class="filter-select">
+          <option value="">All classes</option>
+          <option>9th</option>
+          <option>10th</option>
+          <option>11th</option>
+          <option>12th</option>
+        </select>
+      </div>
+
+      <!-- Table -->
+      <table>
+        <thead>
+          <tr>
+            <th>Student</th>
+            <th>School</th>
+            <th>District</th>
+            <th>Class</th>
+            <th>Applied on</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="app-tbody"></tbody>
+      </table>
+    </div>
+  </main>
+
+<script>
+let allStudents = [];
+
+/* ── RENDER TABLE ─────────────────────────────────────── */
+function renderTable(data) {
+  const tbody = document.getElementById('app-tbody');
+  if (!data.length) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--grey-400);font-size:13px;">No applications match your filters.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = data.map(s => `
+    <tr>
+      <td>
+        <div class="cell-student">
+          <div class="table-avatar">${s.initials || s.name.slice(0,2).toUpperCase()}</div>
+          <span class="cell-name">${s.name}</span>
+        </div>
+      </td>
+      <td class="cell-muted">${s.school}</td>
+      <td class="cell-muted">${s.district}</td>
+      <td class="cell-muted">${s.class}</td>
+      <td class="cell-muted">${fmtDate(s.applied_on)}</td>
+      <td>${statusBadge(s.status)}</td>
+      <td>
+        <div style="display:flex;gap:6px;">
+          <button class="btn btn-outline btn-sm" onclick="openProfile('${s.id}')">
+            <i class="ti ti-eye"></i> View
+          </button>
+          <button class="btn-icon" title="Download student info" onclick="downloadStudent('${s.id}')">
+            <i class="ti ti-download"></i>
+          </button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+/* ── FILTERS ──────────────────────────────────────────── */
+function applyFilters() {
+  const search   = document.getElementById('search-input').value.toLowerCase().trim();
+  const status   = document.getElementById('filter-status').value;
+  const district = document.getElementById('filter-district').value;
+  const cls      = document.getElementById('filter-class').value;
+
+  const filtered = allStudents.filter(s =>
+    (!search   || s.name.toLowerCase().includes(search) || s.school.toLowerCase().includes(search)) &&
+    (!status   || s.status   === status)   &&
+    (!district || s.district === district) &&
+    (!cls      || s.class    === cls)
+  );
+
+  renderTable(filtered);
+  document.getElementById('result-count').textContent = `(${filtered.length})`;
+}
+
+/* ── POPULATE DISTRICT DROPDOWN FROM REAL DATA ────────── */
+function populateDistricts(data) {
+  const districts = [...new Set(data.map(s => s.district))].sort();
+  const sel = document.getElementById('filter-district');
+  sel.innerHTML = '<option value="">All districts</option>' +
+    districts.map(d => `<option value="${d}">${d}</option>`).join('');
+}
+
+/* ── VIEW MODAL ───────────────────────────────────────── */
+function viewStudent(id) {
+  const s = allStudents.find(x => x.id === id);
+  if (!s) return;
+
+  const existing = document.getElementById('view-modal');
+  if (existing) existing.remove();
+
+  const statusLabels = { pending: 'Pending', selected: 'Selected', rejected: 'Not shortlisted' };
+
+  const modal = document.createElement('div');
+  modal.id = 'view-modal';
+  modal.innerHTML = `
+    <div style="position:fixed;inset:0;background:rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;z-index:9999;" onclick="if(event.target===this)this.remove()">
+      <div style="background:#fff;border-radius:12px;width:100%;max-width:480px;box-shadow:0 8px 32px rgba(0,0,0,0.16);font-family:var(--font);overflow:hidden;">
+        <!-- Header -->
+        <div style="background:var(--green-dark);padding:24px 28px;display:flex;align-items:center;gap:16px;">
+          <div style="width:52px;height:52px;border-radius:10px;background:var(--yellow);color:var(--green-dark);font-size:18px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            ${s.initials || s.name.slice(0,2).toUpperCase()}
+          </div>
+          <div>
+            <div style="font-size:18px;font-weight:700;color:#fff;">${s.name}</div>
+            <div style="font-size:13px;color:rgba(255,255,255,0.6);margin-top:2px;">${s.school}</div>
+          </div>
+          <button onclick="document.getElementById('view-modal').remove()" style="margin-left:auto;background:rgba(255,255,255,0.15);border:none;border-radius:6px;width:32px;height:32px;cursor:pointer;color:#fff;font-size:18px;display:flex;align-items:center;justify-content:center;">
+            <i class="ti ti-x"></i>
+          </button>
+        </div>
+        <!-- Body -->
+        <div style="padding:24px 28px;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;">
+            ${[
+              ['District',   s.district],
+              ['Class',      s.class],
+              ['Cycle year', s.cycle_year],
+              ['Applied on', fmtDate(s.applied_on)],
+            ].map(([k,v]) => `
+              <div style="background:var(--grey-50);border-radius:6px;padding:12px 14px;">
+                <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:var(--grey-400);margin-bottom:4px;">${k}</div>
+                <div style="font-size:14px;font-weight:500;color:var(--black);">${v}</div>
+              </div>`).join('')}
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:14px;background:var(--grey-50);border-radius:6px;margin-bottom:20px;">
+            <span style="font-size:13px;font-weight:600;color:var(--grey-600);">Application status</span>
+            ${statusBadge(s.status)}
+          </div>
+          <div style="display:flex;gap:10px;">
+            <button onclick="updateStatus('${s.id}','selected')" style="flex:1;padding:10px;border-radius:6px;border:none;background:var(--status-selected-bg);color:var(--status-selected-txt);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);">
+              Mark selected
+            </button>
+            <button onclick="updateStatus('${s.id}','rejected')" style="flex:1;padding:10px;border-radius:6px;border:none;background:var(--status-rejected-bg);color:var(--status-rejected-txt);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);">
+              Not shortlisted
+            </button>
+            <button onclick="updateStatus('${s.id}','pending')" style="flex:1;padding:10px;border-radius:6px;border:none;background:var(--status-pending-bg);color:var(--status-pending-txt);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);">
+              Set pending
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+}
+
+/* ── UPDATE STATUS FROM VIEW MODAL ───────────────────── */
+async function updateStatus(id, newStatus) {
+  const { error } = await sb.from('students').update({ status: newStatus }).eq('id', id);
+  if (error) { alert('Could not update status.'); return; }
+
+  // Update local data and re-render
+  const s = allStudents.find(x => x.id === id);
+  if (s) s.status = newStatus;
+
+  document.getElementById('view-modal').remove();
+  applyFilters();
+
+  // Refresh counts
+  document.getElementById('count-pending').textContent  = allStudents.filter(s => s.status === 'pending').length;
+  document.getElementById('count-selected').textContent = allStudents.filter(s => s.status === 'selected').length;
+  document.getElementById('count-rejected').textContent = allStudents.filter(s => s.status === 'rejected').length;
+}
+
+/* ── DOWNLOAD SINGLE STUDENT ─────────────────────────── */
+function downloadStudent(id) {
+  const s = allStudents.find(x => x.id === id);
+  if (!s) return;
+  const content = [
+    'Thuvakkam Education — SFS Student Record',
+    '==========================================',
+    `Name:       ${s.name}`,
+    `School:     ${s.school}`,
+    `District:   ${s.district}`,
+    `Class:      ${s.class}`,
+    `Status:     ${s.status}`,
+    `Cycle:      ${s.cycle_year}`,
+    `Applied on: ${fmtDate(s.applied_on)}`,
+  ].join('\n');
+
+  const blob = new Blob([content], { type: 'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `${s.name.replace(/\s+/g,'_')}_SFS${s.cycle_year}.txt`;
+  a.click();
+}
+
+/* ── EXPORT ALL TO CSV ───────────────────────────────── */
+function exportCSV() {
+  const headers = [
+    'Name', 'Email', 'Student Phone', 'Parent/Guardian Phone',
+    'Date of Birth', 'Gender', 'Address', 'State', 'District',
+    'Referred By', 'Referrer Phone',
+    'Father Name', 'Mother Name', 'Guardian Name',
+    'Parent Occupation', 'Annual Income (Rs.)', 'Siblings',
+    '10th School Details', '12th/Diploma Details',
+    'UG College', 'PG College', 'Other Education',
+    'Other Scholarship', 'Scholarship Details',
+    'Awards/Achievements', 'Extra-Curricular Activities',
+    'Family Background',
+    'School', 'Class', 'Board', 'Previous Year %', 'Attendance',
+    'Applied On', 'Cycle Year', 'Status', 'Mentor',
+  ];
+
+  const esc = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
+
+  const rows = allStudents.map(s => [
+    s.name,               s.email,             s.student_phone,    s.phone,
+    s.dob,                s.gender,            s.address,          s.state,          s.district,
+    s.referred_by,        s.referrer_phone,
+    s.father_name,        s.mother_name,       s.guardian_name,
+    s.parent_occupation,  s.annual_income,     s.siblings,
+    s.school_10th,        s.school_12th,
+    s.college_ug,         s.college_pg,        s.other_education,
+    s.other_scholarship,  s.scholarship_details,
+    s.awards,             s.extra_curricular,
+    s.family_about,
+    s.school,             s.class,             s.board,            s.prev_percentage,  s.attendance,
+    fmtDate(s.applied_on), s.cycle_year,       s.status,           s.mentor,
+  ].map(esc).join(','));
+
+  const csv  = '﻿' + [headers.map(esc).join(','), ...rows].join('\r\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const a    = document.createElement('a');
+  a.href     = URL.createObjectURL(blob);
+  a.download = `SFS_Applications_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+}
+
+/* ── LOAD ─────────────────────────────────────────────── */
+async function loadApplications() {
+  await requireAuth();
+
+  const { data, error } = await sb.from('students')
+    .select('*').eq('cycle_year', 2026)
+    .order('applied_on', { ascending: false });
+
+  if (error) { console.error(error); return; }
+
+  allStudents = data;
+  document.getElementById('result-count').textContent    = `(${data.length})`;
+  document.getElementById('count-pending').textContent   = data.filter(s => s.status === 'pending').length;
+  document.getElementById('count-selected').textContent  = data.filter(s => s.status === 'selected').length;
+  document.getElementById('count-rejected').textContent  = data.filter(s => s.status === 'rejected').length;
+
+  populateDistricts(data);
+  renderTable(data);
+
+  // Filters
+  document.getElementById('search-input').addEventListener('input',  applyFilters);
+  document.getElementById('filter-status').addEventListener('change', applyFilters);
+  document.getElementById('filter-district').addEventListener('change', applyFilters);
+  document.getElementById('filter-class').addEventListener('change',  applyFilters);
+
+  // Export CSV button
+  document.querySelector('[data-action="export-csv"]').addEventListener('click', exportCSV);
+}
+
+loadApplications();
+</script>
+
+</body>
+</html>

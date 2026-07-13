@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Donor Transparency — Thuvakkam SFS Portal</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="js/client.js"></script>
+</head>
+<body>
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-accent"></div>
+      <div class="topbar-brand">
+        Thuvakkam Education
+        <span>Sponsor for Success &mdash; Internal Portal</span>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <input class="search-input" type="text" placeholder="Search students, schools..." />
+      <div class="topbar-divider"></div>
+      <div class="user-pill">
+        <div class="user-avatar">RK</div>
+        <div class="user-info">
+          <div class="user-name">Ramesh Kumar</div>
+          <div class="user-role">Committee Member</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="nav-section-label">Main</div>
+    <a class="nav-item" href="dashboard.html">
+      <i class="ti ti-layout-dashboard"></i> Overview
+    </a>
+    <a class="nav-item" href="applications.html">
+      <i class="ti ti-file-text"></i> Applications
+    </a>
+    <a class="nav-item" href="selected.html">
+      <i class="ti ti-user-check"></i> Selected Students
+    </a>
+    <a class="nav-item" href="rejected.html"><i class="ti ti-user-x"></i> Rejected</a>
+    <a class="nav-item" href="previous.html">
+      <i class="ti ti-clock-history"></i> Previous Beneficiaries
+    </a>
+
+    <div class="nav-section-label">Reports</div>
+    <a class="nav-item active" href="donors.html">
+      <i class="ti ti-heart-handshake"></i> Donor Transparency
+    </a>
+    <a class="nav-item" href="documents.html">
+      <i class="ti ti-folder"></i> Documents
+    </a>
+
+    <div class="sidebar-footer">
+      <a class="nav-item" href="#" onclick="signOut()"><i class="ti ti-logout"></i> Sign out</a>
+    </div>
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="main">
+    <div class="page-header">
+      <div class="page-title">Donor Transparency</div>
+      <div class="page-subtitle">Fund utilisation and donor activity — SFS 2026</div>
+    </div>
+
+    <!-- Stat blocks -->
+    <div class="stat-grid">
+      <div class="stat-block">
+        <div class="stat-block-label">Students sponsored</div>
+        <div class="stat-block-value" id="stat-sponsored">—</div>
+        <div class="progress-track">
+          <div class="progress-fill" style="width:52%;"></div>
+        </div>
+        <div class="stat-block-note">52% of 2026 target (112 students)</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-block-label">Funds utilised</div>
+        <div class="stat-block-value">&#8377;8.4L</div>
+        <div class="progress-track">
+          <div class="progress-fill-yellow" style="width:70%;"></div>
+        </div>
+        <div class="stat-block-note">70% of &#8377;12L raised this cycle</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-block-label">Active donors</div>
+        <div class="stat-block-value" id="stat-donors">—</div>
+        <div style="margin-top:14px;"></div>
+        <div id="stat-countries" class="stat-block-note">—</div>
+      </div>
+    </div>
+
+    <!-- Two column row -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;">
+
+      <!-- Fund breakdown -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Fund allocation breakdown</div>
+        </div>
+        <div class="card-body">
+          <div style="display:flex;flex-direction:column;gap:14px;">
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+                <span style="font-size:12px;color:var(--grey-600);">Scholarship disbursements</span>
+                <span style="font-size:12px;font-weight:600;">&#8377;5.8L</span>
+              </div>
+              <div class="progress-track"><div class="progress-fill" style="width:69%;"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+                <span style="font-size:12px;color:var(--grey-600);">Study materials &amp; kits</span>
+                <span style="font-size:12px;font-weight:600;">&#8377;1.2L</span>
+              </div>
+              <div class="progress-track"><div class="progress-fill" style="width:14%;"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+                <span style="font-size:12px;color:var(--grey-600);">Mentoring &amp; events</span>
+                <span style="font-size:12px;font-weight:600;">&#8377;0.9L</span>
+              </div>
+              <div class="progress-track"><div class="progress-fill" style="width:11%;"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+                <span style="font-size:12px;color:var(--grey-600);">Administrative costs</span>
+                <span style="font-size:12px;font-weight:600;">&#8377;0.5L</span>
+              </div>
+              <div class="progress-track"><div class="progress-fill" style="width:6%;"></div></div>
+            </div>
+            <div style="padding-top:12px;border-top:1px solid var(--grey-100);display:flex;justify-content:space-between;">
+              <span style="font-size:12px;font-weight:600;color:var(--grey-600);">Total utilised</span>
+              <span style="font-size:14px;font-weight:700;color:var(--green-dark);">&#8377;8.4L</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Donor tier breakdown -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Donor tier breakdown</div>
+        </div>
+        <div class="card-body">
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--grey-50);border-radius:var(--radius-md);border:1px solid var(--grey-100);">
+              <div>
+                <div style="font-size:13px;font-weight:600;">Patron (CSR)</div>
+                <div style="font-size:11px;color:var(--grey-400);margin-top:2px;">&#8377;1,00,000+ / year</div>
+              </div>
+              <div style="text-align:right;">
+                <div id="tier-patron" style="font-size:20px;font-weight:700;color:var(--green-dark);">—</div>
+                <div style="font-size:11px;color:var(--grey-400);">donors</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--grey-50);border-radius:var(--radius-md);border:1px solid var(--grey-100);">
+              <div>
+                <div style="font-size:13px;font-weight:600;">Champion</div>
+                <div style="font-size:11px;color:var(--grey-400);margin-top:2px;">&#8377;18,000 / year</div>
+              </div>
+              <div style="text-align:right;">
+                <div id="tier-champion" style="font-size:20px;font-weight:700;color:var(--green-dark);">—</div>
+                <div style="font-size:11px;color:var(--grey-400);">donors</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--grey-50);border-radius:var(--radius-md);border:1px solid var(--grey-100);">
+              <div>
+                <div style="font-size:13px;font-weight:600;">Supporter</div>
+                <div style="font-size:11px;color:var(--grey-400);margin-top:2px;">&#8377;5,000 / year</div>
+              </div>
+              <div style="text-align:right;">
+                <div id="tier-supporter" style="font-size:20px;font-weight:700;color:var(--green-dark);">—</div>
+                <div style="font-size:11px;color:var(--grey-400);">donors</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reports -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Reports &amp; documents for donors</div>
+        <div style="font-size:12px;color:var(--grey-400);">Downloadable reports shared with donors</div>
+      </div>
+      <div class="card-body">
+        <div class="report-grid">
+          <button class="report-item">
+            <div class="report-icon"><i class="ti ti-file-text"></i></div>
+            <div>
+              <div class="report-name">Utilisation Report 2025</div>
+              <div class="report-meta">PDF &middot; 2.1 MB &middot; Uploaded Mar 2026</div>
+            </div>
+          </button>
+          <button class="report-item">
+            <div class="report-icon"><i class="ti ti-chart-bar"></i></div>
+            <div>
+              <div class="report-name">Impact Report 2025</div>
+              <div class="report-meta">PDF &middot; 4.8 MB &middot; Uploaded Mar 2026</div>
+            </div>
+          </button>
+          <button class="report-item">
+            <div class="report-icon"><i class="ti ti-receipt"></i></div>
+            <div>
+              <div class="report-name">Audited Accounts 2024&ndash;25</div>
+              <div class="report-meta">PDF &middot; 1.4 MB &middot; Uploaded Jan 2026</div>
+            </div>
+          </button>
+          <button class="report-item">
+            <div class="report-icon"><i class="ti ti-users"></i></div>
+            <div>
+              <div class="report-name">Student Progress Report 2025</div>
+              <div class="report-meta">PDF &middot; 3.2 MB &middot; Uploaded Feb 2026</div>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+<script>
+async function loadDonors() {
+  await requireAuth();
+
+  const { data: donors } = await sb.from('donors').select('*').eq('active', true).order('amount', { ascending: false });
+  if (!donors) return;
+
+  const totalSponsored = donors.reduce((sum, d) => sum + (d.students_sponsored || 0), 0);
+  const activeDonors   = donors.length;
+  const countries      = [...new Set(donors.map(d => d.country))].length;
+
+  document.getElementById('stat-sponsored').textContent = totalSponsored;
+  document.getElementById('stat-donors').textContent    = activeDonors;
+  document.getElementById('stat-countries').textContent = `Across ${countries} countries`;
+
+  const patron   = donors.filter(d => d.tier === 'patron').length;
+  const champion = donors.filter(d => d.tier === 'champion').length;
+  const supporter= donors.filter(d => d.tier === 'supporter').length;
+
+  document.getElementById('tier-patron').textContent   = patron;
+  document.getElementById('tier-champion').textContent = champion;
+  document.getElementById('tier-supporter').textContent= supporter;
+}
+
+loadDonors();
+</script>
+</body>
+</html>

@@ -1,0 +1,311 @@
+:root {
+  --green-dark:  #0E7162;
+  --green-mid:   #26C699;
+  --green-light: #E8F5F2;
+  --yellow:      #FDDB3A;
+  --yellow-light:#FEFAE8;
+  --white:       #FFFFFF;
+  --black:       #111827;
+  --grey-50:     #F9FAFB;
+  --grey-100:    #F3F4F6;
+  --grey-200:    #E5E7EB;
+  --grey-400:    #9CA3AF;
+  --grey-500:    #6B7280;
+  --grey-600:    #4B5563;
+  --shadow-sm:   0 1px 3px rgba(0,0,0,0.08);
+  --shadow-md:   0 4px 16px rgba(0,0,0,0.10);
+  --radius-sm:   6px;
+  --radius-md:   8px;
+  --radius-lg:   12px;
+  --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font);
+  background: var(--grey-50);
+  color: var(--black);
+  min-height: 100vh;
+}
+
+a { text-decoration: none; color: inherit; }
+
+/* ── TOPBAR ─────────────────────────────────────────────── */
+.sp-topbar {
+  position: fixed; top: 0; left: 0; right: 0; height: 60px;
+  background: var(--green-dark);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 24px; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+.sp-brand {
+  display: flex; align-items: center; gap: 12px;
+}
+.sp-brand img { height: 32px; filter: brightness(0) invert(1); }
+.sp-brand-text { font-size: 14px; font-weight: 700; color: #fff; }
+.sp-brand-sub  { font-size: 11px; color: rgba(255,255,255,0.6); font-weight: 400; }
+.sp-topbar-right { display: flex; align-items: center; gap: 14px; }
+.sp-student-chip {
+  background: rgba(255,255,255,0.15); border-radius: 99px;
+  padding: 6px 14px; font-size: 13px; font-weight: 600; color: #fff;
+  display: flex; align-items: center; gap: 8px;
+}
+.sp-student-chip i { font-size: 15px; }
+.sp-logout-btn {
+  background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.25);
+  border-radius: var(--radius-sm); padding: 7px 14px;
+  font-size: 13px; font-weight: 600; color: #fff;
+  cursor: pointer; display: flex; align-items: center; gap: 6px;
+  font-family: var(--font); transition: background 0.15s;
+}
+.sp-logout-btn:hover { background: rgba(255,255,255,0.22); }
+
+/* ── MAIN ───────────────────────────────────────────────── */
+.sp-main {
+  margin-top: 60px;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 32px 24px 64px;
+}
+
+/* ── PROFILE HERO ───────────────────────────────────────── */
+.sp-profile-hero {
+  background: var(--green-dark);
+  border-radius: var(--radius-lg);
+  padding: 28px 32px;
+  margin-bottom: 24px;
+  display: flex; align-items: center; gap: 24px;
+  box-shadow: var(--shadow-md);
+}
+.sp-avatar {
+  width: 72px; height: 72px; border-radius: 14px;
+  background: var(--yellow); color: var(--green-dark);
+  font-size: 26px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.sp-hero-name    { font-size: 22px; font-weight: 800; color: #fff; letter-spacing: -0.02em; }
+.sp-hero-school  { font-size: 13px; color: rgba(255,255,255,0.65); margin-top: 4px; }
+.sp-hero-meta    { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+.sp-meta-chip {
+  background: rgba(255,255,255,0.12); border-radius: 99px;
+  padding: 4px 12px; font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.85);
+  display: flex; align-items: center; gap: 5px;
+}
+.sp-meta-chip i { font-size: 13px; }
+.sp-badge-selected {
+  background: #D1FAE5; color: #065F46;
+  border-radius: 99px; padding: 4px 12px;
+  font-size: 12px; font-weight: 700;
+}
+
+/* ── STATS STRIP ────────────────────────────────────────── */
+.sp-stats {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 12px; margin-bottom: 24px;
+}
+.sp-stat-card {
+  background: var(--white); border: 1px solid var(--grey-200);
+  border-radius: var(--radius-lg); padding: 18px 20px;
+  box-shadow: var(--shadow-sm); text-align: center;
+}
+.sp-stat-val  { font-size: 28px; font-weight: 800; color: var(--green-dark); letter-spacing: -0.02em; }
+.sp-stat-lbl  { font-size: 12px; color: var(--grey-400); margin-top: 3px; }
+
+/* ── TABS ───────────────────────────────────────────────── */
+.sp-tabs {
+  display: flex; gap: 4px; background: var(--white);
+  border: 1px solid var(--grey-200); border-radius: var(--radius-lg);
+  padding: 5px; margin-bottom: 20px;
+  box-shadow: var(--shadow-sm); overflow-x: auto;
+}
+.sp-tab {
+  flex: 1; padding: 9px 14px; border-radius: var(--radius-sm);
+  font-size: 13px; font-weight: 600; color: var(--grey-500);
+  background: transparent; border: none; cursor: pointer;
+  font-family: var(--font); white-space: nowrap;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  transition: background 0.15s, color 0.15s;
+}
+.sp-tab:hover { background: var(--grey-50); color: var(--black); }
+.sp-tab.active {
+  background: var(--green-dark); color: #fff;
+}
+.sp-tab i { font-size: 15px; }
+
+/* ── TAB PANE ───────────────────────────────────────────── */
+.sp-tab-pane { display: none; }
+.sp-tab-pane.active { display: block; }
+
+/* ── SECTION CARD ───────────────────────────────────────── */
+.sp-card {
+  background: var(--white); border: 1px solid var(--grey-200);
+  border-radius: var(--radius-lg); overflow: hidden;
+  box-shadow: var(--shadow-sm); margin-bottom: 16px;
+}
+.sp-card-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px; border-bottom: 1px solid var(--grey-100);
+}
+.sp-card-title {
+  font-size: 13px; font-weight: 700; color: var(--grey-600);
+  display: flex; align-items: center; gap: 8px;
+  text-transform: uppercase; letter-spacing: 0.06em;
+}
+.sp-card-title i { font-size: 16px; color: var(--green-dark); }
+.sp-add-btn {
+  background: var(--green-dark); color: #fff; border: none;
+  border-radius: var(--radius-sm); padding: 7px 14px;
+  font-size: 12px; font-weight: 700; cursor: pointer;
+  font-family: var(--font); display: flex; align-items: center; gap: 6px;
+  transition: background 0.15s;
+}
+.sp-add-btn:hover { background: var(--green-mid); }
+.sp-add-btn i { font-size: 14px; }
+
+/* ── ENTRY ROW ──────────────────────────────────────────── */
+.sp-entry {
+  display: flex; align-items: flex-start; gap: 16px;
+  padding: 16px 20px; border-bottom: 1px solid var(--grey-100);
+}
+.sp-entry:last-child { border-bottom: none; }
+.sp-entry-icon {
+  width: 36px; height: 36px; border-radius: var(--radius-sm);
+  background: var(--green-light); color: var(--green-dark);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0; margin-top: 2px;
+}
+.sp-entry-body { flex: 1; }
+.sp-entry-title { font-size: 14px; font-weight: 600; color: var(--black); }
+.sp-entry-desc  { font-size: 12px; color: var(--grey-500); margin-top: 4px; line-height: 1.5; }
+.sp-entry-meta  { display: flex; align-items: center; gap: 10px; margin-top: 8px; flex-wrap: wrap; }
+.sp-score-badge {
+  background: var(--yellow-light); color: #713F12;
+  border: 1px solid #FDE68A; border-radius: 99px;
+  padding: 3px 10px; font-size: 12px; font-weight: 700;
+}
+.sp-date-lbl {
+  font-size: 11px; color: var(--grey-400);
+  display: flex; align-items: center; gap: 4px;
+}
+.sp-entry-del {
+  background: none; border: none; cursor: pointer;
+  color: var(--grey-400); font-size: 15px; padding: 4px;
+  border-radius: 4px; transition: color 0.15s, background 0.15s;
+  flex-shrink: 0; margin-top: 2px;
+}
+.sp-entry-del:hover { color: #DC2626; background: #FEE2E2; }
+
+.sp-empty {
+  padding: 32px; text-align: center;
+  color: var(--grey-400); font-size: 13px;
+}
+.sp-empty i { font-size: 32px; display: block; margin-bottom: 8px; opacity: 0.4; }
+
+/* ── OVERVIEW RECENT ────────────────────────────────────── */
+.sp-recent-item {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 20px; border-bottom: 1px solid var(--grey-100);
+}
+.sp-recent-item:last-child { border-bottom: none; }
+.sp-cat-dot {
+  width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+}
+
+/* ── ADD MODAL ──────────────────────────────────────────── */
+.sp-modal-backdrop {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.45);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1000; padding: 20px;
+}
+.sp-modal {
+  background: var(--white); border-radius: var(--radius-lg);
+  width: 100%; max-width: 480px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.18); overflow: hidden;
+}
+.sp-modal-head {
+  background: var(--green-dark); padding: 20px 24px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.sp-modal-head-title { font-size: 16px; font-weight: 700; color: #fff; }
+.sp-modal-close {
+  background: rgba(255,255,255,0.15); border: none; border-radius: 6px;
+  width: 30px; height: 30px; cursor: pointer; color: #fff;
+  display: flex; align-items: center; justify-content: center; font-size: 17px;
+}
+.sp-modal-body { padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+.sp-modal-foot {
+  padding: 16px 24px; border-top: 1px solid var(--grey-100);
+  display: flex; gap: 10px; justify-content: flex-end;
+}
+.sp-field-group { display: flex; flex-direction: column; gap: 6px; }
+.sp-field-label { font-size: 12px; font-weight: 600; color: var(--grey-600); }
+.sp-field-input, .sp-field-select, .sp-field-textarea {
+  border: 1px solid var(--grey-200); border-radius: var(--radius-md);
+  padding: 10px 13px; font-size: 14px; font-family: var(--font);
+  color: var(--black); background: var(--white); outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s; width: 100%;
+}
+.sp-field-input:focus, .sp-field-select:focus, .sp-field-textarea:focus {
+  border-color: var(--green-dark); box-shadow: 0 0 0 3px rgba(14,113,98,0.08);
+}
+.sp-field-textarea { resize: vertical; min-height: 72px; }
+.sp-btn-cancel {
+  padding: 10px 20px; border-radius: var(--radius-sm);
+  border: 1px solid var(--grey-200); background: var(--white);
+  font-size: 13px; font-weight: 600; cursor: pointer; font-family: var(--font);
+  color: var(--grey-600);
+}
+.sp-btn-save {
+  padding: 10px 20px; border-radius: var(--radius-sm);
+  border: none; background: var(--green-dark); color: #fff;
+  font-size: 13px; font-weight: 700; cursor: pointer; font-family: var(--font);
+  display: flex; align-items: center; gap: 6px;
+}
+.sp-btn-save:hover { background: var(--green-mid); }
+.sp-btn-save:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* ── LOGIN PAGE ─────────────────────────────────────────── */
+.sp-login-wrap {
+  min-height: 100vh; display: flex; align-items: center;
+  justify-content: center; padding: 24px; background: var(--grey-50);
+}
+.sp-login-card {
+  background: var(--white); border: 1px solid var(--grey-200);
+  border-radius: var(--radius-lg); width: 100%; max-width: 400px;
+  box-shadow: var(--shadow-md); overflow: hidden;
+}
+.sp-login-head {
+  background: var(--green-dark); padding: 32px;
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+}
+.sp-login-head img { height: 44px; filter: brightness(0) invert(1); }
+.sp-login-head-title { font-size: 18px; font-weight: 800; color: #fff; }
+.sp-login-head-sub   { font-size: 13px; color: rgba(255,255,255,0.65); text-align: center; }
+.sp-login-body { padding: 28px 32px; display: flex; flex-direction: column; gap: 16px; }
+.sp-login-btn {
+  width: 100%; background: var(--green-dark); color: #fff;
+  border: none; border-radius: var(--radius-md); padding: 13px;
+  font-size: 15px; font-weight: 700; font-family: var(--font);
+  cursor: pointer; transition: background 0.15s;
+}
+.sp-login-btn:hover { background: var(--green-mid); }
+.sp-login-btn:disabled { opacity: 0.65; cursor: not-allowed; }
+.sp-login-error {
+  background: #FEE2E2; border: 1px solid #FCA5A5;
+  border-radius: var(--radius-md); padding: 12px 14px;
+  font-size: 13px; color: #991B1B; display: none;
+}
+.sp-login-hint {
+  font-size: 12px; color: var(--grey-400); text-align: center; line-height: 1.6;
+}
+
+/* ── RESPONSIVE ─────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .sp-profile-hero { flex-direction: column; align-items: flex-start; gap: 16px; }
+  .sp-stats { grid-template-columns: 1fr 1fr; }
+  .sp-tabs  { gap: 2px; }
+  .sp-tab   { font-size: 12px; padding: 8px 10px; }
+  .sp-main  { padding: 20px 16px 48px; }
+}

@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Donor Dashboard — Thuvakkam SFS</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- TOPBAR -->
+  <header class="dp-topbar">
+    <div class="dp-brand">
+      <img src="../website/assets/logo.webp" alt="Thuvakkam Education" />
+      <div>
+        <div class="dp-brand-name">Thuvakkam Education</div>
+        <div class="dp-brand-sub">Donor Portal</div>
+      </div>
+    </div>
+    <div class="dp-topbar-right">
+      <div class="dp-user-chip">
+        <i class="ti ti-heart-handshake"></i>
+        <span id="topbar-name">Loading...</span>
+      </div>
+      <button class="dp-logout-btn" onclick="doLogout()">
+        <i class="ti ti-logout"></i> Sign out
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="dp-main">
+
+    <!-- Loading -->
+    <div id="loading-state" style="text-align:center;padding:80px 20px;color:var(--grey-400);">
+      <i class="ti ti-loader-2" style="font-size:32px;display:block;margin-bottom:12px;animation:spin 1s linear infinite;"></i>
+      Loading your dashboard...
+    </div>
+
+    <!-- Content (hidden until loaded) -->
+    <div id="dashboard-content" style="display:none;">
+
+      <!-- Hero -->
+      <div class="dp-hero">
+        <div class="dp-hero-avatar" id="hero-avatar">--</div>
+        <div style="flex:1;">
+          <div class="dp-hero-name" id="hero-name"></div>
+          <div class="dp-hero-sub" id="hero-sub"></div>
+          <div class="dp-hero-chips" id="hero-chips"></div>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="dp-stats">
+        <div class="dp-stat-card">
+          <div class="dp-stat-val" id="stat-total">₹0</div>
+          <div class="dp-stat-lbl">Total donated</div>
+        </div>
+        <div class="dp-stat-card">
+          <div class="dp-stat-val" id="stat-count">0</div>
+          <div class="dp-stat-lbl">Donations made</div>
+        </div>
+        <div class="dp-stat-card">
+          <div class="dp-stat-val" id="stat-students">0</div>
+          <div class="dp-stat-lbl">Students supported</div>
+        </div>
+      </div>
+
+      <!-- Donations card -->
+      <div class="dp-card">
+        <div class="dp-card-head">
+          <div class="dp-card-title"><i class="ti ti-coin"></i> Donation history</div>
+          <button class="dp-donate-btn" onclick="openDonateModal()">
+            <i class="ti ti-plus"></i> Make a donation
+          </button>
+        </div>
+        <div id="donations-body">
+          <div class="dp-empty"><i class="ti ti-coin-off"></i>No donations recorded yet.</div>
+        </div>
+      </div>
+
+      <!-- Matched student(s) -->
+      <div id="matched-section"></div>
+
+    </div>
+  </main>
+
+  <!-- DONATE MODAL -->
+  <div id="donate-modal" style="display:none;">
+    <div class="dp-modal-backdrop" onclick="if(event.target===this)closeDonateModal()">
+      <div class="dp-modal">
+        <div class="dp-modal-head">
+          <div class="dp-modal-title"><i class="ti ti-coin" style="margin-right:8px;"></i>Record a donation</div>
+          <button class="dp-modal-close" onclick="closeDonateModal()"><i class="ti ti-x"></i></button>
+        </div>
+        <div class="dp-modal-body">
+          <div class="dp-field-group">
+            <label class="dp-field-label">Amount (₹) <span class="req">*</span></label>
+            <input class="dp-field-input" id="d-amount" type="number" min="1" placeholder="e.g. 5000" />
+          </div>
+          <div class="dp-field-group">
+            <label class="dp-field-label">Purpose</label>
+            <select class="dp-field-input" id="d-purpose" style="cursor:pointer;">
+              <option>General scholarship support</option>
+              <option>Study materials</option>
+              <option>Mentoring programme</option>
+              <option>Emergency support</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="dp-field-group">
+            <label class="dp-field-label">Transaction / Reference no.</label>
+            <input class="dp-field-input" id="d-txn" type="text" placeholder="UPI ref, bank transfer ID, etc." />
+          </div>
+          <div class="dp-field-group">
+            <label class="dp-field-label">Note <span style="color:var(--grey-400);font-weight:400;">(optional)</span></label>
+            <textarea class="dp-field-input" id="d-note" rows="3" placeholder="Any message or note for the committee..."></textarea>
+          </div>
+          <div id="donate-err" style="font-size:13px;color:#991B1B;display:none;"></div>
+        </div>
+        <div class="dp-modal-foot">
+          <button class="dp-btn-outline" onclick="closeDonateModal()">Cancel</button>
+          <button class="dp-btn-primary" id="donate-save-btn" onclick="saveDonation()">
+            <i class="ti ti-check"></i> Save donation
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+  const sb = supabase.createClient(
+    'https://vftexybohuaxngyhwjts.supabase.co',
+    'sb_publishable_vO20BiWyS_VIkhU2DDmw3g_BoGBeCdq'
+  );
+
+  const CAT_COLORS = {
+    grade:          { color: '#2563EB', icon: 'ti-book',        label: 'Grade' },
+    exam:           { color: '#7C3AED', icon: 'ti-certificate', label: 'Exam' },
+    olympiad:       { color: '#D97706', icon: 'ti-trophy',      label: 'Olympiad' },
+    achievement:    { color: '#059669', icon: 'ti-award',       label: 'Achievement' },
+    extracurricular:{ color: '#DC2626', icon: 'ti-star',        label: 'Extracurricular' },
+    other:          { color: '#6B7280', icon: 'ti-file',        label: 'Other' },
+  };
+
+  let currentDonor   = null;
+  let donations      = [];
+  let matchedStudents= [];
+  let realtimeChannels = [];
+
+  async function init() {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) { window.location.href = 'index.html'; return; }
+
+    const { data: donor } = await sb.from('donor_accounts')
+      .select('*').eq('auth_user_id', session.user.id).maybeSingle();
+
+    if (!donor) { await sb.auth.signOut(); window.location.href = 'index.html'; return; }
+    currentDonor = donor;
+
+    await Promise.all([loadDonations(), loadMatches()]);
+    renderHero();
+    document.getElementById('loading-state').style.display = 'none';
+    document.getElementById('dashboard-content').style.display = 'block';
+
+    setupRealtime();
+  }
+
+  async function loadDonations() {
+    const { data } = await sb.from('donations')
+      .select('*').eq('donor_id', currentDonor.id)
+      .order('donated_at', { ascending: false });
+    donations = data || [];
+  }
+
+  async function loadMatches() {
+    const { data } = await sb.from('donor_student_matches')
+      .select('*, students(*)')
+      .eq('donor_id', currentDonor.id);
+    matchedStudents = (data || []).map(m => m.students).filter(Boolean);
+  }
+
+  /* ── REALTIME ──────────────────────────────────────────── */
+  function setupRealtime() {
+    // Listen for new matches (admin matched this donor to a student)
+    const matchChannel = sb.channel('donor-matches-' + currentDonor.id)
+      .on('postgres_changes', {
+        event: 'INSERT', schema: 'public', table: 'donor_student_matches',
+        filter: `donor_id=eq.${currentDonor.id}`
+      }, async () => {
+        await loadMatches();
+        renderMatchedSection();
+        renderStats();
+      })
+      .subscribe();
+    realtimeChannels.push(matchChannel);
+
+    // Listen for student updates from matched students
+    matchedStudents.forEach(s => {
+      const ch = sb.channel('student-updates-' + s.id)
+        .on('postgres_changes', {
+          event: 'INSERT', schema: 'public', table: 'student_updates',
+          filter: `student_id=eq.${s.id}`
+        }, payload => {
+          prependUpdate(s.id, payload.new);
+        })
+        .subscribe();
+      realtimeChannels.push(ch);
+    });
+  }
+
+  function prependUpdate(studentId, update) {
+    const feed = document.getElementById('update-feed-' + studentId);
+    if (!feed) return;
+    const cat = CAT_COLORS[update.category] || CAT_COLORS.other;
+    const item = document.createElement('div');
+    item.className = 'dp-update-item';
+    item.style.background = '#F0FDF4';
+    item.innerHTML = `
+      <div class="dp-update-icon" style="background:${cat.color}18;">
+        <i class="ti ${cat.icon}" style="color:${cat.color};"></i>
+      </div>
+      <div style="flex:1;">
+        <div class="dp-update-title">${esc(update.title)} <span class="dp-new-badge">New</span></div>
+        <div class="dp-update-meta">
+          <span>${cat.label}</span>
+          ${update.score ? `<span class="dp-update-score">${esc(update.score)}</span>` : ''}
+          ${update.record_date ? `<span><i class="ti ti-calendar" style="font-size:11px;"></i> ${fmtDate(update.record_date)}</span>` : ''}
+        </div>
+        ${update.description ? `<div style="font-size:12px;color:var(--grey-500);margin-top:4px;">${esc(update.description)}</div>` : ''}
+      </div>`;
+    feed.prepend(item);
+    setTimeout(() => item.style.background = '', 3000);
+  }
+
+  /* ── RENDER ────────────────────────────────────────────── */
+  function renderHero() {
+    const d = currentDonor;
+    const initials = d.full_name.split(' ').map(w => w[0]).slice(0,2).join('').toUpperCase();
+    document.getElementById('topbar-name').textContent = d.full_name.split(' ')[0];
+    document.getElementById('hero-avatar').textContent = initials;
+    document.getElementById('hero-name').textContent   = d.full_name;
+    document.getElementById('hero-sub').textContent    = d.occupation || 'Donor';
+    document.getElementById('hero-chips').innerHTML = `
+      <div class="dp-chip"><i class="ti ti-calendar"></i> Member since ${fmtDate(d.created_at)}</div>
+      ${d.email_verified ? '<div class="dp-verified-badge"><i class="ti ti-shield-check"></i> Email verified</div>' : ''}
+    `;
+    renderStats();
+    renderDonations();
+    renderMatchedSection();
+  }
+
+  function renderStats() {
+    const total = donations.reduce((s, d) => s + parseFloat(d.amount || 0), 0);
+    document.getElementById('stat-total').textContent   = '₹' + total.toLocaleString('en-IN');
+    document.getElementById('stat-count').textContent   = donations.length;
+    document.getElementById('stat-students').textContent = matchedStudents.length;
+  }
+
+  function renderDonations() {
+    const body = document.getElementById('donations-body');
+    if (!donations.length) {
+      body.innerHTML = '<div class="dp-empty"><i class="ti ti-coin-off"></i>No donations recorded yet.<br/>Click "Make a donation" to add your first contribution.</div>';
+      return;
+    }
+    body.innerHTML = `
+      <table class="dp-table">
+        <thead><tr>
+          <th>Date</th><th>Amount</th><th>Purpose</th><th>Ref. No.</th>
+        </tr></thead>
+        <tbody>
+          ${donations.map(d => `
+            <tr>
+              <td>${fmtDate(d.donated_at)}</td>
+              <td class="dp-amount">₹${parseFloat(d.amount).toLocaleString('en-IN')}</td>
+              <td>${esc(d.purpose || '—')}</td>
+              <td style="color:var(--grey-400);font-size:12px;">${esc(d.txn_ref || '—')}</td>
+            </tr>`).join('')}
+        </tbody>
+      </table>`;
+  }
+
+  async function renderMatchedSection() {
+    const section = document.getElementById('matched-section');
+    if (!matchedStudents.length) {
+      section.innerHTML = `
+        <div class="dp-card">
+          <div class="dp-card-head">
+            <div class="dp-card-title"><i class="ti ti-user-heart"></i> Your matched student</div>
+          </div>
+          <div class="dp-no-match">
+            <div class="dp-no-match-icon"><i class="ti ti-hourglass"></i></div>
+            <div style="font-size:16px;font-weight:700;color:var(--black);margin-bottom:8px;">Awaiting student match</div>
+            <div style="font-size:13px;color:var(--grey-500);max-width:380px;margin:0 auto;line-height:1.7;">
+              Thank you for your support! The Thuvakkam committee will manually match you with a scholarship student. You'll be notified here once the match is made.
+            </div>
+          </div>
+        </div>`;
+      return;
+    }
+
+    const studentCards = await Promise.all(matchedStudents.map(async s => {
+      const { data: updates } = await sb.from('student_updates')
+        .select('*').eq('student_id', s.id)
+        .order('record_date', { ascending: false }).limit(20);
+      return renderStudentCard(s, updates || []);
+    }));
+
+    section.innerHTML = studentCards.join('');
+  }
+
+  function renderStudentCard(s, updates) {
+    const initials = (s.initials || s.name.slice(0,2)).toUpperCase();
+    const val = (v) => v ? `<span class="dp-info-val">${esc(String(v))}</span>` : `<span class="dp-info-val empty">Not provided</span>`;
+
+    const updateRows = updates.length
+      ? updates.map(u => {
+          const cat = CAT_COLORS[u.category] || CAT_COLORS.other;
+          return `<div class="dp-update-item">
+            <div class="dp-update-icon" style="background:${cat.color}18;">
+              <i class="ti ${cat.icon}" style="color:${cat.color};"></i>
+            </div>
+            <div style="flex:1;">
+              <div class="dp-update-title">${esc(u.title)}</div>
+              <div class="dp-update-meta">
+                <span>${cat.label}</span>
+                ${u.score ? `<span class="dp-update-score">${esc(u.score)}</span>` : ''}
+                ${u.record_date ? `<span><i class="ti ti-calendar" style="font-size:11px;"></i> ${fmtDate(u.record_date)}</span>` : ''}
+                ${u.proof_url ? `<a href="${u.proof_url}" target="_blank" style="color:var(--green-dark);font-size:12px;font-weight:600;display:inline-flex;align-items:center;gap:3px;"><i class="ti ti-file-check"></i> Proof</a>` : ''}
+              </div>
+              ${u.description ? `<div style="font-size:12px;color:var(--grey-500);margin-top:4px;">${esc(u.description)}</div>` : ''}
+            </div>
+          </div>`;
+        }).join('')
+      : '<div class="dp-empty"><i class="ti ti-activity"></i>No academic updates yet.<br/>Updates will appear here as the student adds them.</div>';
+
+    return `
+      <div class="dp-card" style="margin-bottom:20px;">
+        <div class="dp-student-header">
+          <div class="dp-student-avatar">${initials}</div>
+          <div style="flex:1;">
+            <div class="dp-student-name">${esc(s.name)}</div>
+            <div class="dp-student-school">${esc(s.school || '')} · SFS ${s.cycle_year}</div>
+          </div>
+          <span style="background:#D1FAE5;color:#065F46;border-radius:99px;padding:4px 12px;font-size:12px;font-weight:700;">Your matched student</span>
+        </div>
+
+        <!-- Profile info tabs -->
+        <div style="display:flex;border-bottom:1px solid var(--grey-100);">
+          <button onclick="switchTab('${s.id}','profile')" id="tab-profile-${s.id}"
+            style="flex:1;padding:12px;font-size:13px;font-weight:600;border:none;cursor:pointer;background:var(--green-dark);color:#fff;font-family:var(--font);">
+            Profile
+          </button>
+          <button onclick="switchTab('${s.id}','updates')" id="tab-updates-${s.id}"
+            style="flex:1;padding:12px;font-size:13px;font-weight:600;border:none;cursor:pointer;background:var(--white);color:var(--grey-500);font-family:var(--font);">
+            Academic updates
+          </button>
+        </div>
+
+        <!-- Profile pane -->
+        <div id="pane-profile-${s.id}">
+          <div style="padding:16px 20px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--grey-400);">Personal</div>
+          <div class="dp-info-grid">
+            <div class="dp-info-row"><span class="dp-info-key">Full name</span>${val(s.name)}</div>
+            <div class="dp-info-row"><span class="dp-info-key">Gender</span>${val(s.gender)}</div>
+            <div class="dp-info-row"><span class="dp-info-key">Date of birth</span>${val(s.dob ? fmtDate(s.dob) : null)}</div>
+            <div class="dp-info-row"><span class="dp-info-key">State</span>${val(s.state)}</div>
+            <div class="dp-info-row"><span class="dp-info-key">District</span>${val(s.district)}</div>
+            <div class="dp-info-row"><span class="dp-info-key">Email</span>${val(s.email)}</div>
+          </div>
+          <div style="padding:16px 20px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--grey-400);border-top:1px solid var(--grey-100);">Family</div>
+          <div class="dp-info-grid">
+            <div class="dp-info-row"><span class="dp-info-key">Father's name</span>${val(s.father_name)}</div>
+            <div class="dp-info-row"><span class="dp-info-key">Mother's name</span>${val(s.mother_name)}</div>
+            <div class="dp-info-row"><span class="dp-info-key">Annual income</span>${val(s.annual_income ? '₹' + Number(s.annual_income).toLocaleString('en-IN') : null)}</div>
+            <div class="dp-info-row"><span class="dp-info-key">Siblings</span>${val(s.siblings)}</div>
+          </div>
+          <div style="padding:16px 20px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--grey-400);border-top:1px solid var(--grey-100);">Education</div>
+          <div class="dp-info-grid">
+            <div class="dp-info-row" style="grid-column:span 2;flex-direction:column;align-items:flex-start;gap:4px;">
+              <span class="dp-info-key">10th Standard</span><span class="dp-info-val" style="text-align:left;">${s.school_10th || '<span class="empty">Not provided</span>'}</span>
+            </div>
+            <div class="dp-info-row" style="grid-column:span 2;flex-direction:column;align-items:flex-start;gap:4px;">
+              <span class="dp-info-key">12th / Diploma</span><span class="dp-info-val" style="text-align:left;">${s.school_12th || '<span class="empty">Not provided</span>'}</span>
+            </div>
+            ${s.college_ug ? `<div class="dp-info-row" style="grid-column:span 2;flex-direction:column;align-items:flex-start;gap:4px;"><span class="dp-info-key">UG College</span><span class="dp-info-val" style="text-align:left;">${esc(s.college_ug)}</span></div>` : ''}
+            <div class="dp-info-row"><span class="dp-info-key">Previous year %</span>${val(s.prev_percentage ? s.prev_percentage + '%' : null)}</div>
+            <div class="dp-info-row"><span class="dp-info-key">Mentor</span>${val(s.mentor)}</div>
+          </div>
+          ${s.family_about ? `
+            <div style="padding:16px 20px;border-top:1px solid var(--grey-100);">
+              <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--grey-400);margin-bottom:10px;">About the family</div>
+              <p style="font-size:13px;color:var(--grey-600);line-height:1.7;white-space:pre-wrap;">${esc(s.family_about)}</p>
+            </div>` : ''}
+        </div>
+
+        <!-- Updates pane -->
+        <div id="pane-updates-${s.id}" style="display:none;" id="update-feed-${s.id}">
+          <div style="padding:14px 20px;border-bottom:1px solid var(--grey-100);font-size:12px;color:var(--grey-400);display:flex;align-items:center;gap:6px;">
+            <i class="ti ti-activity" style="color:var(--green-dark);"></i>
+            Updates sync automatically when the student posts new records.
+          </div>
+          <div id="update-feed-${s.id}">${updateRows}</div>
+        </div>
+      </div>`;
+  }
+
+  function switchTab(studentId, tab) {
+    const profileBtn  = document.getElementById('tab-profile-' + studentId);
+    const updatesBtn  = document.getElementById('tab-updates-' + studentId);
+    const profilePane = document.getElementById('pane-profile-' + studentId);
+    const updatesPane = document.getElementById('pane-updates-' + studentId);
+
+    if (tab === 'profile') {
+      profileBtn.style.background = 'var(--green-dark)'; profileBtn.style.color = '#fff';
+      updatesBtn.style.background = 'var(--white)';       updatesBtn.style.color = 'var(--grey-500)';
+      profilePane.style.display = 'block'; updatesPane.style.display = 'none';
+    } else {
+      updatesBtn.style.background = 'var(--green-dark)'; updatesBtn.style.color = '#fff';
+      profileBtn.style.background = 'var(--white)';       profileBtn.style.color = 'var(--grey-500)';
+      updatesPane.style.display = 'block'; profilePane.style.display = 'none';
+    }
+  }
+
+  /* ── DONATE MODAL ──────────────────────────────────────── */
+  function openDonateModal()  { document.getElementById('donate-modal').style.display = 'block'; }
+  function closeDonateModal() { document.getElementById('donate-modal').style.display = 'none'; document.getElementById('donate-err').style.display='none'; }
+
+  async function saveDonation() {
+    const amount  = parseFloat(document.getElementById('d-amount').value);
+    const purpose = document.getElementById('d-purpose').value;
+    const txnRef  = document.getElementById('d-txn').value.trim();
+    const note    = document.getElementById('d-note').value.trim();
+    const btn     = document.getElementById('donate-save-btn');
+    const errEl   = document.getElementById('donate-err');
+
+    errEl.style.display = 'none';
+    if (!amount || amount <= 0) { errEl.textContent = 'Please enter a valid donation amount.'; errEl.style.display = 'block'; return; }
+
+    btn.disabled = true; btn.innerHTML = '<i class="ti ti-loader-2" style="animation:spin 0.8s linear infinite;display:inline-block;"></i> Saving...';
+
+    const { data, error } = await sb.from('donations').insert({
+      donor_id:   currentDonor.id,
+      amount,
+      currency:   'INR',
+      purpose,
+      txn_ref:    txnRef || null,
+      note:       note   || null,
+      donated_at: new Date().toISOString(),
+    }).select().single();
+
+    if (error) { errEl.textContent = 'Could not save donation: ' + error.message; errEl.style.display = 'block'; btn.disabled = false; btn.innerHTML = '<i class="ti ti-check"></i> Save donation'; return; }
+
+    donations.unshift(data);
+    renderDonations();
+    renderStats();
+    closeDonateModal();
+    document.getElementById('d-amount').value = '';
+    document.getElementById('d-txn').value    = '';
+    document.getElementById('d-note').value   = '';
+    btn.disabled = false; btn.innerHTML = '<i class="ti ti-check"></i> Save donation';
+  }
+
+  async function doLogout() { await sb.auth.signOut(); window.location.href = 'index.html'; }
+
+  function fmtDate(d) {
+    if (!d) return '';
+    return new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+  }
+  function esc(str) {
+    return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  init();
+</script>
+<style>@keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }</style>
+</body>
+</html>

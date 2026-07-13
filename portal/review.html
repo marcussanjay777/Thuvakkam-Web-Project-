@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Review Queue — Thuvakkam SFS Portal</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="js/client.js"></script>
+  <script src="js/profile.js"></script>
+  <style>
+    .review-layout {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    /* Left: queue list */
+    .queue-card {
+      background: var(--white);
+      border: 1px solid var(--grey-100);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      position: sticky;
+      top: calc(var(--topbar-height) + 28px);
+      max-height: calc(100vh - var(--topbar-height) - 80px);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .queue-header {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--grey-100);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .queue-header-title { font-size: 13px; font-weight: 600; }
+    .queue-count {
+      font-size: 11px; font-weight: 700;
+      background: var(--yellow); color: var(--green-dark);
+      padding: 3px 8px; border-radius: 99px;
+    }
+
+    .queue-list { overflow-y: auto; flex: 1; }
+
+    .queue-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 13px 16px;
+      cursor: pointer;
+      border-bottom: 1px solid var(--grey-50);
+      transition: background 0.12s;
+      border-left: 3px solid transparent;
+    }
+
+    .queue-item:hover { background: var(--grey-50); }
+    .queue-item.active {
+      background: var(--green-light);
+      border-left-color: var(--green-dark);
+    }
+
+    .queue-item-avatar {
+      width: 36px; height: 36px; border-radius: 8px;
+      background: var(--green-light); color: var(--green-dark);
+      font-size: 12px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .queue-item-name  { font-size: 13px; font-weight: 500; color: var(--black); }
+    .queue-item-meta  { font-size: 11px; color: var(--grey-400); margin-top: 2px; }
+
+    /* Right: detail panel */
+    .review-panel {
+      background: var(--white);
+      border: 1px solid var(--grey-100);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+
+    .review-panel-hero {
+      background: var(--green-dark);
+      padding: 28px 32px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .review-avatar {
+      width: 64px; height: 64px; border-radius: 12px;
+      background: var(--yellow); color: var(--green-dark);
+      font-size: 22px; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .review-name { font-size: 22px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+    .review-school { font-size: 13px; color: rgba(255,255,255,0.6); }
+
+    .review-body { padding: 28px 32px; }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .detail-block {
+      background: var(--grey-50);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+    }
+
+    .detail-block-key {
+      font-size: 10px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.07em;
+      color: var(--grey-400); margin-bottom: 5px;
+    }
+
+    .detail-block-val {
+      font-size: 15px; font-weight: 600; color: var(--black);
+    }
+
+    .review-section-title {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em; color: var(--grey-400);
+      margin-bottom: 12px;
+    }
+
+    .info-row {
+      display: flex; justify-content: space-between;
+      padding: 11px 0; border-bottom: 1px solid var(--grey-100);
+      font-size: 13px;
+    }
+    .info-row:last-child { border-bottom: none; }
+    .info-key { color: var(--grey-600); }
+    .info-val { font-weight: 500; color: var(--black); }
+    .info-val.empty { color: var(--grey-200); font-style: italic; }
+
+    .decision-bar {
+      padding: 20px 32px;
+      border-top: 1px solid var(--grey-100);
+      background: var(--grey-50);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-approve {
+      flex: 1; padding: 13px;
+      background: var(--green-dark); color: #fff;
+      border: none; border-radius: var(--radius-md);
+      font-size: 14px; font-weight: 700;
+      font-family: var(--font); cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: background 0.15s;
+    }
+    .btn-approve:hover { background: var(--green-mid); }
+
+    .btn-decline {
+      flex: 1; padding: 13px;
+      background: #FEE2E2; color: #991B1B;
+      border: none; border-radius: var(--radius-md);
+      font-size: 14px; font-weight: 700;
+      font-family: var(--font); cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: background 0.15s;
+    }
+    .btn-decline:hover { background: #FECACA; }
+
+    .btn-skip {
+      padding: 13px 20px;
+      background: transparent; color: var(--grey-600);
+      border: 1px solid var(--grey-200); border-radius: var(--radius-md);
+      font-size: 13px; font-weight: 500;
+      font-family: var(--font); cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-skip:hover { background: var(--grey-100); }
+
+    .empty-queue {
+      text-align: center; padding: 64px 32px; color: var(--grey-400);
+    }
+
+    .empty-queue i { font-size: 48px; margin-bottom: 16px; display: block; color: var(--grey-200); }
+    .empty-queue h3 { font-size: 16px; font-weight: 600; color: var(--grey-800); margin-bottom: 8px; }
+    .empty-queue p { font-size: 13px; line-height: 1.6; }
+
+    .no-selection {
+      padding: 64px 32px; text-align: center; color: var(--grey-400);
+    }
+    .no-selection i { font-size: 40px; display: block; margin-bottom: 16px; color: var(--grey-200); }
+    .no-selection p { font-size: 13px; }
+
+    .decision-toast {
+      position: fixed; bottom: 28px; right: 28px;
+      padding: 14px 20px; border-radius: var(--radius-md);
+      font-size: 13px; font-weight: 600; font-family: var(--font);
+      box-shadow: var(--shadow-md); z-index: 9999;
+      transform: translateY(80px); opacity: 0;
+      transition: transform 0.25s, opacity 0.25s;
+    }
+    .decision-toast.show { transform: translateY(0); opacity: 1; }
+    .decision-toast.approved { background: #D1FAE5; color: #065F46; }
+    .decision-toast.declined { background: #FEE2E2; color: #991B1B; }
+  </style>
+</head>
+<body>
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-accent"></div>
+      <div class="topbar-brand">
+        Thuvakkam Education
+        <span>Sponsor for Success &mdash; Internal Portal</span>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <input class="search-input" type="text" placeholder="Search students, schools..." />
+      <div class="topbar-divider"></div>
+      <div class="user-pill">
+        <div class="user-avatar">—</div>
+        <div class="user-info">
+          <div class="user-name">Loading...</div>
+          <div class="user-role"></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="nav-section-label">Main</div>
+    <a class="nav-item" href="dashboard.html"><i class="ti ti-layout-dashboard"></i> Overview</a>
+    <a class="nav-item" href="applications.html"><i class="ti ti-file-text"></i> Applications</a>
+    <a class="nav-item" href="add-student.html"><i class="ti ti-user-plus"></i> Add Student</a>
+    <a class="nav-item active" href="review.html"><i class="ti ti-clipboard-check"></i> Review Queue</a>
+    <a class="nav-item" href="selected.html"><i class="ti ti-user-check"></i> Selected Students</a>
+    <a class="nav-item" href="rejected.html"><i class="ti ti-user-x"></i> Rejected</a>
+    <a class="nav-item" href="previous.html"><i class="ti ti-clock-history"></i> Previous Beneficiaries</a>
+    <div class="nav-section-label">Reports</div>
+    <a class="nav-item" href="donor-management.html"><i class="ti ti-heart-handshake"></i> Donor Management</a>
+    <a class="nav-item" href="donors.html"><i class="ti ti-chart-bar"></i> Donor Transparency</a>
+    <a class="nav-item" href="documents.html"><i class="ti ti-folder"></i> Documents</a>
+    <div class="sidebar-footer">
+      <a class="nav-item" href="#" onclick="signOut()"><i class="ti ti-logout"></i> Sign out</a>
+    </div>
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="main">
+    <div class="page-header">
+      <div class="page-title">Review Queue</div>
+      <div class="page-subtitle">Approve or decline pending scholarship applications one by one</div>
+    </div>
+
+    <div class="review-layout" id="review-layout">
+
+      <!-- Queue list -->
+      <div class="queue-card">
+        <div class="queue-header">
+          <span class="queue-header-title">Pending applications</span>
+          <span class="queue-count" id="queue-count">0</span>
+        </div>
+        <div class="queue-list" id="queue-list"></div>
+      </div>
+
+      <!-- Detail panel -->
+      <div id="review-panel-wrap">
+        <div class="no-selection">
+          <i class="ti ti-hand-click"></i>
+          <p>Select a student from the list to review their application.</p>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Toast -->
+  <div class="decision-toast" id="decision-toast"></div>
+
+<script>
+let queue = [];
+let currentId = null;
+
+/* ── QUEUE LIST ───────────────────────────────────────── */
+function renderQueue(data) {
+  const el = document.getElementById('queue-list');
+  document.getElementById('queue-count').textContent = data.length;
+
+  if (!data.length) {
+    el.innerHTML = `
+      <div class="empty-queue">
+        <i class="ti ti-circle-check"></i>
+        <h3>All caught up!</h3>
+        <p>No pending applications to review right now.</p>
+      </div>`;
+    document.getElementById('review-panel-wrap').innerHTML = '';
+    return;
+  }
+
+  el.innerHTML = data.map(s => `
+    <div class="queue-item ${s.id === currentId ? 'active' : ''}" onclick="selectStudent('${s.id}')">
+      <div class="queue-item-avatar">${s.initials || s.name.slice(0,2).toUpperCase()}</div>
+      <div>
+        <div class="queue-item-name">${s.name}</div>
+        <div class="queue-item-meta">${s.school} &middot; ${s.district}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ── DETAIL PANEL ─────────────────────────────────────── */
+function showPanel(s) {
+  const wrap = document.getElementById('review-panel-wrap');
+
+  const field = (v, fallback = 'Not provided') =>
+    v ? `<span class="info-val">${v}</span>` : `<span class="info-val empty">${fallback}</span>`;
+
+  wrap.innerHTML = `
+    <div class="review-panel">
+
+      <div class="review-panel-hero">
+        <div class="review-avatar">${s.initials || s.name.slice(0,2).toUpperCase()}</div>
+        <div>
+          <div class="review-name">${s.name}</div>
+          <div class="review-school">${s.school} &middot; Class ${s.class}</div>
+        </div>
+        <button onclick="openProfile('${s.id}')" style="margin-left:auto;background:rgba(255,255,255,0.15);border:none;border-radius:6px;padding:8px 14px;cursor:pointer;color:#fff;font-size:12px;font-weight:600;font-family:var(--font);display:flex;align-items:center;gap:6px;">
+          <i class="ti ti-external-link"></i> Full profile
+        </button>
+      </div>
+
+      <div class="review-body">
+
+        <div class="detail-grid">
+          <div class="detail-block">
+            <div class="detail-block-key">District</div>
+            <div class="detail-block-val">${s.district}</div>
+          </div>
+          <div class="detail-block">
+            <div class="detail-block-key">Class</div>
+            <div class="detail-block-val">${s.class}</div>
+          </div>
+          <div class="detail-block">
+            <div class="detail-block-key">Applied on</div>
+            <div class="detail-block-val">${fmtDate(s.applied_on)}</div>
+          </div>
+          ${s.prev_percentage ? `
+          <div class="detail-block">
+            <div class="detail-block-key">Previous %</div>
+            <div class="detail-block-val">${s.prev_percentage}%</div>
+          </div>` : ''}
+          ${s.attendance ? `
+          <div class="detail-block">
+            <div class="detail-block-key">Attendance</div>
+            <div class="detail-block-val">${s.attendance}%</div>
+          </div>` : ''}
+          ${s.annual_income ? `
+          <div class="detail-block">
+            <div class="detail-block-key">Family income</div>
+            <div class="detail-block-val">&#8377;${Number(s.annual_income).toLocaleString('en-IN')}</div>
+          </div>` : ''}
+        </div>
+
+        <div class="review-section-title">Family details</div>
+        <div style="margin-bottom:20px;">
+          <div class="info-row"><span class="info-key">Father's name</span>${field(s.father_name)}</div>
+          <div class="info-row"><span class="info-key">Mother's name</span>${field(s.mother_name)}</div>
+          <div class="info-row"><span class="info-key">Occupation</span>${field(s.parent_occupation)}</div>
+          <div class="info-row"><span class="info-key">Siblings</span>${field(s.siblings)}</div>
+        </div>
+
+        <div class="review-section-title">Contact</div>
+        <div style="margin-bottom:20px;">
+          <div class="info-row"><span class="info-key">Phone</span>${field(s.phone)}</div>
+          <div class="info-row"><span class="info-key">Address</span>${field(s.address)}</div>
+        </div>
+
+        ${s.notes ? `
+        <div class="review-section-title">Committee notes</div>
+        <div style="background:var(--grey-50);border-radius:var(--radius-md);padding:14px 16px;font-size:13px;color:var(--grey-800);line-height:1.6;margin-bottom:20px;">${s.notes}</div>
+        ` : ''}
+
+        <div class="review-section-title">Your decision</div>
+        <textarea id="decision-notes" placeholder="Optional: add a note about this decision..."
+          style="width:100%;border:1px solid var(--grey-200);border-radius:var(--radius-md);padding:10px 14px;font-size:13px;font-family:var(--font);resize:vertical;min-height:72px;outline:none;"></textarea>
+      </div>
+
+      <div class="decision-bar">
+        <button class="btn-approve" onclick="decide('${s.id}','selected')">
+          <i class="ti ti-circle-check"></i> Approve scholarship
+        </button>
+        <button class="btn-decline" onclick="decide('${s.id}','rejected')">
+          <i class="ti ti-circle-x"></i> Decline
+        </button>
+        <button class="btn-skip" onclick="skipToNext('${s.id}')">
+          Skip <i class="ti ti-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+function selectStudent(id) {
+  currentId = id;
+  const s = queue.find(x => x.id === id);
+  if (s) showPanel(s);
+  renderQueue(queue); // re-render to update active state
+}
+
+/* ── DECISIONS ────────────────────────────────────────── */
+async function decide(id, status) {
+  const notes = document.getElementById('decision-notes')?.value || '';
+  const updatePayload = { status };
+  if (notes.trim()) updatePayload.notes = notes.trim();
+
+  const { error } = await sb.from('students').update(updatePayload).eq('id', id);
+  if (error) { alert('Could not update: ' + error.message); return; }
+
+  // Remove from local queue
+  queue = queue.filter(s => s.id !== id);
+
+  // Toast
+  const toast = document.getElementById('decision-toast');
+  toast.textContent = status === 'selected' ? 'Application approved!' : 'Application declined.';
+  toast.className   = `decision-toast ${status === 'selected' ? 'approved' : 'declined'} show`;
+  setTimeout(() => toast.classList.remove('show'), 2500);
+
+  // Move to next
+  if (queue.length) {
+    currentId = queue[0].id;
+    showPanel(queue[0]);
+  } else {
+    currentId = null;
+    document.getElementById('review-panel-wrap').innerHTML = '';
+  }
+  renderQueue(queue);
+}
+
+function skipToNext(id) {
+  const idx  = queue.findIndex(s => s.id === id);
+  const next = queue[(idx + 1) % queue.length];
+  if (next) selectStudent(next.id);
+}
+
+/* ── LOAD ─────────────────────────────────────────────── */
+async function loadReview() {
+  await requireAuth();
+
+  const { data, error } = await sb.from('students')
+    .select('*').eq('status', 'pending').eq('cycle_year', 2026)
+    .order('applied_on', { ascending: true });
+
+  if (error) { console.error(error); return; }
+
+  queue = data || [];
+  renderQueue(queue);
+
+  if (queue.length) selectStudent(queue[0].id);
+}
+
+loadReview();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Overview — Thuvakkam SFS Portal</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="js/client.js"></script>
+</head>
+<body>
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-accent"></div>
+      <div class="topbar-brand">
+        Thuvakkam Education
+        <span>Sponsor for Success &mdash; Internal Portal</span>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <input class="search-input" type="text" placeholder="Search students, schools..." />
+      <div class="topbar-divider"></div>
+      <div class="user-pill">
+        <div class="user-avatar">RK</div>
+        <div class="user-info">
+          <div class="user-name">Ramesh Kumar</div>
+          <div class="user-role">Committee Member</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="nav-section-label">Main</div>
+    <a class="nav-item active" href="dashboard.html">
+      <i class="ti ti-layout-dashboard"></i> Overview
+    </a>
+    <a class="nav-item" href="applications.html">
+      <i class="ti ti-file-text"></i> Applications
+    </a>
+    <a class="nav-item" href="selected.html">
+      <i class="ti ti-user-check"></i> Selected Students
+    </a>
+    <a class="nav-item" href="rejected.html"><i class="ti ti-user-x"></i> Rejected</a>
+    <a class="nav-item" href="previous.html">
+      <i class="ti ti-clock-history"></i> Previous Beneficiaries
+    </a>
+
+    <div class="nav-section-label">Reports</div>
+    <a class="nav-item" href="donors.html">
+      <i class="ti ti-heart-handshake"></i> Donor Transparency
+    </a>
+    <a class="nav-item" href="documents.html">
+      <i class="ti ti-folder"></i> Documents
+    </a>
+
+    <div class="sidebar-footer">
+      <a class="nav-item" href="#" onclick="signOut()"><i class="ti ti-logout"></i> Sign out</a>
+    </div>
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="main">
+    <div class="page-header">
+      <div class="page-title">Dashboard Overview</div>
+      <div class="page-subtitle">SFS 2026 cycle &mdash; data as of July 2026</div>
+    </div>
+
+    <!-- Metric cards -->
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-card-accent"></div>
+        <div class="metric-label">Total Applications</div>
+        <div class="metric-value" id="metric-total">—</div>
+        <div class="metric-delta"><i class="ti ti-trending-up" style="font-size:12px;vertical-align:-1px;"></i> 2026 cycle</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-card-accent"></div>
+        <div class="metric-label">Selected Students</div>
+        <div class="metric-value" id="metric-selected">—</div>
+        <div class="metric-delta"><i class="ti ti-trending-up" style="font-size:12px;vertical-align:-1px;"></i> This cycle</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-card-accent" style="background:#F5C31D;"></div>
+        <div class="metric-label">Pending Review</div>
+        <div class="metric-value" id="metric-pending">—</div>
+        <div class="metric-delta neutral">Requires committee attention</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-card-accent"></div>
+        <div class="metric-label">Partner Schools</div>
+        <div class="metric-value">24</div>
+        <div class="metric-delta"><i class="ti ti-trending-up" style="font-size:12px;vertical-align:-1px;"></i> 3 new partners</div>
+      </div>
+    </div>
+
+    <!-- Charts row -->
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:24px;">
+
+      <!-- Bar chart -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Year-wise scholarship data</div>
+          <div class="chart-legend">
+            <div class="legend-item">
+              <div class="legend-dot" style="background:#2D7A4F;"></div> Applications
+            </div>
+            <div class="legend-item">
+              <div class="legend-dot" style="background:#F5C31D;"></div> Selected
+            </div>
+          </div>
+        </div>
+        <div class="chart-wrap">
+          <div class="bar-chart" id="bar-chart"></div>
+        </div>
+      </div>
+
+      <!-- Summary -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">2026 cycle at a glance</div>
+        </div>
+        <div class="card-body">
+          <div style="display:flex;flex-direction:column;gap:16px;">
+            <div>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                <span style="font-size:12px;color:var(--grey-600);">Applications reviewed</span>
+                <span style="font-size:12px;font-weight:600;">267 / 325</span>
+              </div>
+              <div class="progress-track"><div class="progress-fill" style="width:82%;"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                <span style="font-size:12px;color:var(--grey-600);">Scholarships funded</span>
+                <span style="font-size:12px;font-weight:600;">58 / 112</span>
+              </div>
+              <div class="progress-track"><div class="progress-fill-yellow" style="width:52%;"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                <span style="font-size:12px;color:var(--grey-600);">Documents verified</span>
+                <span style="font-size:12px;font-weight:600;">98 / 112</span>
+              </div>
+              <div class="progress-track"><div class="progress-fill" style="width:87%;"></div></div>
+            </div>
+            <div style="padding-top:8px;border-top:1px solid var(--grey-100);">
+              <div style="font-size:11px;color:var(--grey-400);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.06em;font-weight:600;">District coverage</div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px;">
+                <span style="font-size:11px;background:var(--grey-50);border:1px solid var(--grey-100);padding:3px 8px;border-radius:4px;color:var(--grey-600);">Chennai</span>
+                <span style="font-size:11px;background:var(--grey-50);border:1px solid var(--grey-100);padding:3px 8px;border-radius:4px;color:var(--grey-600);">Madurai</span>
+                <span style="font-size:11px;background:var(--grey-50);border:1px solid var(--grey-100);padding:3px 8px;border-radius:4px;color:var(--grey-600);">Coimbatore</span>
+                <span style="font-size:11px;background:var(--grey-50);border:1px solid var(--grey-100);padding:3px 8px;border-radius:4px;color:var(--grey-600);">Tirunelveli</span>
+                <span style="font-size:11px;background:var(--grey-50);border:1px solid var(--grey-100);padding:3px 8px;border-radius:4px;color:var(--grey-600);">Salem</span>
+                <span style="font-size:11px;background:var(--grey-50);border:1px solid var(--grey-100);padding:3px 8px;border-radius:4px;color:var(--grey-600);">+3 more</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent applications -->
+    <div class="card">
+      <div class="table-toolbar">
+        <div class="table-toolbar-left">
+          Recent applications <span>(last 5 submitted)</span>
+        </div>
+        <div class="table-toolbar-right">
+          <a href="applications.html" class="btn btn-outline btn-sm">View all</a>
+        </div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Student</th>
+            <th>School</th>
+            <th>District</th>
+            <th>Class</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="recent-tbody">
+          <tr>
+            <td><div class="cell-student"><div class="table-avatar">AK</div><span class="cell-name">Arun Kumar</span></div></td>
+            <td class="cell-muted">Avvai School</td>
+            <td class="cell-muted">Chennai</td>
+            <td class="cell-muted">10th</td>
+            <td><span class="badge badge-pending">Pending</span></td>
+          </tr>
+          <tr>
+            <td><div class="cell-student"><div class="table-avatar">ML</div><span class="cell-name">Meena Lakshmi</span></div></td>
+            <td class="cell-muted">Govt. HSS Ramanathapuram</td>
+            <td class="cell-muted">Ramanathapuram</td>
+            <td class="cell-muted">11th</td>
+            <td><span class="badge badge-selected">Selected</span></td>
+          </tr>
+          <tr>
+            <td><div class="cell-student"><div class="table-avatar">DK</div><span class="cell-name">Dinesh Kumar</span></div></td>
+            <td class="cell-muted">Panchayat Union School</td>
+            <td class="cell-muted">Madurai</td>
+            <td class="cell-muted">12th</td>
+            <td><span class="badge badge-selected">Selected</span></td>
+          </tr>
+          <tr>
+            <td><div class="cell-student"><div class="table-avatar">PD</div><span class="cell-name">Priya Devi</span></div></td>
+            <td class="cell-muted">Govt. Girls HSS</td>
+            <td class="cell-muted">Tirunelveli</td>
+            <td class="cell-muted">9th</td>
+            <td><span class="badge badge-selected">Selected</span></td>
+          </tr>
+          <tr>
+            <td><div class="cell-student"><div class="table-avatar">KR</div><span class="cell-name">Karthik Raja</span></div></td>
+            <td class="cell-muted">Municipal School</td>
+            <td class="cell-muted">Coimbatore</td>
+            <td class="cell-muted">10th</td>
+            <td><span class="badge badge-pending">Pending</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+<script>
+function renderChart(data) {
+  const el = document.getElementById('bar-chart');
+  if (!data.length) return;
+  const max = Math.max(...data.map(d => d.apps), 1);
+  el.innerHTML = data.map(d => `
+    <div class="bar-group">
+      <div class="bar-cols">
+        <div class="bar bar-apps" style="height:${Math.round((d.apps/max)*140)}px;" title="${d.apps} applications"></div>
+        <div class="bar bar-sel"  style="height:${Math.round((d.sel/max)*140)}px;"  title="${d.sel} selected"></div>
+      </div>
+      <div class="bar-year">${d.year}</div>
+    </div>
+  `).join('');
+}
+
+async function loadDashboard() {
+  await requireAuth();
+
+  const { data: all } = await sb.from('students').select('cycle_year,status');
+  if (all) {
+    const cur = all.filter(s => s.cycle_year === 2026);
+    document.getElementById('metric-total').textContent    = cur.length;
+    document.getElementById('metric-selected').textContent = cur.filter(s=>s.status==='selected').length;
+    document.getElementById('metric-pending').textContent  = cur.filter(s=>s.status==='pending').length;
+    const years = [...new Set(all.map(s=>s.cycle_year))].sort();
+    renderChart(years.map(yr => {
+      const rows = all.filter(s=>s.cycle_year===yr);
+      return { year: String(yr), apps: rows.length, sel: rows.filter(s=>s.status==='selected').length };
+    }));
+  }
+
+  // Fetch recent 5 applications
+  const { data: recent } = await sb.from('students')
+    .select('*').eq('cycle_year', 2026)
+    .order('applied_on', { ascending: false }).limit(5);
+
+  if (recent) {
+    document.getElementById('recent-tbody').innerHTML = recent.map(s => `
+      <tr>
+        <td><div class="cell-student"><div class="table-avatar">${s.initials || s.name.slice(0,2).toUpperCase()}</div><span class="cell-name">${s.name}</span></div></td>
+        <td class="cell-muted">${s.school}</td>
+        <td class="cell-muted">${s.district}</td>
+        <td class="cell-muted">${s.class}</td>
+        <td>${statusBadge(s.status)}</td>
+      </tr>
+    `).join('');
+  }
+
+}
+
+loadDashboard();
+</script>
+
+</body>
+</html>

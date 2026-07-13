@@ -1,0 +1,571 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@700&display=swap');
+
+  #sfs-root * { box-sizing: border-box; margin: 0; padding: 0; }
+  #sfs-root {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--color-text-primary);
+    min-height: 600px;
+    background: var(--color-background-tertiary);
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+    border: 0.5px solid var(--color-border-tertiary);
+  }
+
+  /* LOGIN */
+  #login-screen {
+    min-height: 600px;
+    background: #042C53;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+  }
+  .login-card {
+    background: var(--color-background-primary);
+    border-radius: var(--border-radius-xl);
+    padding: 2.5rem;
+    width: 100%;
+    max-width: 380px;
+    border: 0.5px solid var(--color-border-tertiary);
+  }
+  .login-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    color: #042C53;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 4px;
+  }
+  .login-sub {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    margin-bottom: 2rem;
+  }
+  .login-card label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    display: block;
+    margin-bottom: 6px;
+  }
+  .login-card input {
+    width: 100%;
+    border: 0.5px solid var(--color-border-secondary);
+    border-radius: var(--border-radius-md);
+    padding: 10px 14px;
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    background: var(--color-background-secondary);
+    color: var(--color-text-primary);
+    margin-bottom: 1rem;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .login-card input:focus { border-color: #185FA5; }
+  .btn-primary {
+    background: #042C53;
+    color: #fff;
+    border: none;
+    border-radius: var(--border-radius-md);
+    padding: 11px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    width: 100%;
+    transition: background 0.2s;
+  }
+  .btn-primary:hover { background: #0C447C; }
+  .forgot-link {
+    display: block;
+    text-align: center;
+    margin-top: 1rem;
+    font-size: 12px;
+    color: #185FA5;
+    text-decoration: none;
+  }
+
+  /* DASHBOARD */
+  #dashboard { display: none; min-height: 600px; }
+  .topbar {
+    background: var(--color-background-primary);
+    border-bottom: 0.5px solid var(--color-border-tertiary);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .topbar-brand {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    color: #042C53;
+    font-weight: 700;
+  }
+  .topbar-sub { font-size: 11px; color: var(--color-text-secondary); margin-top: 1px; }
+  .topbar-right { display: flex; align-items: center; gap: 12px; }
+  .search-box {
+    background: var(--color-background-secondary);
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-md);
+    padding: 7px 12px;
+    font-size: 13px;
+    color: var(--color-text-primary);
+    font-family: 'DM Sans', sans-serif;
+    width: 180px;
+    outline: none;
+  }
+  .avatar { width: 32px; height: 32px; border-radius: 50%; background: #B5D4F4; display: flex; align-items: center; justify-content: center; font-weight: 500; font-size: 12px; color: #0C447C; }
+
+  .layout { display: flex; min-height: 560px; }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: 220px;
+    background: #042C53;
+    padding: 1.25rem 1rem;
+    flex-shrink: 0;
+  }
+  .nav-section { font-size: 10px; font-weight: 500; color: #378ADD; letter-spacing: 0.08em; text-transform: uppercase; padding: 0 8px; margin-bottom: 8px; margin-top: 16px; }
+  .nav-section:first-child { margin-top: 0; }
+  .nav-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 9px 10px;
+    border-radius: var(--border-radius-md);
+    border: none;
+    background: transparent;
+    color: #B5D4F4;
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 400;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.15s, color 0.15s;
+  }
+  .nav-btn:hover { background: rgba(55,138,221,0.18); color: #fff; }
+  .nav-btn.active { background: #185FA5; color: #fff; }
+  .nav-btn i { font-size: 16px; width: 18px; flex-shrink: 0; }
+
+  /* CONTENT */
+  .content { flex: 1; padding: 1.5rem; overflow-y: auto; }
+  .section { display: none; }
+  .section.active { display: block; }
+
+  .page-title { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: var(--color-text-primary); margin-bottom: 1.25rem; }
+
+  /* METRIC CARDS */
+  .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 1.25rem; }
+  .metric {
+    background: var(--color-background-primary);
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-lg);
+    padding: 1rem 1.25rem;
+  }
+  .metric-label { font-size: 11px; color: var(--color-text-secondary); font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
+  .metric-val { font-size: 28px; font-weight: 600; margin-top: 6px; color: var(--color-text-primary); }
+  .metric-delta { font-size: 11px; margin-top: 4px; }
+  .up { color: var(--color-text-success); }
+
+  /* CHART AREA */
+  .chart-card {
+    background: var(--color-background-primary);
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-lg);
+    padding: 1.25rem;
+  }
+  .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+  .chart-title { font-weight: 500; font-size: 14px; }
+  .chart-legend { display: flex; gap: 16px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--color-text-secondary); }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+  /* BAR CHART */
+  .bar-chart { display: flex; align-items: flex-end; gap: 10px; height: 160px; margin-top: 8px; }
+  .bar-group { display: flex; gap: 4px; align-items: flex-end; flex: 1; flex-direction: column; }
+  .bar-year { font-size: 10px; color: var(--color-text-tertiary); text-align: center; margin-top: 6px; width: 100%; }
+  .bar-wrap { display: flex; gap: 4px; align-items: flex-end; width: 100%; }
+  .bar { border-radius: 3px 3px 0 0; flex: 1; min-width: 12px; transition: opacity 0.2s; }
+  .bar:hover { opacity: 0.8; }
+
+  /* TABLE */
+  .table-card {
+    background: var(--color-background-primary);
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+  }
+  .table-toolbar { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; border-bottom: 0.5px solid var(--color-border-tertiary); }
+  .table-toolbar-title { font-weight: 500; font-size: 14px; }
+  .btn-sm {
+    background: #042C53;
+    color: #fff;
+    border: none;
+    border-radius: var(--border-radius-md);
+    padding: 7px 14px;
+    font-size: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .btn-sm-ghost {
+    background: transparent;
+    color: var(--color-text-primary);
+    border: 0.5px solid var(--color-border-secondary);
+    border-radius: var(--border-radius-md);
+    padding: 6px 12px;
+    font-size: 12px;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    display: flex; align-items: center; gap: 6px;
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { background: var(--color-background-secondary); font-weight: 500; color: var(--color-text-secondary); padding: 10px 16px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 0.5px solid var(--color-border-tertiary); }
+  td { padding: 12px 16px; border-bottom: 0.5px solid var(--color-border-tertiary); vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 500; }
+  .badge-pending { background: #FAEEDA; color: #633806; }
+  .badge-selected { background: #EAF3DE; color: #27500A; }
+  .badge-rejected { background: #FCEBEB; color: #501313; }
+  .avatar-sm { width: 34px; height: 34px; border-radius: 8px; background: #B5D4F4; display: flex; align-items: center; justify-content: center; font-weight: 500; font-size: 12px; color: #0C447C; }
+
+  /* STUDENT CARDS */
+  .student-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .student-card {
+    background: var(--color-background-primary);
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+  }
+  .student-card-img { height: 120px; background: linear-gradient(135deg, #042C53, #185FA5); display: flex; align-items: center; justify-content: center; }
+  .student-card-img-text { font-family: 'Playfair Display', serif; font-size: 32px; color: rgba(255,255,255,0.4); font-weight: 700; }
+  .student-card-body { padding: 14px; }
+  .student-name { font-weight: 500; font-size: 14px; }
+  .student-school { font-size: 12px; color: var(--color-text-secondary); margin-top: 2px; margin-bottom: 10px; }
+  .student-meta { font-size: 12px; color: var(--color-text-secondary); display: flex; flex-direction: column; gap: 4px; }
+  .student-meta span strong { color: var(--color-text-primary); font-weight: 500; }
+  .btn-view { display: block; width: 100%; margin-top: 12px; background: transparent; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); padding: 8px; font-size: 12px; font-family: 'DM Sans', sans-serif; color: var(--color-text-primary); cursor: pointer; text-align: center; }
+  .btn-view:hover { background: var(--color-background-secondary); }
+
+  /* DONOR */
+  .donor-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 1.25rem; }
+  .stat-big { font-size: 36px; font-weight: 600; color: var(--color-text-primary); margin-top: 8px; }
+  .progress-bar-track { background: var(--color-background-secondary); border-radius: 99px; height: 6px; margin-top: 12px; }
+  .progress-bar-fill { background: #185FA5; height: 6px; border-radius: 99px; }
+
+  /* DOCS */
+  .doc-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 0.5px solid var(--color-border-tertiary); }
+  .doc-row:last-child { border-bottom: none; }
+  .doc-icon { width: 36px; height: 36px; background: #E6F1FB; border-radius: var(--border-radius-md); display: flex; align-items: center; justify-content: center; color: #185FA5; font-size: 18px; flex-shrink: 0; }
+  .doc-name { font-weight: 500; font-size: 13px; }
+  .doc-date { font-size: 11px; color: var(--color-text-secondary); margin-top: 2px; }
+</style>
+
+<div id="sfs-root">
+  <h2 class="sr-only" style="position:absolute;left:-9999px;">Thuvakkam Education SFS Portal — donor and committee dashboard</h2>
+
+  <!-- LOGIN -->
+  <div id="login-screen">
+    <div class="login-card">
+      <div class="login-logo">Thuvakkam Education</div>
+      <div class="login-sub">SFS Donor & Committee Portal</div>
+      <label>Email</label>
+      <input type="email" placeholder="committee@thuvakkam.org" />
+      <label>Password</label>
+      <input type="password" placeholder="••••••••" />
+      <button class="btn-primary" onclick="showDash()">Sign in</button>
+      <a href="#" class="forgot-link">Forgot password?</a>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="dashboard">
+    <div class="topbar">
+      <div>
+        <div class="topbar-brand">Thuvakkam Education</div>
+        <div class="topbar-sub">Student Funding System (SFS)</div>
+      </div>
+      <div class="topbar-right">
+        <input class="search-box" type="text" placeholder="Search students…" />
+        <div class="avatar">RK</div>
+      </div>
+    </div>
+
+    <div class="layout">
+      <!-- SIDEBAR -->
+      <aside class="sidebar">
+        <div class="nav-section">Main</div>
+        <button class="nav-btn active" onclick="nav('overview', this)">
+          <i class="ti ti-layout-dashboard" aria-hidden="true"></i> Overview
+        </button>
+        <button class="nav-btn" onclick="nav('applications', this)">
+          <i class="ti ti-file-text" aria-hidden="true"></i> Applications
+        </button>
+        <button class="nav-btn" onclick="nav('selected', this)">
+          <i class="ti ti-user-check" aria-hidden="true"></i> Selected Students
+        </button>
+        <button class="nav-btn" onclick="nav('previous', this)">
+          <i class="ti ti-clock" aria-hidden="true"></i> Previous Beneficiaries
+        </button>
+        <div class="nav-section">Reports</div>
+        <button class="nav-btn" onclick="nav('donors', this)">
+          <i class="ti ti-heart" aria-hidden="true"></i> Donor Transparency
+        </button>
+        <button class="nav-btn" onclick="nav('documents', this)">
+          <i class="ti ti-folder" aria-hidden="true"></i> Documents
+        </button>
+      </aside>
+
+      <!-- CONTENT -->
+      <main class="content">
+
+        <!-- OVERVIEW -->
+        <div id="sec-overview" class="section active">
+          <div class="page-title">Dashboard Overview</div>
+          <div class="metrics">
+            <div class="metric">
+              <div class="metric-label">Total Applications</div>
+              <div class="metric-val">325</div>
+              <div class="metric-delta up">↑ 18% from last year</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">Selected Students</div>
+              <div class="metric-val">112</div>
+              <div class="metric-delta up">↑ 12 new this cycle</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">Pending Review</div>
+              <div class="metric-val">58</div>
+              <div class="metric-delta" style="color:var(--color-text-secondary);">Needs attention</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">Partner Schools</div>
+              <div class="metric-val">24</div>
+              <div class="metric-delta up">↑ 3 new partners</div>
+            </div>
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-header">
+              <div class="chart-title">Year-wise scholarship data</div>
+              <div class="chart-legend">
+                <div class="legend-item"><div class="legend-dot" style="background:#185FA5;"></div> Applications</div>
+                <div class="legend-item"><div class="legend-dot" style="background:#3B6D11;"></div> Selected</div>
+              </div>
+            </div>
+            <div class="bar-chart" id="bar-chart"></div>
+          </div>
+        </div>
+
+        <!-- APPLICATIONS -->
+        <div id="sec-applications" class="section">
+          <div class="page-title">Student Applications</div>
+          <div class="table-card">
+            <div class="table-toolbar">
+              <div class="table-toolbar-title">All applications <span style="color:var(--color-text-secondary);font-weight:400;">(325)</span></div>
+              <div style="display:flex;gap:8px;">
+                <button class="btn-sm-ghost"><i class="ti ti-filter" aria-hidden="true"></i> Filter</button>
+                <button class="btn-sm"><i class="ti ti-download" aria-hidden="true"></i> Export</button>
+              </div>
+            </div>
+            <table>
+              <thead><tr>
+                <th>Student</th><th>School</th><th>District</th><th>Class</th><th>Status</th><th>Actions</th>
+              </tr></thead>
+              <tbody id="app-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- SELECTED STUDENTS -->
+        <div id="sec-selected" class="section">
+          <div class="page-title">Selected Students</div>
+          <div class="student-grid" id="selected-grid"></div>
+        </div>
+
+        <!-- PREVIOUS -->
+        <div id="sec-previous" class="section">
+          <div class="page-title">Previous Beneficiaries</div>
+          <div class="student-grid" id="prev-grid"></div>
+        </div>
+
+        <!-- DONORS -->
+        <div id="sec-donors" class="section">
+          <div class="page-title">Donor Transparency</div>
+          <div class="donor-grid">
+            <div class="chart-card">
+              <div style="font-size:12px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:0.05em;">Students Sponsored</div>
+              <div class="stat-big">58</div>
+              <div class="progress-bar-track"><div class="progress-bar-fill" style="width:52%;"></div></div>
+              <div style="font-size:11px;color:var(--color-text-secondary);margin-top:6px;">52% of 2026 target (112)</div>
+            </div>
+            <div class="chart-card">
+              <div style="font-size:12px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:0.05em;">Funds Utilised</div>
+              <div class="stat-big">₹8.4L</div>
+              <div class="progress-bar-track"><div class="progress-bar-fill" style="width:70%;background:#3B6D11;"></div></div>
+              <div style="font-size:11px;color:var(--color-text-secondary);margin-top:6px;">70% of ₹12L raised</div>
+            </div>
+            <div class="chart-card">
+              <div style="font-size:12px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:0.05em;">Active Donors</div>
+              <div class="stat-big">34</div>
+              <div style="font-size:11px;color:var(--color-text-secondary);margin-top:8px;">Across 6 countries</div>
+            </div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-header">
+              <div class="chart-title">Reports & documents</div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+              <button class="btn-sm-ghost" style="justify-content:flex-start;padding:14px;border-radius:var(--border-radius-md);">
+                <i class="ti ti-file-text" aria-hidden="true"></i>
+                <div style="text-align:left;"><div style="font-size:13px;font-weight:500;">Utilisation Report 2025</div><div style="font-size:11px;color:var(--color-text-secondary);margin-top:2px;">PDF · 2.1 MB</div></div>
+              </button>
+              <button class="btn-sm-ghost" style="justify-content:flex-start;padding:14px;border-radius:var(--border-radius-md);">
+                <i class="ti ti-chart-bar" aria-hidden="true"></i>
+                <div style="text-align:left;"><div style="font-size:13px;font-weight:500;">Impact Report 2025</div><div style="font-size:11px;color:var(--color-text-secondary);margin-top:2px;">PDF · 4.8 MB</div></div>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- DOCUMENTS -->
+        <div id="sec-documents" class="section">
+          <div class="page-title">Student Documents</div>
+          <div class="table-card" style="padding:0 16px;">
+            <div id="doc-list"></div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+</div>
+
+<script>
+const students = [
+  { name: 'Arun Kumar', initials: 'AK', school: 'Avvai School', district: 'Chennai', cls: '10th', status: 'pending', year: null },
+  { name: 'Meena Lakshmi', initials: 'ML', school: 'Govt. HSS Ramanathapuram', district: 'Ramanathapuram', cls: '11th', status: 'selected', year: null },
+  { name: 'Dinesh Kumar', initials: 'DK', school: 'Panchayat Union School', district: 'Madurai', cls: '12th', status: 'selected', year: null },
+  { name: 'Priya Devi', initials: 'PD', school: 'Govt. Girls HSS', district: 'Tirunelveli', cls: '9th', status: 'selected', year: null },
+  { name: 'Karthik Raja', initials: 'KR', school: 'Municipal School', district: 'Coimbatore', cls: '10th', status: 'pending', year: null },
+  { name: 'Sumathi Arjun', initials: 'SA', school: 'Avvai School', district: 'Chennai', cls: '11th', status: 'rejected', year: null },
+  { name: 'Rajesh Murugan', initials: 'RM', school: 'Panchayat Union School', district: 'Salem', cls: '12th', status: 'selected', year: null },
+];
+const prev = [
+  { name: 'Selvam Pandian', initials: 'SP', school: 'Govt. HSS Villupuram', district: 'Villupuram', cls: '12th (Graduated)', year: '2024' },
+  { name: 'Anitha Srinivas', initials: 'AS', school: 'Govt. Girls HS', district: 'Thanjavur', cls: '12th (Graduated)', year: '2024' },
+  { name: 'Mani Kumar', initials: 'MK', school: 'Municipal School', district: 'Vellore', cls: '12th (Graduated)', year: '2023' },
+];
+const docs = [
+  { student: 'Arun Kumar', type: 'Income Certificate', date: '02 May 2026' },
+  { student: 'Meena Lakshmi', type: 'Aadhaar Card', date: '28 Apr 2026' },
+  { student: 'Dinesh Kumar', type: 'School Transfer Certificate', date: '25 Apr 2026' },
+  { student: 'Priya Devi', type: 'Marksheet – Grade 8', date: '20 Apr 2026' },
+  { student: 'Karthik Raja', type: 'Community Certificate', date: '15 Apr 2026' },
+];
+const chartData = [
+  { year: '2021', apps: 140, sel: 48 },
+  { year: '2022', apps: 198, sel: 67 },
+  { year: '2023', apps: 240, sel: 85 },
+  { year: '2024', apps: 275, sel: 96 },
+  { year: '2025', apps: 310, sel: 104 },
+  { year: '2026', apps: 325, sel: 112 },
+];
+
+const statusBadge = s => {
+  const map = { pending: 'badge-pending', selected: 'badge-selected', rejected: 'badge-rejected' };
+  return `<span class="badge ${map[s]}">${s.charAt(0).toUpperCase()+s.slice(1)}</span>`;
+};
+
+function renderApplications() {
+  const tbody = document.getElementById('app-tbody');
+  tbody.innerHTML = students.map(s => `
+    <tr>
+      <td style="display:flex;align-items:center;gap:10px;">
+        <div class="avatar-sm">${s.initials}</div>
+        <span style="font-weight:500;">${s.name}</span>
+      </td>
+      <td style="color:var(--color-text-secondary);">${s.school}</td>
+      <td style="color:var(--color-text-secondary);">${s.district}</td>
+      <td style="color:var(--color-text-secondary);">${s.cls}</td>
+      <td>${statusBadge(s.status)}</td>
+      <td><div style="display:flex;gap:8px;">
+        <button class="btn-sm-ghost" style="padding:5px 10px;font-size:11px;"><i class="ti ti-eye" aria-hidden="true"></i> View</button>
+        <button class="btn-sm" style="padding:5px 10px;font-size:11px;background:#3B6D11;"><i class="ti ti-download" aria-hidden="true"></i></button>
+      </div></td>
+    </tr>
+  `).join('');
+}
+
+function renderStudentCards(el, arr) {
+  const g = document.getElementById(el);
+  g.innerHTML = arr.map(s => `
+    <div class="student-card">
+      <div class="student-card-img"><div class="student-card-img-text">${s.initials}</div></div>
+      <div class="student-card-body">
+        <div class="student-name">${s.name}</div>
+        <div class="student-school">${s.school}</div>
+        <div class="student-meta">
+          <span><strong>District:</strong> ${s.district}</span>
+          <span><strong>Class:</strong> ${s.cls}</span>
+          ${s.year ? `<span><strong>Supported:</strong> ${s.year}</span>` : `<span><strong>Status:</strong> Selected</span>`}
+        </div>
+        <button class="btn-view">View profile →</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderDocs() {
+  const el = document.getElementById('doc-list');
+  el.innerHTML = docs.map(d => `
+    <div class="doc-row">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div class="doc-icon"><i class="ti ti-file" aria-hidden="true"></i></div>
+        <div>
+          <div class="doc-name">${d.student} — ${d.type}</div>
+          <div class="doc-date">Uploaded ${d.date}</div>
+        </div>
+      </div>
+      <button class="btn-sm" style="gap:6px;"><i class="ti ti-download" aria-hidden="true"></i> Download</button>
+    </div>
+  `).join('');
+}
+
+function renderChart() {
+  const el = document.getElementById('bar-chart');
+  const max = Math.max(...chartData.map(d => d.apps));
+  el.innerHTML = chartData.map(d => `
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;">
+      <div class="bar-wrap">
+        <div class="bar" style="height:${Math.round((d.apps/max)*140)}px;background:#185FA5;opacity:0.85;" title="${d.apps} applications"></div>
+        <div class="bar" style="height:${Math.round((d.sel/max)*140)}px;background:#3B6D11;" title="${d.sel} selected"></div>
+      </div>
+      <div class="bar-year">${d.year}</div>
+    </div>
+  `).join('');
+}
+
+function showDash() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'block';
+}
+
+function nav(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('sec-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+renderApplications();
+renderStudentCards('selected-grid', students.filter(s => s.status === 'selected'));
+renderStudentCards('prev-grid', prev);
+renderDocs();
+renderChart();
+</script>

@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Add Student — Thuvakkam SFS Portal</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="js/client.js"></script>
+  <style>
+    .form-grid   { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .form-grid.full { grid-template-columns: 1fr; }
+    .form-group  { display: flex; flex-direction: column; gap: 6px; }
+    .form-label  { font-size: 12px; font-weight: 600; color: var(--grey-600); letter-spacing: 0.02em; }
+    .form-label .req { color: #DC2626; margin-left: 2px; }
+    .form-input, .form-select, .form-textarea {
+      border: 1px solid var(--grey-200); border-radius: var(--radius-md);
+      padding: 10px 14px; font-size: 14px; font-family: var(--font);
+      color: var(--black); background: var(--white); outline: none;
+      transition: border-color 0.15s;
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--green-dark); }
+    .form-textarea { resize: vertical; min-height: 80px; }
+    .form-section {
+      background: var(--white); border: 1px solid var(--grey-100);
+      border-radius: var(--radius-lg); padding: 24px; margin-bottom: 20px;
+      box-shadow: var(--shadow-sm);
+    }
+    .form-section-title {
+      font-size: 13px; font-weight: 700; color: var(--green-dark);
+      text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 18px;
+      padding-bottom: 10px; border-bottom: 1px solid var(--grey-100);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .form-section-title i { font-size: 16px; }
+    .form-hint { font-size: 11px; color: var(--grey-400); margin-top: 3px; }
+    .form-error-msg {
+      background: #FEE2E2; border: 1px solid #FCA5A5; border-radius: var(--radius-md);
+      padding: 12px 16px; font-size: 13px; color: #991B1B; margin-bottom: 16px; display: none;
+    }
+    .form-success-msg {
+      background: #D1FAE5; border: 1px solid #6EE7B7; border-radius: var(--radius-md);
+      padding: 12px 16px; font-size: 13px; color: #065F46; margin-bottom: 16px; display: none;
+    }
+    .sticky-footer {
+      position: sticky; bottom: 0; background: var(--white);
+      border-top: 1px solid var(--grey-100); padding: 16px 28px;
+      display: flex; align-items: center; justify-content: space-between;
+      box-shadow: 0 -4px 12px rgba(0,0,0,0.06); z-index: 10;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-accent"></div>
+      <div class="topbar-brand">
+        Thuvakkam Education
+        <span>Sponsor for Success &mdash; Internal Portal</span>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <input class="search-input" type="text" placeholder="Search students, schools..." />
+      <div class="topbar-divider"></div>
+      <div class="user-pill">
+        <div class="user-avatar">—</div>
+        <div class="user-info">
+          <div class="user-name">Loading...</div>
+          <div class="user-role"></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="nav-section-label">Main</div>
+    <a class="nav-item" href="dashboard.html"><i class="ti ti-layout-dashboard"></i> Overview</a>
+    <a class="nav-item" href="applications.html"><i class="ti ti-file-text"></i> Applications</a>
+    <a class="nav-item active" href="add-student.html"><i class="ti ti-user-plus"></i> Add Student</a>
+    <a class="nav-item" href="review.html"><i class="ti ti-clipboard-check"></i> Review Queue</a>
+    <a class="nav-item" href="selected.html"><i class="ti ti-user-check"></i> Selected Students</a>
+    <a class="nav-item" href="rejected.html"><i class="ti ti-user-x"></i> Rejected</a>
+    <a class="nav-item" href="previous.html"><i class="ti ti-clock-history"></i> Previous Beneficiaries</a>
+    <div class="nav-section-label">Reports</div>
+    <a class="nav-item" href="donor-management.html"><i class="ti ti-heart-handshake"></i> Donor Management</a>
+    <a class="nav-item" href="donors.html"><i class="ti ti-chart-bar"></i> Donor Transparency</a>
+    <a class="nav-item" href="documents.html"><i class="ti ti-folder"></i> Documents</a>
+    <div class="sidebar-footer">
+      <a class="nav-item" href="#" onclick="signOut()"><i class="ti ti-logout"></i> Sign out</a>
+    </div>
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="main" style="padding-bottom:0;">
+    <div style="padding:0 0 24px;">
+      <div class="page-title">Add Student</div>
+      <div class="page-subtitle">Manually enter a student's application details</div>
+    </div>
+
+    <div id="form-error" class="form-error-msg"></div>
+    <div id="form-success" class="form-success-msg"></div>
+
+    <form id="student-form" onsubmit="submitStudent(event)">
+
+      <!-- PERSONAL -->
+      <div class="form-section">
+        <div class="form-section-title"><i class="ti ti-user"></i> Personal information</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Full name <span class="req">*</span></label>
+            <input class="form-input" name="name" type="text" placeholder="e.g. Arun Kumar" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Date of birth</label>
+            <input class="form-input" name="dob" type="date" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Gender</label>
+            <select class="form-select" name="gender">
+              <option value="">Select</option>
+              <option>Male</option>
+              <option>Female</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Aadhaar number</label>
+            <input class="form-input" name="aadhaar" type="text" placeholder="XXXX XXXX XXXX" maxlength="14" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone number</label>
+            <input class="form-input" name="phone" type="tel" placeholder="+91 XXXXXXXXXX" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Cycle year <span class="req">*</span></label>
+            <select class="form-select" name="cycle_year" required>
+              <option value="2026">2026</option>
+              <option value="2025">2025</option>
+              <option value="2024">2024</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group" style="margin-top:16px;">
+          <label class="form-label">Address</label>
+          <textarea class="form-textarea" name="address" placeholder="Full residential address"></textarea>
+        </div>
+      </div>
+
+      <!-- SCHOOL -->
+      <div class="form-section">
+        <div class="form-section-title"><i class="ti ti-school"></i> School &amp; education</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">School name <span class="req">*</span></label>
+            <input class="form-input" name="school" type="text" placeholder="e.g. Govt. HSS Ramanathapuram" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">District <span class="req">*</span></label>
+            <select class="form-select" name="district" required>
+              <option value="">Select district</option>
+              <option>Chennai</option><option>Coimbatore</option><option>Madurai</option>
+              <option>Ramanathapuram</option><option>Salem</option><option>Thanjavur</option>
+              <option>Tirunelveli</option><option>Villupuram</option><option>Vellore</option>
+              <option>Trichy</option><option>Erode</option><option>Dindigul</option>
+              <option>Kancheepuram</option><option>Cuddalore</option><option>Nagapattinam</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Class <span class="req">*</span></label>
+            <select class="form-select" name="class" required>
+              <option value="">Select class</option>
+              <option>9th</option><option>10th</option><option>11th</option><option>12th</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Board</label>
+            <select class="form-select" name="board">
+              <option value="Tamil Nadu State Board">Tamil Nadu State Board</option>
+              <option value="CBSE">CBSE</option>
+              <option value="ICSE">ICSE</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Previous year %</label>
+            <input class="form-input" name="prev_percentage" type="number" min="0" max="100" step="0.1" placeholder="e.g. 78.5" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Attendance %</label>
+            <input class="form-input" name="attendance" type="number" min="0" max="100" step="0.1" placeholder="e.g. 92" />
+          </div>
+        </div>
+      </div>
+
+      <!-- FAMILY -->
+      <div class="form-section">
+        <div class="form-section-title"><i class="ti ti-home"></i> Family details</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Father's name</label>
+            <input class="form-input" name="father_name" type="text" placeholder="Father's full name" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Mother's name</label>
+            <input class="form-input" name="mother_name" type="text" placeholder="Mother's full name" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Parent occupation</label>
+            <input class="form-input" name="parent_occupation" type="text" placeholder="e.g. Daily wage worker" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Annual family income (₹)</label>
+            <input class="form-input" name="annual_income" type="number" min="0" placeholder="e.g. 120000" />
+            <span class="form-hint">Enter in rupees. e.g. 1,20,000 = 120000</span>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Number of siblings</label>
+            <input class="form-input" name="siblings" type="number" min="0" max="20" placeholder="e.g. 2" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Application status</label>
+            <select class="form-select" name="status">
+              <option value="pending">Pending review</option>
+              <option value="selected">Selected</option>
+              <option value="rejected">Not shortlisted</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- NOTES -->
+      <div class="form-section">
+        <div class="form-section-title"><i class="ti ti-notes"></i> Committee notes</div>
+        <div class="form-group">
+          <textarea class="form-textarea" name="notes" placeholder="Any internal notes about this applicant..." style="min-height:100px;"></textarea>
+        </div>
+      </div>
+
+      <!-- STICKY FOOTER -->
+      <div class="sticky-footer">
+        <a href="applications.html" class="btn btn-outline"><i class="ti ti-arrow-left"></i> Back to applications</a>
+        <div style="display:flex;gap:10px;">
+          <button type="button" onclick="resetForm()" class="btn btn-outline">Clear form</button>
+          <button type="submit" id="submit-btn" class="btn btn-primary"><i class="ti ti-user-plus"></i> Add student</button>
+        </div>
+      </div>
+
+    </form>
+  </main>
+
+<script>
+async function submitStudent(e) {
+  e.preventDefault();
+  const form   = e.target;
+  const btn    = document.getElementById('submit-btn');
+  const errEl  = document.getElementById('form-error');
+  const succEl = document.getElementById('form-success');
+
+  errEl.style.display  = 'none';
+  succEl.style.display = 'none';
+  btn.textContent = 'Saving...';
+  btn.disabled = true;
+
+  const fd = new FormData(form);
+  const name = fd.get('name').trim();
+
+  // Build initials
+  const initials = name.split(' ').filter(Boolean).map(w => w[0].toUpperCase()).slice(0,2).join('');
+
+  const payload = {
+    name,
+    initials,
+    school:            fd.get('school').trim(),
+    district:          fd.get('district'),
+    class:             fd.get('class'),
+    status:            fd.get('status') || 'pending',
+    cycle_year:        parseInt(fd.get('cycle_year')),
+    applied_on:        new Date().toISOString().slice(0,10),
+    dob:               fd.get('dob')               || null,
+    gender:            fd.get('gender')             || null,
+    aadhaar:           fd.get('aadhaar').trim()     || null,
+    phone:             fd.get('phone').trim()       || null,
+    address:           fd.get('address').trim()     || null,
+    board:             fd.get('board')              || null,
+    father_name:       fd.get('father_name').trim() || null,
+    mother_name:       fd.get('mother_name').trim() || null,
+    parent_occupation: fd.get('parent_occupation').trim() || null,
+    annual_income:     fd.get('annual_income')      ? parseFloat(fd.get('annual_income')) : null,
+    siblings:          fd.get('siblings')           ? parseInt(fd.get('siblings'))        : null,
+    prev_percentage:   fd.get('prev_percentage')    ? parseFloat(fd.get('prev_percentage')) : null,
+    attendance:        fd.get('attendance')         ? parseFloat(fd.get('attendance'))    : null,
+    notes:             fd.get('notes').trim()       || null,
+  };
+
+  const { error } = await sb.from('students').insert(payload);
+
+  btn.disabled = false;
+  btn.innerHTML = '<i class="ti ti-user-plus"></i> Add student';
+
+  if (error) {
+    errEl.textContent = 'Error: ' + error.message;
+    errEl.style.display = 'block';
+    errEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+
+  succEl.innerHTML = `<i class="ti ti-circle-check" style="font-size:16px;vertical-align:-2px;margin-right:8px;"></i><strong>${name}</strong> has been added successfully. <a href="applications.html" style="color:var(--green-dark);font-weight:600;">View applications &rarr;</a>`;
+  succEl.style.display = 'block';
+  succEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  form.reset();
+}
+
+function resetForm() {
+  document.getElementById('student-form').reset();
+  document.getElementById('form-error').style.display  = 'none';
+  document.getElementById('form-success').style.display = 'none';
+}
+
+requireAuth();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Login — Thuvakkam SFS</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <div class="sp-login-wrap">
+    <div class="sp-login-card">
+
+      <div class="sp-login-head">
+        <img src="../website/assets/logo.webp" alt="Thuvakkam Education" />
+        <div class="sp-login-head-title">Student Portal</div>
+        <div class="sp-login-head-sub">Sign in with the credentials provided<br/>by your SFS coordinator</div>
+      </div>
+
+      <div class="sp-login-body">
+        <div class="sp-login-error" id="login-error"></div>
+
+        <div class="sp-field-group">
+          <label class="sp-field-label">Email address</label>
+          <input class="sp-field-input" id="login-email" type="email" placeholder="your.email@example.com" autocomplete="email" />
+        </div>
+        <div class="sp-field-group">
+          <label class="sp-field-label">Password</label>
+          <input class="sp-field-input" id="login-password" type="password" placeholder="Enter your password" autocomplete="current-password" />
+        </div>
+
+        <button class="sp-login-btn" id="login-btn" onclick="doLogin()">
+          Sign in
+        </button>
+
+        <p class="sp-login-hint">
+          Credentials are issued by Thuvakkam Education after your scholarship is confirmed.<br/>
+          If you've lost your login details, contact <strong>info@thuvakkam.org</strong>
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script>
+    const sb = supabase.createClient(
+      'https://vftexybohuaxngyhwjts.supabase.co',
+      'sb_publishable_vO20BiWyS_VIkhU2DDmw3g_BoGBeCdq'
+    );
+
+    // Already logged in → go straight to profile
+    sb.auth.getSession().then(({ data: { session } }) => {
+      if (session) window.location.href = 'profile.html';
+    });
+
+    // Allow Enter key to submit
+    document.getElementById('login-password').addEventListener('keydown', e => {
+      if (e.key === 'Enter') doLogin();
+    });
+
+    async function doLogin() {
+      const email    = document.getElementById('login-email').value.trim();
+      const password = document.getElementById('login-password').value;
+      const btn      = document.getElementById('login-btn');
+      const errEl    = document.getElementById('login-error');
+
+      errEl.style.display = 'none';
+      if (!email || !password) {
+        errEl.textContent  = 'Please enter your email and password.';
+        errEl.style.display = 'block';
+        return;
+      }
+
+      btn.disabled    = true;
+      btn.textContent = 'Signing in...';
+
+      const { error } = await sb.auth.signInWithPassword({ email, password });
+
+      if (error) {
+        errEl.textContent   = 'Incorrect email or password. Please check and try again.';
+        errEl.style.display = 'block';
+        btn.disabled    = false;
+        btn.textContent = 'Sign in';
+        return;
+      }
+
+      // Verify this is a student account (not a portal staff member)
+      const { data: { user } } = await sb.auth.getUser();
+      const { data: student } = await sb.from('students')
+        .select('id').eq('auth_user_id', user.id).maybeSingle();
+
+      if (!student) {
+        await sb.auth.signOut();
+        errEl.textContent   = 'This account is not linked to a student profile. Please contact your coordinator.';
+        errEl.style.display = 'block';
+        btn.disabled    = false;
+        btn.textContent = 'Sign in';
+        return;
+      }
+
+      window.location.href = 'profile.html';
+    }
+  </script>
+</body>
+</html>

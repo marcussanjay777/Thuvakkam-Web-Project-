@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Impact — Thuvakkam SFS</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <div class="topnotice">
+    SFS 2026 applications are now open. &nbsp;<a href="apply.html">Apply before 31 August 2026</a>
+  </div>
+
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-brand">
+        <img src="assets/logo.webp" alt="Thuvakkam Education" style="height:38px;width:auto;object-fit:contain;" />
+        <div class="nav-brand-text">
+          <div class="nav-brand-name">Thuvakkam Education</div>
+          <div class="nav-brand-sub">Sponsor for Success</div>
+        </div>
+      </a>
+      <div class="nav-links">
+        <a class="nav-link"         href="index.html">Home</a>
+        <a class="nav-link active"  href="impact.html">Impact</a>
+        <a class="nav-link"         href="criteria.html">Selection</a>
+        <a class="nav-link"         href="support.html">Support</a>
+        <a class="nav-link"         href="stories.html">Stories</a>
+        <a class="nav-link"         href="apply.html">Apply</a>
+        <a class="nav-link"         href="sponsor.html">Sponsor</a>
+      </div>
+      <div class="nav-actions">
+        <a href="apply.html" class="btn-nav-outline">Apply now</a>
+        <a href="../donor-portal/index.html" class="btn-nav-primary">Donate</a>
+        <a href="../student-portal/index.html" class="btn-nav-outline" style="border-color:var(--yellow);color:var(--yellow);">Student Portal</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- PAGE HERO -->
+  <div class="page-hero">
+    <div class="page-hero-inner">
+      <div class="section-label-light" style="margin-bottom:8px;">SFS Impact</div>
+      <div class="page-hero-title">Impact dashboard</div>
+      <div class="page-hero-sub">Monitoring educational continuity and long-term student outcomes across Tamil Nadu</div>
+    </div>
+  </div>
+
+  <!-- HEADLINE STATS -->
+  <section class="section-dark" style="padding-top:48px;padding-bottom:48px;">
+    <div class="container">
+      <div class="grid-4">
+        <div style="text-align:center;">
+          <div class="stat-num" style="color:var(--white);">124</div>
+          <div class="stat-label" style="color:rgba(255,255,255,0.5);">Active students</div>
+        </div>
+        <div style="text-align:center;">
+          <div class="stat-num" style="color:var(--white);">48</div>
+          <div class="stat-label" style="color:rgba(255,255,255,0.5);">Alumni supported</div>
+        </div>
+        <div style="text-align:center;">
+          <div class="stat-num" style="color:var(--yellow);">67%</div>
+          <div class="stat-label" style="color:rgba(255,255,255,0.5);">Girl students</div>
+        </div>
+        <div style="text-align:center;">
+          <div class="stat-num" style="color:var(--yellow);">85%</div>
+          <div class="stat-label" style="color:rgba(255,255,255,0.5);">First-generation learners</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CHART + DISTRICT -->
+  <section class="section">
+    <div class="container">
+      <div class="grid-2">
+
+        <!-- Year-wise chart -->
+        <div class="card">
+          <div style="margin-bottom:20px;">
+            <div style="font-size:16px;font-weight:700;color:var(--black);margin-bottom:4px;">Year-wise growth</div>
+            <div style="font-size:13px;color:var(--grey-400);">Applications vs students selected per cycle</div>
+          </div>
+          <div class="chart-legend" style="margin-bottom:16px;">
+            <div class="legend-item" style="color:var(--grey-600);">
+              <div class="legend-dot" style="background:var(--green-mid);"></div> Applications
+            </div>
+            <div class="legend-item" style="color:var(--grey-600);">
+              <div class="legend-dot" style="background:var(--yellow);"></div> Selected
+            </div>
+          </div>
+          <div class="bar-chart" id="impact-chart" style="height:160px;"></div>
+        </div>
+
+        <!-- District reach -->
+        <div class="card">
+          <div style="margin-bottom:20px;">
+            <div style="font-size:16px;font-weight:700;color:var(--black);margin-bottom:4px;">District-wise reach</div>
+            <div style="font-size:13px;color:var(--grey-400);">Number of students supported per district</div>
+          </div>
+          <div id="district-list"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- OUTCOME HIGHLIGHTS -->
+  <section class="section section-alt">
+    <div class="container">
+      <div class="section-label">Outcomes</div>
+      <h2 class="section-title">What happens after SFS</h2>
+      <p class="section-sub" style="margin-bottom:40px;">We track student progress beyond the scholarship period to measure long-term educational and career impact.</p>
+
+      <div class="grid-3">
+        <div class="card" style="text-align:center;padding:36px 24px;">
+          <div style="font-size:40px;font-weight:800;color:var(--green-dark);letter-spacing:-0.04em;margin-bottom:8px;">91%</div>
+          <div style="font-size:14px;font-weight:600;color:var(--black);margin-bottom:8px;">Continued to higher education</div>
+          <div style="font-size:13px;color:var(--grey-600);line-height:1.6;">Of tracked alumni enrolled in degree or diploma programmes after completing school.</div>
+        </div>
+        <div class="card" style="text-align:center;padding:36px 24px;">
+          <div style="font-size:40px;font-weight:800;color:var(--green-dark);letter-spacing:-0.04em;margin-bottom:8px;">78%</div>
+          <div style="font-size:14px;font-weight:600;color:var(--black);margin-bottom:8px;">First in family to attend college</div>
+          <div style="font-size:13px;color:var(--grey-600);line-height:1.6;">A majority of supported students are the first from their family to pursue higher education.</div>
+        </div>
+        <div class="card" style="text-align:center;padding:36px 24px;">
+          <div style="font-size:40px;font-weight:800;color:var(--green-dark);letter-spacing:-0.04em;margin-bottom:8px;">34</div>
+          <div style="font-size:14px;font-weight:600;color:var(--black);margin-bottom:8px;">Active donors across 6 countries</div>
+          <div style="font-size:13px;color:var(--grey-600);line-height:1.6;">Donors from India, USA, UK, Canada, Australia, and UAE contributing to SFS 2026.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FUND UTILISATION -->
+  <section class="section">
+    <div class="container">
+      <div class="section-label">Transparency</div>
+      <h2 class="section-title">How funds are used</h2>
+      <p class="section-sub" style="margin-bottom:40px;">Every rupee raised is tracked and reported. Donors receive quarterly updates and annual impact reports.</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <div style="font-size:15px;font-weight:700;margin-bottom:24px;">2026 cycle fund utilisation</div>
+          <div style="display:flex;flex-direction:column;gap:18px;">
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:7px;">
+                <span style="font-size:13px;color:var(--grey-600);">Scholarship disbursements</span>
+                <span style="font-size:13px;font-weight:600;">69% &mdash; Rs. 5.8L</span>
+              </div>
+              <div class="progress-track"><div class="progress-fill" style="width:69%;"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:7px;">
+                <span style="font-size:13px;color:var(--grey-600);">Study materials and kits</span>
+                <span style="font-size:13px;font-weight:600;">14% &mdash; Rs. 1.2L</span>
+              </div>
+              <div class="progress-track"><div class="progress-fill" style="width:14%;background:var(--yellow);"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:7px;">
+                <span style="font-size:13px;color:var(--grey-600);">Mentoring and events</span>
+                <span style="font-size:13px;font-weight:600;">11% &mdash; Rs. 0.9L</span>
+              </div>
+              <div class="progress-track"><div class="progress-fill" style="width:11%;"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:7px;">
+                <span style="font-size:13px;color:var(--grey-600);">Administration</span>
+                <span style="font-size:13px;font-weight:600;">6% &mdash; Rs. 0.5L</span>
+              </div>
+              <div class="progress-track"><div class="progress-fill" style="width:6%;background:var(--grey-400);"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:16px;">
+          <div class="card" style="padding:24px;">
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--grey-400);margin-bottom:8px;">Total raised 2026</div>
+            <div style="font-size:36px;font-weight:800;color:var(--green-dark);letter-spacing:-0.04em;">Rs. 12L</div>
+            <div style="font-size:13px;color:var(--grey-600);margin-top:4px;">From 34 individual and corporate donors</div>
+          </div>
+          <div class="card" style="padding:24px;">
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--grey-400);margin-bottom:8px;">Total utilised</div>
+            <div style="font-size:36px;font-weight:800;color:var(--green-dark);letter-spacing:-0.04em;">Rs. 8.4L</div>
+            <div style="font-size:13px;color:var(--grey-600);margin-top:4px;">70% of funds utilised as of July 2026</div>
+          </div>
+          <div style="text-align:center;padding:16px;">
+            <a href="sponsor.html" class="btn btn-primary">Support a student today</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div>
+          <img src="assets/logo.webp" alt="Thuvakkam Education" style="height:44px;width:auto;object-fit:contain;margin-bottom:10px;display:block;" />
+        <div class="footer-brand-name">Thuvakkam Education</div>
+          <div class="footer-brand-body">Supporting education, opportunity, and long-term student empowerment across Tamil Nadu since 2020.</div>
+          <div class="footer-reg">Reg. No: 131/2014 &nbsp;&middot;&nbsp; Exceeding Limits</div>
+        </div>
+        <div>
+          <div class="footer-col-head">Programme</div>
+          <a class="footer-link" href="impact.html">Impact dashboard</a>
+          <a class="footer-link" href="criteria.html">Selection criteria</a>
+          <a class="footer-link" href="support.html">Support provided</a>
+          <a class="footer-link" href="stories.html">Student stories</a>
+        </div>
+        <div>
+          <div class="footer-col-head">Get involved</div>
+          <a class="footer-link" href="apply.html">Apply for SFS</a>
+          <a class="footer-link" href="sponsor.html">Become a sponsor</a>
+          <a class="footer-link" href="sponsor.html">CSR partnership</a>
+        </div>
+        <div>
+          <div class="footer-col-head">Contact</div>
+          <div class="footer-contact-row"><i class="ti ti-mail"></i> info@thuvakkam.org</div>
+          <div class="footer-contact-row"><i class="ti ti-phone"></i> +91 94448 88937</div>
+          <div class="footer-contact-row"><i class="ti ti-map-pin"></i> Chennai, Tamil Nadu</div>
+        </div>
+      </div>
+      <hr class="footer-divider" />
+      <div class="footer-bottom">
+        <span>&copy; 2026 Thuvakkam Education. All rights reserved.</span>
+        <div style="display:flex;gap:20px;">
+          <a href="#">Privacy policy</a>
+          <a href="#">Terms of use</a>
+          <a href="../portal/index.html">Committee portal</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+<script>
+const chartData = [
+  {yr:'2021',apps:80, sel:28},{yr:'2022',apps:120,sel:42},
+  {yr:'2023',apps:165,sel:58},{yr:'2024',apps:210,sel:76},
+  {yr:'2025',apps:275,sel:96},{yr:'2026',apps:325,sel:112}
+];
+const districts = [
+  {name:'Chennai',       count:28},{name:'Ramanathapuram',count:22},
+  {name:'Madurai',       count:18},{name:'Tirunelveli',   count:15},
+  {name:'Coimbatore',    count:12},{name:'Salem',         count:10},
+  {name:'Villupuram',    count:8}, {name:'Thanjavur',     count:7}
+];
+
+function renderChart() {
+  const el = document.getElementById('impact-chart');
+  const max = Math.max(...chartData.map(d => d.apps));
+  el.innerHTML = chartData.map(d => `
+    <div class="bar-group">
+      <div class="bar-cols">
+        <div class="bar bar-apps" style="height:${Math.round((d.apps/max)*140)}px;" title="${d.apps} applications"></div>
+        <div class="bar bar-sel"  style="height:${Math.round((d.sel /max)*140)}px;" title="${d.sel} selected"></div>
+      </div>
+      <div class="bar-year" style="color:var(--grey-400);">${d.yr}</div>
+    </div>
+  `).join('');
+}
+
+function renderDistricts() {
+  const el = document.getElementById('district-list');
+  const max = Math.max(...districts.map(d => d.count));
+  el.innerHTML = districts.map(d => `
+    <div class="district-row">
+      <div class="district-name">${d.name}</div>
+      <div class="district-track"><div class="district-fill" style="width:${Math.round((d.count/max)*100)}%;"></div></div>
+      <div class="district-count">${d.count}</div>
+    </div>
+  `).join('');
+}
+
+renderChart();
+renderDistricts();
+</script>
+
+</body>
+</html>

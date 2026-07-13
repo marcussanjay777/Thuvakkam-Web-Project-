@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Donor Management — Thuvakkam SFS Portal</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="js/client.js"></script>
+  <style>
+    .dm-layout { display: grid; grid-template-columns: 340px 1fr; gap: 0; height: calc(100vh - 60px); overflow: hidden; }
+    .dm-list-panel { border-right: 1px solid var(--grey-100); overflow-y: auto; background: var(--white); }
+    .dm-detail-panel { overflow-y: auto; background: var(--grey-50); padding: 24px; }
+
+    .dm-list-head { padding: 16px; border-bottom: 1px solid var(--grey-100); position: sticky; top: 0; background: var(--white); z-index: 1; }
+    .dm-list-title { font-size: 13px; font-weight: 700; color: var(--black); margin-bottom: 10px; }
+    .dm-search { width: 100%; border: 1px solid var(--grey-200); border-radius: var(--radius-md); padding: 9px 12px; font-size: 13px; font-family: var(--font); outline: none; }
+    .dm-search:focus { border-color: var(--green-dark); }
+
+    .dm-donor-row {
+      padding: 14px 16px; border-bottom: 1px solid var(--grey-100);
+      cursor: pointer; display: flex; align-items: center; gap: 12px;
+      transition: background 0.1s;
+    }
+    .dm-donor-row:hover   { background: var(--grey-50); }
+    .dm-donor-row.active  { background: var(--green-light); border-left: 3px solid var(--green-dark); }
+    .dm-donor-avatar {
+      width: 38px; height: 38px; border-radius: 8px;
+      background: var(--green-dark); color: var(--white);
+      font-size: 14px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .dm-donor-name  { font-size: 13px; font-weight: 600; color: var(--black); }
+    .dm-donor-email { font-size: 11px; color: var(--grey-400); margin-top: 2px; }
+    .dm-donor-meta  { display: flex; gap: 6px; margin-top: 4px; flex-wrap: wrap; }
+    .dm-tag {
+      font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 99px;
+    }
+    .dm-tag-verified   { background: #D1FAE5; color: #065F46; }
+    .dm-tag-unverified { background: #FEE2E2; color: #991B1B; }
+    .dm-tag-matched    { background: #EDE9FE; color: #4C1D95; }
+    .dm-tag-amount     { background: var(--yellow-light); color: #713F12; }
+
+    .dm-placeholder {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      height: 100%; color: var(--grey-400); text-align: center; gap: 12px;
+    }
+    .dm-placeholder i { font-size: 48px; opacity: 0.3; }
+
+    /* Detail card */
+    .dm-detail-card { background: var(--white); border: 1px solid var(--grey-200); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); margin-bottom: 16px; }
+    .dm-detail-head { background: var(--green-dark); padding: 20px 24px; display: flex; align-items: center; gap: 16px; }
+    .dm-detail-avatar { width: 52px; height: 52px; border-radius: 10px; background: var(--yellow); color: var(--green-dark); font-size: 18px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .dm-detail-name  { font-size: 18px; font-weight: 700; color: #fff; }
+    .dm-detail-email { font-size: 13px; color: rgba(255,255,255,0.65); margin-top: 3px; }
+
+    .dm-field-grid { display: grid; grid-template-columns: 1fr 1fr; }
+    .dm-field-row {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      padding: 12px 20px; border-bottom: 1px solid var(--grey-100); gap: 12px;
+    }
+    .dm-field-row:last-child { border-bottom: none; }
+    .dm-field-key { font-size: 12px; color: var(--grey-400); font-weight: 500; flex-shrink: 0; }
+    .dm-field-val { font-size: 13px; color: var(--black); font-weight: 500; text-align: right; }
+
+    .dm-section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--grey-400); padding: 14px 20px 8px; border-bottom: 1px solid var(--grey-100); }
+
+    /* Donations mini-table */
+    .dm-mini-table { width: 100%; border-collapse: collapse; }
+    .dm-mini-table th { padding: 10px 16px; font-size: 11px; font-weight: 700; color: var(--grey-400); text-transform: uppercase; letter-spacing: 0.06em; text-align: left; border-bottom: 1px solid var(--grey-100); background: var(--grey-50); }
+    .dm-mini-table td { padding: 12px 16px; font-size: 13px; border-bottom: 1px solid var(--grey-100); }
+    .dm-mini-table tr:last-child td { border-bottom: none; }
+
+    /* Match section */
+    .dm-match-box { padding: 16px 20px; }
+    .dm-matched-student { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; background: var(--green-light); border: 1px solid #A7F3D0; border-radius: var(--radius-md); margin-bottom: 10px; }
+    .dm-add-match-btn { background: var(--green-dark); color: #fff; border: none; border-radius: var(--radius-md); padding: 10px 16px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: var(--font); display: flex; align-items: center; gap: 6px; transition: background 0.15s; width: 100%; justify-content: center; }
+    .dm-add-match-btn:hover { background: var(--green-mid); }
+
+    /* Student search modal */
+    .dm-modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.45); display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 20px; }
+    .dm-modal { background: var(--white); border-radius: var(--radius-lg); width: 100%; max-width: 560px; max-height: 80vh; box-shadow: 0 8px 40px rgba(0,0,0,0.18); overflow: hidden; display: flex; flex-direction: column; }
+    .dm-modal-head { background: var(--green-dark); padding: 18px 24px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+    .dm-modal-head-title { font-size: 15px; font-weight: 700; color: #fff; }
+    .dm-modal-close { background: rgba(255,255,255,0.15); border: none; border-radius: 6px; width: 30px; height: 30px; cursor: pointer; color: #fff; font-size: 17px; display: flex; align-items: center; justify-content: center; }
+    .dm-modal-search { padding: 14px; border-bottom: 1px solid var(--grey-100); flex-shrink: 0; }
+    .dm-modal-list { overflow-y: auto; flex: 1; }
+    .dm-student-row { padding: 14px 16px; border-bottom: 1px solid var(--grey-100); display: flex; align-items: center; gap: 12px; cursor: pointer; transition: background 0.1s; }
+    .dm-student-row:hover { background: var(--grey-50); }
+    .dm-student-row.selected { background: var(--green-light); }
+    .dm-modal-foot { padding: 14px 16px; border-top: 1px solid var(--grey-100); display: flex; gap: 10px; justify-content: flex-end; flex-shrink: 0; }
+    .dm-btn-primary { padding: 10px 20px; border-radius: var(--radius-sm); border: none; background: var(--green-dark); color: #fff; font-size: 13px; font-weight: 700; cursor: pointer; font-family: var(--font); }
+    .dm-btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+    .dm-btn-outline { padding: 10px 20px; border-radius: var(--radius-sm); border: 1px solid var(--grey-200); background: var(--white); font-size: 13px; font-weight: 600; cursor: pointer; font-family: var(--font); color: var(--grey-600); }
+  </style>
+</head>
+<body>
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-accent"></div>
+      <div class="topbar-brand">Thuvakkam Education <span>Sponsor for Success — Internal Portal</span></div>
+    </div>
+    <div class="topbar-right">
+      <input class="search-input" type="text" placeholder="Search students, schools..." />
+      <div class="topbar-divider"></div>
+      <div class="user-pill">
+        <div class="user-avatar" id="user-avatar">--</div>
+        <div class="user-info">
+          <div class="user-name" id="user-name">Loading...</div>
+          <div class="user-role" id="user-role"></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="nav-section-label">Main</div>
+    <a class="nav-item" href="dashboard.html"><i class="ti ti-layout-dashboard"></i> Overview</a>
+    <a class="nav-item" href="applications.html"><i class="ti ti-file-text"></i> Applications</a>
+    <a class="nav-item" href="selected.html"><i class="ti ti-user-check"></i> Selected Students</a>
+    <a class="nav-item" href="rejected.html"><i class="ti ti-user-x"></i> Rejected</a>
+    <a class="nav-item" href="previous.html"><i class="ti ti-clock-history"></i> Previous Beneficiaries</a>
+    <div class="nav-section-label">Reports</div>
+    <a class="nav-item active" href="donor-management.html"><i class="ti ti-heart-handshake"></i> Donor Management</a>
+    <a class="nav-item" href="donors.html"><i class="ti ti-chart-bar"></i> Donor Transparency</a>
+    <a class="nav-item" href="documents.html"><i class="ti ti-folder"></i> Documents</a>
+    <div class="sidebar-footer">
+      <a class="nav-item" href="#" onclick="signOut()"><i class="ti ti-logout"></i> Sign out</a>
+    </div>
+  </aside>
+
+  <!-- CONTENT: full-height split layout -->
+  <main class="main" style="padding:0;overflow:hidden;">
+    <div class="dm-layout">
+
+      <!-- LEFT: Donor list -->
+      <div class="dm-list-panel">
+        <div class="dm-list-head">
+          <div class="dm-list-title">All Donors <span id="donor-count" style="color:var(--grey-400);font-weight:400;"></span></div>
+          <input class="dm-search" id="donor-search" type="text" placeholder="Search by name or email..." oninput="filterDonors()" />
+        </div>
+        <div id="donor-list"></div>
+      </div>
+
+      <!-- RIGHT: Donor detail -->
+      <div class="dm-detail-panel" id="donor-detail">
+        <div class="dm-placeholder">
+          <i class="ti ti-heart-handshake"></i>
+          <div style="font-size:15px;font-weight:600;color:var(--grey-500);">Select a donor to view details</div>
+          <div style="font-size:13px;color:var(--grey-400);">All registered donor accounts appear on the left.</div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- STUDENT MATCH MODAL -->
+  <div id="match-modal" style="display:none;">
+    <div class="dm-modal-backdrop" onclick="if(event.target===this)closeMatchModal()">
+      <div class="dm-modal">
+        <div class="dm-modal-head">
+          <div class="dm-modal-head-title"><i class="ti ti-link" style="margin-right:8px;"></i>Match donor with a student</div>
+          <button class="dm-modal-close" onclick="closeMatchModal()"><i class="ti ti-x"></i></button>
+        </div>
+        <div class="dm-modal-search">
+          <input class="dm-search" id="student-search" type="text" placeholder="Search selected students by name or school..." oninput="filterStudents()" />
+        </div>
+        <div class="dm-modal-list" id="student-list"></div>
+        <div class="dm-modal-foot">
+          <button class="dm-btn-outline" onclick="closeMatchModal()">Cancel</button>
+          <button class="dm-btn-primary" id="confirm-match-btn" onclick="confirmMatch()" disabled>Confirm match</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+let allDonors      = [];
+let allStudents    = [];
+let selectedDonor  = null;
+let selectedMatch  = null;
+let donorMatches   = {};   // donorId → [studentIds]
+let donorDonations = {};   // donorId → [donations]
+
+/* ── LOAD ──────────────────────────────────────────────── */
+async function loadAll() {
+  await requireAuth();
+
+  const [donorRes, studentRes, matchRes, donationRes] = await Promise.all([
+    sb.from('donor_accounts').select('*').order('created_at', { ascending: false }),
+    sb.from('students').select('id,name,initials,school,district,class,cycle_year').eq('status','selected').order('name'),
+    sb.from('donor_student_matches').select('*'),
+    sb.from('donations').select('*').order('donated_at', { ascending: false }),
+  ]);
+
+  allDonors   = donorRes.data  || [];
+  allStudents = studentRes.data || [];
+
+  // Index matches by donor_id
+  (matchRes.data || []).forEach(m => {
+    if (!donorMatches[m.donor_id]) donorMatches[m.donor_id] = [];
+    donorMatches[m.donor_id].push(m.student_id);
+  });
+
+  // Index donations by donor_id
+  (donationRes.data || []).forEach(d => {
+    if (!donorDonations[d.donor_id]) donorDonations[d.donor_id] = [];
+    donorDonations[d.donor_id].push(d);
+  });
+
+  document.getElementById('donor-count').textContent = `(${allDonors.length})`;
+  renderDonorList(allDonors);
+}
+
+/* ── DONOR LIST ────────────────────────────────────────── */
+function renderDonorList(donors) {
+  const el = document.getElementById('donor-list');
+  if (!donors.length) {
+    el.innerHTML = '<div style="padding:24px;text-align:center;color:var(--grey-400);font-size:13px;">No donors found.</div>';
+    return;
+  }
+  el.innerHTML = donors.map(d => {
+    const initials  = d.full_name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+    const total     = (donorDonations[d.id] || []).reduce((s,x) => s + parseFloat(x.amount||0), 0);
+    const matched   = (donorMatches[d.id] || []).length > 0;
+    const isActive  = selectedDonor?.id === d.id;
+    return `
+      <div class="dm-donor-row ${isActive ? 'active' : ''}" onclick="selectDonor('${d.id}')">
+        <div class="dm-donor-avatar">${initials}</div>
+        <div style="flex:1;min-width:0;">
+          <div class="dm-donor-name">${esc(d.full_name)}</div>
+          <div class="dm-donor-email">${esc(d.email)}</div>
+          <div class="dm-donor-meta">
+            <span class="dm-tag ${d.email_verified ? 'dm-tag-verified' : 'dm-tag-unverified'}">${d.email_verified ? 'Verified' : 'Unverified'}</span>
+            ${matched ? '<span class="dm-tag dm-tag-matched">Matched</span>' : ''}
+            ${total > 0 ? `<span class="dm-tag dm-tag-amount">₹${total.toLocaleString('en-IN')}</span>` : ''}
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function filterDonors() {
+  const q = document.getElementById('donor-search').value.toLowerCase();
+  renderDonorList(allDonors.filter(d =>
+    d.full_name.toLowerCase().includes(q) || d.email.toLowerCase().includes(q)
+  ));
+}
+
+/* ── DONOR DETAIL ──────────────────────────────────────── */
+function selectDonor(id) {
+  selectedDonor = allDonors.find(d => d.id === id);
+  if (!selectedDonor) return;
+  filterDonors();
+  renderDetail();
+}
+
+function renderDetail() {
+  const d = selectedDonor;
+  const initials  = d.full_name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+  const donations = donorDonations[d.id] || [];
+  const total     = donations.reduce((s,x) => s + parseFloat(x.amount||0), 0);
+  const matchedIds= donorMatches[d.id] || [];
+  const matched   = matchedIds.map(sid => allStudents.find(s => s.id === sid)).filter(Boolean);
+
+  const donationRows = donations.length
+    ? donations.map(don => `
+        <tr>
+          <td>${fmtDate(don.donated_at)}</td>
+          <td style="font-weight:700;color:var(--green-dark);">₹${parseFloat(don.amount).toLocaleString('en-IN')}</td>
+          <td>${esc(don.purpose || '—')}</td>
+          <td style="color:var(--grey-400);font-size:12px;">${esc(don.txn_ref || '—')}</td>
+        </tr>`).join('')
+    : '<tr><td colspan="4" style="padding:16px;text-align:center;color:var(--grey-400);">No donations recorded yet.</td></tr>';
+
+  const matchedRows = matched.length
+    ? matched.map(s => `
+        <div class="dm-matched-student">
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--black);">${esc(s.name)}</div>
+            <div style="font-size:12px;color:var(--grey-500);margin-top:2px;">${esc(s.school)} · ${esc(s.district)}</div>
+          </div>
+          <button onclick="removeMatch('${d.id}','${s.id}')" style="background:none;border:none;cursor:pointer;color:var(--grey-400);font-size:13px;display:flex;align-items:center;gap:4px;font-family:var(--font);" title="Remove match">
+            <i class="ti ti-unlink"></i>
+          </button>
+        </div>`).join('')
+    : '<div style="font-size:13px;color:var(--grey-400);margin-bottom:12px;">No students matched yet.</div>';
+
+  document.getElementById('donor-detail').innerHTML = `
+    <div class="dm-detail-card">
+      <div class="dm-detail-head">
+        <div class="dm-detail-avatar">${initials}</div>
+        <div style="flex:1;">
+          <div class="dm-detail-name">${esc(d.full_name)}</div>
+          <div class="dm-detail-email">${esc(d.email)}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+          <span style="background:${d.email_verified?'#D1FAE5':'#FEE2E2'};color:${d.email_verified?'#065F46':'#991B1B'};border-radius:99px;padding:4px 12px;font-size:12px;font-weight:700;">
+            ${d.email_verified ? 'Email verified' : 'Email unverified'}
+          </span>
+          <span style="background:var(--yellow-light);color:#713F12;border-radius:99px;padding:4px 12px;font-size:12px;font-weight:700;">
+            Total: ₹${total.toLocaleString('en-IN')}
+          </span>
+        </div>
+      </div>
+      <div class="dm-field-grid">
+        <div class="dm-field-row"><span class="dm-field-key">Full name</span><span class="dm-field-val">${esc(d.full_name)}</span></div>
+        <div class="dm-field-row"><span class="dm-field-key">Occupation</span><span class="dm-field-val">${esc(d.occupation||'—')}</span></div>
+        <div class="dm-field-row"><span class="dm-field-key">Date of birth</span><span class="dm-field-val">${d.dob ? fmtDate(d.dob) : '—'}</span></div>
+        <div class="dm-field-row"><span class="dm-field-key">Member since</span><span class="dm-field-val">${fmtDate(d.created_at)}</span></div>
+      </div>
+    </div>
+
+    <!-- Donations -->
+    <div class="dm-detail-card">
+      <div class="dm-section-title">Donation history (${donations.length})</div>
+      <table class="dm-mini-table">
+        <thead><tr><th>Date</th><th>Amount</th><th>Purpose</th><th>Ref.</th></tr></thead>
+        <tbody>${donationRows}</tbody>
+      </table>
+    </div>
+
+    <!-- Matching -->
+    <div class="dm-detail-card">
+      <div class="dm-section-title">Matched students (${matched.length})</div>
+      <div class="dm-match-box">
+        ${matchedRows}
+        <button class="dm-add-match-btn" onclick="openMatchModal()">
+          <i class="ti ti-link"></i> Match with a student
+        </button>
+      </div>
+    </div>`;
+}
+
+/* ── MATCH MODAL ───────────────────────────────────────── */
+function openMatchModal() {
+  selectedMatch = null;
+  document.getElementById('confirm-match-btn').disabled = true;
+  document.getElementById('student-search').value = '';
+  renderStudentList(allStudents);
+  document.getElementById('match-modal').style.display = 'block';
+}
+
+function closeMatchModal() {
+  document.getElementById('match-modal').style.display = 'none';
+  selectedMatch = null;
+}
+
+function renderStudentList(students) {
+  const alreadyMatched = donorMatches[selectedDonor?.id] || [];
+  const el = document.getElementById('student-list');
+  if (!students.length) {
+    el.innerHTML = '<div style="padding:24px;text-align:center;color:var(--grey-400);font-size:13px;">No selected students found.</div>';
+    return;
+  }
+  el.innerHTML = students.map(s => {
+    const already = alreadyMatched.includes(s.id);
+    return `
+      <div class="dm-student-row ${selectedMatch?.id === s.id ? 'selected' : ''} ${already ? '' : ''}"
+           onclick="${already ? '' : `pickStudent('${s.id}')`}"
+           style="${already ? 'opacity:0.5;cursor:not-allowed;' : ''}">
+        <div class="table-avatar" style="width:36px;height:36px;font-size:13px;flex-shrink:0;">${(s.initials||s.name.slice(0,2)).toUpperCase()}</div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:600;">${esc(s.name)}</div>
+          <div style="font-size:12px;color:var(--grey-400);">${esc(s.school)} · ${esc(s.district)}</div>
+        </div>
+        ${already ? '<span style="font-size:11px;color:#065F46;font-weight:700;">Already matched</span>' : ''}
+      </div>`;
+  }).join('');
+}
+
+function filterStudents() {
+  const q = document.getElementById('student-search').value.toLowerCase();
+  renderStudentList(allStudents.filter(s =>
+    s.name.toLowerCase().includes(q) || s.school.toLowerCase().includes(q)
+  ));
+}
+
+function pickStudent(id) {
+  selectedMatch = allStudents.find(s => s.id === id);
+  document.getElementById('confirm-match-btn').disabled = !selectedMatch;
+  filterStudents();
+}
+
+async function confirmMatch() {
+  if (!selectedDonor || !selectedMatch) return;
+  const btn = document.getElementById('confirm-match-btn');
+  btn.disabled    = true;
+  btn.textContent = 'Matching...';
+
+  const { data: { user } } = await sb.auth.getUser();
+  const { data: profile }  = await sb.from('profiles').select('id').eq('id', user.id).maybeSingle();
+
+  const { error } = await sb.from('donor_student_matches').insert({
+    donor_id:   selectedDonor.id,
+    student_id: selectedMatch.id,
+    matched_by: profile?.id || null,
+    matched_at: new Date().toISOString(),
+  });
+
+  if (error) {
+    alert('Match failed: ' + error.message);
+    btn.disabled = false; btn.textContent = 'Confirm match';
+    return;
+  }
+
+  // Update local state
+  if (!donorMatches[selectedDonor.id]) donorMatches[selectedDonor.id] = [];
+  donorMatches[selectedDonor.id].push(selectedMatch.id);
+
+  closeMatchModal();
+  renderDetail();
+  filterDonors();
+
+  btn.disabled = false; btn.textContent = 'Confirm match';
+}
+
+async function removeMatch(donorId, studentId) {
+  if (!confirm('Remove this donor-student match?')) return;
+
+  const { error } = await sb.from('donor_student_matches')
+    .delete().eq('donor_id', donorId).eq('student_id', studentId);
+
+  if (error) { alert('Could not remove match: ' + error.message); return; }
+
+  donorMatches[donorId] = (donorMatches[donorId] || []).filter(id => id !== studentId);
+  renderDetail();
+  filterDonors();
+}
+
+/* ── UTILS ──────────────────────────────────────────────── */
+function fmtDate(d) {
+  if (!d) return '—';
+  return new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+function esc(str) {
+  return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+loadAll();
+</script>
+</body>
+</html>
