@@ -41,7 +41,7 @@ a { text-decoration: none; color: inherit; }
 .sp-brand {
   display: flex; align-items: center; gap: 12px;
 }
-.sp-brand img { height: 32px; filter: brightness(0) invert(1); }
+.sp-brand img { height: 32px; }
 .sp-brand-text { font-size: 14px; font-weight: 700; color: #fff; }
 .sp-brand-sub  { font-size: 11px; color: rgba(255,255,255,0.6); font-weight: 400; }
 .sp-topbar-right { display: flex; align-items: center; gap: 14px; }
@@ -280,7 +280,7 @@ a { text-decoration: none; color: inherit; }
   background: var(--green-dark); padding: 32px;
   display: flex; flex-direction: column; align-items: center; gap: 12px;
 }
-.sp-login-head img { height: 44px; filter: brightness(0) invert(1); }
+.sp-login-head img { height: 44px; }
 .sp-login-head-title { font-size: 18px; font-weight: 800; color: #fff; }
 .sp-login-head-sub   { font-size: 13px; color: rgba(255,255,255,0.65); text-align: center; }
 .sp-login-body { padding: 28px 32px; display: flex; flex-direction: column; gap: 16px; }
