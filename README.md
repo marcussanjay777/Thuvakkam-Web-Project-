@@ -47,9 +47,12 @@ Logs in as **Sanjay Marcus** (test student).
 
 ---
 
-## Donor Portal
+## Donor Portal — Test Account
 
-Donors register themselves via the donor portal. OTP email verification is being set up — currently in progress.
+| Field | Value |
+|-------|-------|
+| Email | testdonor@sfs.com |
+| Password | Donor@123 |
 
 ---
 
