@@ -64,16 +64,38 @@
   <!-- STUDENTS GRID -->
   <section class="section">
     <div class="container">
-      <div id="students-meta" style="font-size:14px; color:var(--grey-600); margin-bottom:28px;"></div>
-      <div id="students-grid" class="grid-3" style="display:none;"></div>
+
       <div id="loading" style="text-align:center; padding:80px 0; color:var(--grey-400);">
         <i class="ti ti-loader-2" style="font-size:36px; display:block; margin:0 auto 12px;"></i>
         Loading students…
       </div>
+
+      <!-- SPONSORED STUDENTS -->
+      <div id="sponsored-section" style="display:none; margin-bottom:56px;">
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:24px;">
+          <div style="width:10px;height:10px;border-radius:50%;background:var(--green-dark);flex-shrink:0;"></div>
+          <h2 style="font-size:20px;font-weight:800;color:var(--black);letter-spacing:-0.02em;">Sponsored students</h2>
+          <span id="sponsored-count" style="font-size:13px;color:var(--grey-400);"></span>
+        </div>
+        <div id="sponsored-grid" class="grid-3"></div>
+      </div>
+
+      <!-- SEEKING SPONSOR -->
+      <div id="seeking-section" style="display:none;">
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:8px;">
+          <div style="width:10px;height:10px;border-radius:50%;background:var(--yellow);flex-shrink:0;"></div>
+          <h2 style="font-size:20px;font-weight:800;color:var(--black);letter-spacing:-0.02em;">Seeking a sponsor</h2>
+          <span id="seeking-count" style="font-size:13px;color:var(--grey-400);"></span>
+        </div>
+        <p style="font-size:14px;color:var(--grey-600);margin-bottom:24px;margin-left:22px;">These students have been selected but are still waiting to be matched with a sponsor. <a href="sponsor.html" style="color:var(--green-dark);font-weight:600;text-decoration:underline;">Become their sponsor →</a></p>
+        <div id="seeking-grid" class="grid-3"></div>
+      </div>
+
       <div id="empty" style="display:none; text-align:center; padding:80px 0; color:var(--grey-400);">
         <i class="ti ti-users" style="font-size:36px; display:block; margin:0 auto 12px;"></i>
-        No funded students to show yet. Check back soon.
+        No students to show yet. Check back soon.
       </div>
+
     </div>
   </section>
 
@@ -140,47 +162,60 @@
       document.getElementById('thankyou-banner').style.display = 'block';
     }
 
+    function buildCard(s, isSponsored) {
+      const initials = s.initials || s.name.trim().split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+      const funded   = parseFloat(s.total_funded || 0);
+      const badge = isSponsored
+        ? `<div style="background:var(--green-light);border-radius:var(--radius-md);padding:8px 16px;display:inline-block;">
+             <span style="font-size:13px;color:var(--green-dark);font-weight:700;">₹${funded.toLocaleString('en-IN')} raised</span>
+           </div>`
+        : `<div style="background:var(--yellow-light);border:1px solid var(--yellow);border-radius:var(--radius-md);padding:8px 16px;display:inline-block;">
+             <span style="font-size:13px;color:#92620A;font-weight:600;">Seeking sponsor</span>
+           </div>`;
+
+      return `
+        <div class="card" style="text-align:center;padding:32px 24px;">
+          <div style="width:64px;height:64px;background:${isSponsored ? 'var(--yellow)' : 'var(--grey-100)'};border-radius:50%;
+                      display:flex;align-items:center;justify-content:center;
+                      font-size:22px;font-weight:800;color:${isSponsored ? 'var(--green-dark)' : 'var(--grey-400)'};margin:0 auto 16px;">
+            ${initials}
+          </div>
+          <div style="font-size:17px;font-weight:700;color:var(--black);margin-bottom:4px;">${s.name}</div>
+          <div style="font-size:13px;color:var(--grey-600);margin-bottom:4px;">Class ${s.class}${s.board ? ' · ' + s.board : ''}</div>
+          <div style="font-size:13px;color:var(--grey-600);margin-bottom:16px;">${s.school}${s.district ? ', ' + s.district : ''}</div>
+          ${badge}
+        </div>
+      `;
+    }
+
     async function loadStudents() {
       const { data, error } = await sb.rpc('get_public_student_funding');
 
-      const loading = document.getElementById('loading');
-      const grid    = document.getElementById('students-grid');
-      const empty   = document.getElementById('empty');
-      const meta    = document.getElementById('students-meta');
-
-      loading.style.display = 'none';
+      document.getElementById('loading').style.display = 'none';
 
       if (error || !data || data.length === 0) {
-        empty.style.display = 'block';
+        document.getElementById('empty').style.display = 'block';
         return;
       }
 
-      meta.textContent = `${data.length} student${data.length !== 1 ? 's' : ''} currently supported`;
-      grid.style.display = 'grid';
+      const sponsored = data.filter(s => parseFloat(s.total_funded || 0) > 0);
+      const seeking   = data.filter(s => parseFloat(s.total_funded || 0) === 0);
 
-      grid.innerHTML = data.map(s => {
-        const initials = s.initials || s.name.trim().split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
-        const funded   = parseFloat(s.total_funded || 0);
-        const fundedLabel = funded > 0
-          ? `<span style="font-size:13px;color:var(--green-dark);font-weight:700;">₹${funded.toLocaleString('en-IN')} raised</span>`
-          : `<span style="font-size:13px;color:var(--grey-400);">Seeking sponsor</span>`;
+      if (sponsored.length > 0) {
+        document.getElementById('sponsored-section').style.display = 'block';
+        document.getElementById('sponsored-count').textContent = `${sponsored.length} student${sponsored.length !== 1 ? 's' : ''}`;
+        document.getElementById('sponsored-grid').innerHTML = sponsored.map(s => buildCard(s, true)).join('');
+      }
 
-        return `
-          <div class="card" style="text-align:center;padding:32px 24px;">
-            <div style="width:64px;height:64px;background:var(--yellow);border-radius:50%;
-                        display:flex;align-items:center;justify-content:center;
-                        font-size:22px;font-weight:800;color:var(--green-dark);margin:0 auto 16px;">
-              ${initials}
-            </div>
-            <div style="font-size:17px;font-weight:700;color:var(--black);margin-bottom:4px;">${s.name}</div>
-            <div style="font-size:13px;color:var(--grey-600);margin-bottom:4px;">Class ${s.class}${s.board ? ' · ' + s.board : ''}</div>
-            <div style="font-size:13px;color:var(--grey-600);margin-bottom:16px;">${s.school}${s.district ? ', ' + s.district : ''}</div>
-            <div style="background:var(--green-light);border-radius:var(--radius-md);padding:8px 16px;display:inline-block;">
-              ${fundedLabel}
-            </div>
-          </div>
-        `;
-      }).join('');
+      if (seeking.length > 0) {
+        document.getElementById('seeking-section').style.display = 'block';
+        document.getElementById('seeking-count').textContent = `${seeking.length} student${seeking.length !== 1 ? 's' : ''}`;
+        document.getElementById('seeking-grid').innerHTML = seeking.map(s => buildCard(s, false)).join('');
+      }
+
+      if (sponsored.length === 0 && seeking.length === 0) {
+        document.getElementById('empty').style.display = 'block';
+      }
     }
 
     loadStudents();
