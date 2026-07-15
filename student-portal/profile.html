@@ -440,7 +440,7 @@
       // Upload proof to storage
       const ext      = proofFile.name.split('.').pop();
       const path     = `student-proofs/${currentStudent.id}/${editingCategory}_${Date.now()}.${ext}`;
-      const { error: uploadErr } = await sb.storage.from('studen-documents').upload(path, proofFile, { upsert: false });
+      const { error: uploadErr } = await sb.storage.from('student-documents').upload(path, proofFile, { upsert: false });
       if (uploadErr) {
         errEl.textContent   = 'Proof upload failed: ' + uploadErr.message;
         errEl.style.display = 'block';
@@ -448,7 +448,7 @@
         btn.innerHTML       = '<i class="ti ti-check"></i> Save';
         return;
       }
-      const { data: urlData } = sb.storage.from('studen-documents').getPublicUrl(path);
+      const { data: urlData } = sb.storage.from('student-documents').getPublicUrl(path);
       const proofUrl = urlData.publicUrl;
 
       btn.innerHTML = '<i class="ti ti-loader-2" style="animation:spin 0.8s linear infinite;display:inline-block;"></i> Saving...';
