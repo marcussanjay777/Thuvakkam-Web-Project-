@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>General Donations — Thuvakkam SFS Portal</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="js/client.js"></script>
+</head>
+<body>
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-accent"></div>
+      <div class="topbar-brand">
+        Thuvakkam Education
+        <span>Sponsor for Success &mdash; Internal Portal</span>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <input class="search-input" type="text" placeholder="Search students, schools..." />
+      <div class="topbar-divider"></div>
+      <div class="user-pill">
+        <div class="user-avatar">RK</div>
+        <div class="user-info">
+          <div class="user-name">Ramesh Kumar</div>
+          <div class="user-role">Committee Member</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="nav-section-label">Main</div>
+    <a class="nav-item" href="dashboard.html">
+      <i class="ti ti-layout-dashboard"></i> Overview
+    </a>
+    <a class="nav-item" href="applications.html">
+      <i class="ti ti-file-text"></i> Applications
+    </a>
+    <a class="nav-item" href="selected.html">
+      <i class="ti ti-user-check"></i> Selected Students
+    </a>
+    <a class="nav-item" href="rejected.html"><i class="ti ti-user-x"></i> Rejected</a>
+    <a class="nav-item" href="previous.html">
+      <i class="ti ti-clock-history"></i> Previous Beneficiaries
+    </a>
+
+    <div class="nav-section-label">Reports</div>
+    <a class="nav-item" href="donors.html">
+      <i class="ti ti-heart-handshake"></i> Donor Transparency
+    </a>
+    <a class="nav-item active" href="general-donations.html">
+      <i class="ti ti-cash"></i> General Donations
+    </a>
+    <a class="nav-item" href="documents.html">
+      <i class="ti ti-folder"></i> Documents
+    </a>
+
+    <div class="sidebar-footer">
+      <a class="nav-item" href="#" onclick="signOut()"><i class="ti ti-logout"></i> Sign out</a>
+    </div>
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="main">
+    <div class="page-header">
+      <div>
+        <div class="page-title">General Donations</div>
+        <div class="page-subtitle">One-off donations from the public — no account required</div>
+      </div>
+      <button onclick="exportCSV()" class="btn-export" style="display:flex;align-items:center;gap:6px;padding:8px 16px;background:var(--green-dark);color:#fff;border:none;border-radius:var(--radius-md);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">
+        <i class="ti ti-download"></i> Export CSV
+      </button>
+    </div>
+
+    <!-- STAT BLOCKS -->
+    <div class="stat-grid">
+      <div class="stat-block">
+        <div class="stat-block-label">Total donations</div>
+        <div class="stat-block-value" id="stat-count">—</div>
+        <div class="stat-block-note">all time</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-block-label">Total amount raised</div>
+        <div class="stat-block-value" id="stat-total">—</div>
+        <div class="stat-block-note">general fund</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-block-label">Average donation</div>
+        <div class="stat-block-value" id="stat-avg">—</div>
+        <div class="stat-block-note">per donor</div>
+      </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="card" style="margin-top:0;">
+      <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;">
+        <div class="card-title">All donations</div>
+        <div id="result-count" style="font-size:13px;color:var(--grey-400);"></div>
+      </div>
+      <div class="card-body" style="padding:0;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Amount</th>
+              <th>Message</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody id="donations-tbody">
+            <tr><td colspan="5" style="text-align:center;padding:40px;color:var(--grey-400);">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    requireAuth();
+
+    let allDonations = [];
+
+    async function loadDonations() {
+      const { data, error } = await sb
+        .from('general_donations')
+        .select('*')
+        .order('donated_at', { ascending: false });
+
+      const tbody = document.getElementById('donations-tbody');
+
+      if (error || !data) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--grey-400);">Could not load donations.</td></tr>`;
+        return;
+      }
+
+      allDonations = data;
+
+      // Stats
+      const total  = data.reduce((sum, d) => sum + parseFloat(d.amount || 0), 0);
+      const avg    = data.length ? total / data.length : 0;
+
+      document.getElementById('stat-count').textContent = data.length;
+      document.getElementById('stat-total').textContent = '₹' + total.toLocaleString('en-IN', { maximumFractionDigits: 0 });
+      document.getElementById('stat-avg').textContent   = '₹' + Math.round(avg).toLocaleString('en-IN');
+      document.getElementById('result-count').textContent = `${data.length} record${data.length !== 1 ? 's' : ''}`;
+
+      if (data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--grey-400);">No general donations yet.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = data.map(d => {
+        const date = new Date(d.donated_at).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+        const amt  = parseFloat(d.amount || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 });
+        const note = d.note ? `<span style="color:var(--grey-600);">${d.note}</span>` : `<span style="color:var(--grey-200);">—</span>`;
+        return `
+          <tr>
+            <td style="font-weight:600;">${d.full_name}</td>
+            <td style="color:var(--grey-600);">${d.email}</td>
+            <td><span style="font-weight:700;color:var(--green-dark);">₹${amt}</span></td>
+            <td>${note}</td>
+            <td style="color:var(--grey-400);font-size:12px;">${date}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function exportCSV() {
+      if (!allDonations.length) return;
+      const headers = ['Name', 'Email', 'Amount (INR)', 'Message', 'Date'];
+      const rows = allDonations.map(d => [
+        `"${d.full_name}"`,
+        `"${d.email}"`,
+        d.amount,
+        `"${d.note || ''}"`,
+        new Date(d.donated_at).toLocaleDateString('en-GB'),
+      ]);
+      const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const a    = document.createElement('a');
+      a.href     = URL.createObjectURL(blob);
+      a.download = 'general-donations.csv';
+      a.click();
+    }
+
+    loadDonations();
+  </script>
+</body>
+</html>
