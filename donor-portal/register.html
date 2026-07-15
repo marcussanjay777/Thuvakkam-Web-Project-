@@ -41,15 +41,9 @@
 
       <!-- ── STEP 1: Details ── -->
       <div id="step-1" style="display:flex;flex-direction:column;gap:16px;">
-        <div class="dp-steps">
-          <div class="dp-step active" id="si-1"><div class="dp-step-num">1</div> Your details</div>
-          <div class="dp-step-divider"></div>
-          <div class="dp-step" id="si-2"><div class="dp-step-num">2</div> Verify email</div>
-        </div>
-
         <div>
           <div class="dp-auth-title">Create your account</div>
-          <div class="dp-auth-sub" style="margin-top:6px;">All fields are required. We'll send a code to verify your email.</div>
+          <div class="dp-auth-sub" style="margin-top:6px;">All fields are required.</div>
         </div>
 
         <div class="dp-field-group">
@@ -77,46 +71,11 @@
         </div>
 
         <button class="dp-auth-btn" id="step1-btn" onclick="submitStep1()">
-          Continue &amp; send verification code
+          Create account
         </button>
         <div class="dp-auth-link">Already have an account? <a href="index.html">Sign in</a></div>
       </div>
 
-      <!-- ── STEP 2: OTP ── -->
-      <div id="step-2" style="display:none;flex-direction:column;gap:20px;">
-        <div class="dp-steps">
-          <div class="dp-step done" id="si-1b"><div class="dp-step-num"><i class="ti ti-check" style="font-size:11px;"></i></div> Your details</div>
-          <div class="dp-step-divider"></div>
-          <div class="dp-step active" id="si-2b"><div class="dp-step-num">2</div> Verify email</div>
-        </div>
-
-        <div>
-          <div class="dp-auth-title">Verify your email</div>
-          <div class="dp-auth-sub" id="otp-hint" style="margin-top:6px;"></div>
-        </div>
-
-        <div style="text-align:center;">
-          <div class="dp-otp-wrap">
-            <input class="dp-otp-digit" id="otp0" type="text" maxlength="1" inputmode="numeric" />
-            <input class="dp-otp-digit" id="otp1" type="text" maxlength="1" inputmode="numeric" />
-            <input class="dp-otp-digit" id="otp2" type="text" maxlength="1" inputmode="numeric" />
-            <input class="dp-otp-digit" id="otp3" type="text" maxlength="1" inputmode="numeric" />
-            <input class="dp-otp-digit" id="otp4" type="text" maxlength="1" inputmode="numeric" />
-            <input class="dp-otp-digit" id="otp5" type="text" maxlength="1" inputmode="numeric" />
-          </div>
-          <div style="font-size:12px;color:var(--grey-400);margin-top:14px;">
-            Didn't receive it?
-            <button id="resend-btn" onclick="resendOtp()" style="background:none;border:none;color:var(--green-dark);font-weight:600;cursor:pointer;font-size:12px;font-family:inherit;">Resend code</button>
-          </div>
-        </div>
-
-        <button class="dp-auth-btn" id="step2-btn" onclick="submitStep2()">
-          Verify &amp; create account
-        </button>
-        <div class="dp-auth-link">
-          <button onclick="goBack()" style="background:none;border:none;color:var(--grey-400);cursor:pointer;font-size:13px;font-family:inherit;">← Go back</button>
-        </div>
-      </div>
 
     </div>
   </div>
@@ -129,9 +88,6 @@
     'sb_publishable_vO20BiWyS_VIkhU2DDmw3g_BoGBeCdq'
   );
 
-  let pendingEmail = '';
-  let pendingData  = {};
-
   // Already logged in as donor → skip to dashboard
   sb.auth.getSession().then(async ({ data: { session } }) => {
     if (!session) return;
@@ -139,27 +95,6 @@
     if (data) window.location.href = 'dashboard.html';
   });
 
-  // OTP digit auto-advance + paste support
-  for (let i = 0; i < 6; i++) {
-    const inp = document.getElementById('otp' + i);
-    inp.addEventListener('input', () => {
-      inp.value = inp.value.replace(/\D/g, '');
-      if (inp.value && i < 5) document.getElementById('otp' + (i + 1)).focus();
-    });
-    inp.addEventListener('keydown', e => {
-      if (e.key === 'Backspace' && !inp.value && i > 0) document.getElementById('otp' + (i - 1)).focus();
-      if (e.key === 'Enter') submitStep2();
-    });
-    inp.addEventListener('paste', e => {
-      const text = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '').slice(0, 6);
-      [...text].forEach((ch, j) => { const el = document.getElementById('otp' + j); if (el) el.value = ch; });
-      const last = document.getElementById('otp' + Math.min(text.length, 5));
-      if (last) last.focus();
-      e.preventDefault();
-    });
-  }
-
-  /* ── STEP 1: Create auth account + send OTP ── */
   async function submitStep1() {
     const name       = document.getElementById('reg-name').value.trim();
     const dob        = document.getElementById('reg-dob').value;
@@ -173,9 +108,9 @@
     if (password.length < 8) { showErr('Password must be at least 8 characters.'); return; }
 
     btn.disabled    = true;
-    btn.textContent = 'Sending verification code...';
+    btn.textContent = 'Creating account...';
 
-    // 1. Create the Supabase auth user
+    // Create auth user
     const { data: authData, error: signUpErr } = await sb.auth.signUp({ email, password });
     if (signUpErr) {
       const msg = signUpErr.message.toLowerCase();
@@ -183,99 +118,32 @@
         const { data: existingDonor } = await sb.from('donor_accounts').select('id').eq('email', email).maybeSingle();
         showErr(existingDonor
           ? 'A donor account already exists for this email. Please sign in.'
-          : 'This email is already used by an admin or student account. Please use a different email.');
+          : 'This email is already used by another account. Please use a different email.');
       } else {
         showErr('Could not create account: ' + signUpErr.message);
       }
-      btn.disabled = false; btn.textContent = 'Continue & send verification code';
-      return;
-    }
-
-    pendingEmail = email;
-    pendingData  = { name, dob, occupation, email, userId: authData.user?.id };
-
-    // 2. Sign out first — signInWithOtp won't work while a session is active
-    await sb.auth.signOut();
-
-    // 3. Send OTP (uses your custom SMTP + template with {{ .Token }})
-    const { error: otpErr } = await sb.auth.signInWithOtp({
-      email,
-      options: { shouldCreateUser: false }
-    });
-
-    if (otpErr) {
-      showErr('OTP error: ' + (otpErr.message || otpErr.status || otpErr.toString() || 'Unknown — check Resend dashboard'));
-      btn.disabled = false; btn.textContent = 'Continue & send verification code';
-      return;
-    }
-
-    document.getElementById('otp-hint').textContent = `A 6-digit code was sent to ${email}. Enter it below.`;
-    showStep(2);
-    document.getElementById('otp0').focus();
-  }
-
-  /* ── STEP 2: Verify OTP + save donor profile ── */
-  async function submitStep2() {
-    const code = [0,1,2,3,4,5].map(i => document.getElementById('otp'+i).value).join('');
-    const btn  = document.getElementById('step2-btn');
-
-    hideMessages();
-    if (code.length < 6) { showErr('Please enter the complete 6-digit code.'); return; }
-
-    btn.disabled    = true;
-    btn.textContent = 'Verifying...';
-
-    const { data, error } = await sb.auth.verifyOtp({
-      email: pendingEmail,
-      token: code,
-      type:  'email',
-    });
-
-    if (error) {
-      showErr('Invalid or expired code. Please try again or resend.');
-      btn.disabled = false; btn.textContent = 'Verify & create account';
+      btn.disabled = false; btn.textContent = 'Create account';
       return;
     }
 
     // Save donor profile
     const { error: insertErr } = await sb.from('donor_accounts').insert({
-      auth_user_id:   data.user.id,
-      full_name:      pendingData.name,
-      dob:            pendingData.dob,
-      occupation:     pendingData.occupation,
-      email:          pendingData.email,
+      auth_user_id:   authData.user.id,
+      full_name:      name,
+      dob:            dob,
+      occupation:     occupation,
+      email:          email,
       email_verified: true,
     });
 
     if (insertErr) {
-      showErr('Verified! But profile save failed: ' + insertErr.message);
-      btn.disabled = false; btn.textContent = 'Verify & create account';
+      showErr('Account created but profile save failed: ' + insertErr.message);
+      btn.disabled = false; btn.textContent = 'Create account';
       return;
     }
 
-    showSuccess('Email verified! Taking you to your dashboard...');
+    showSuccess('Account created! Taking you to your dashboard...');
     setTimeout(() => window.location.href = 'dashboard.html', 1200);
-  }
-
-  /* ── Resend OTP ── */
-  async function resendOtp() {
-    const btn = document.getElementById('resend-btn');
-    btn.disabled = true; btn.textContent = 'Sending...';
-    await sb.auth.signInWithOtp({ email: pendingEmail, options: { shouldCreateUser: false } });
-    btn.textContent = 'Sent!';
-    setTimeout(() => { btn.disabled = false; btn.textContent = 'Resend code'; }, 30000);
-  }
-
-  function showStep(n) {
-    document.getElementById('step-1').style.display = n === 1 ? 'flex' : 'none';
-    document.getElementById('step-2').style.display = n === 2 ? 'flex' : 'none';
-  }
-
-  function goBack() {
-    hideMessages();
-    showStep(1);
-    const btn = document.getElementById('step1-btn');
-    btn.disabled = false; btn.textContent = 'Continue & send verification code';
   }
 
   function showErr(msg)     { const e = document.getElementById('reg-error');   e.textContent = msg; e.style.display = 'block'; }
