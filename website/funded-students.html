@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Students We're Helping — Thuvakkam SFS</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+</head>
+<body>
+
+  <div class="topnotice">
+    SFS 2026 applications are now open. &nbsp;<a href="apply.html">Apply before 31 August 2026</a>
+  </div>
+
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-brand">
+        <img src="assets/logo.webp" alt="Thuvakkam Education" style="height:38px;width:auto;object-fit:contain;" />
+        <div class="nav-brand-text">
+          <div class="nav-brand-name">Thuvakkam Education</div>
+          <div class="nav-brand-sub">Sponsor for Success</div>
+        </div>
+      </a>
+      <div class="nav-links">
+        <a class="nav-link"        href="index.html">Home</a>
+        <a class="nav-link"        href="impact.html">Impact</a>
+        <a class="nav-link"        href="criteria.html">Selection</a>
+        <a class="nav-link"        href="support.html">Support</a>
+        <a class="nav-link"        href="stories.html">Stories</a>
+        <a class="nav-link"        href="apply.html">Apply</a>
+        <a class="nav-link"        href="sponsor.html">Sponsor</a>
+        <a class="nav-link active" href="funded-students.html">Our Students</a>
+      </div>
+      <div class="nav-actions">
+        <a href="apply.html" class="btn-nav-outline">Apply now</a>
+        <a href="donate.html" class="btn-nav-primary">Donate</a>
+        <a href="../student-portal/index.html" class="btn-nav-outline" style="border-color:var(--yellow);color:var(--yellow);">Student Portal</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- THANK YOU BANNER (shown after donation redirect) -->
+  <div id="thankyou-banner" style="display:none; background:#D1FAE5; border-bottom:2px solid #6EE7B7; padding:16px 24px; text-align:center;">
+    <i class="ti ti-circle-check" style="color:#065F46; font-size:18px; vertical-align:middle; margin-right:8px;"></i>
+    <span style="color:#065F46; font-weight:600; font-size:15px;">Thank you for your donation! Your contribution is making a real difference.</span>
+  </div>
+
+  <!-- HERO -->
+  <section style="background:var(--green-dark); padding:80px 0 60px; text-align:center;">
+    <div class="container">
+      <div class="section-label-light" style="margin-bottom:16px;">Funded by your support</div>
+      <h1 style="color:#fff; font-size:40px; font-weight:800; letter-spacing:-0.03em; margin-bottom:16px; line-height:1.15;">
+        Students we're helping
+      </h1>
+      <p style="color:rgba(255,255,255,0.8); font-size:16px; max-width:560px; margin:0 auto 32px; line-height:1.7;">
+        Every student here is supported by donors like you. Your contribution goes directly toward their fees, materials, and mentoring.
+      </p>
+      <a href="donate.html" class="btn btn-yellow">Make a donation</a>
+    </div>
+  </section>
+
+  <!-- STUDENTS GRID -->
+  <section class="section">
+    <div class="container">
+      <div id="students-meta" style="font-size:14px; color:var(--grey-600); margin-bottom:28px;"></div>
+      <div id="students-grid" class="grid-3" style="display:none;"></div>
+      <div id="loading" style="text-align:center; padding:80px 0; color:var(--grey-400);">
+        <i class="ti ti-loader-2" style="font-size:36px; display:block; margin:0 auto 12px;"></i>
+        Loading students…
+      </div>
+      <div id="empty" style="display:none; text-align:center; padding:80px 0; color:var(--grey-400);">
+        <i class="ti ti-users" style="font-size:36px; display:block; margin:0 auto 12px;"></i>
+        No funded students to show yet. Check back soon.
+      </div>
+    </div>
+  </section>
+
+  <!-- DONATE CTA -->
+  <section class="section-sm" style="background:var(--cream);">
+    <div class="container" style="text-align:center;">
+      <h2 style="font-size:26px; font-weight:800; color:var(--black); margin-bottom:12px; letter-spacing:-0.02em;">Help another student stay in school.</h2>
+      <p style="font-size:15px; color:var(--grey-600); margin-bottom:24px;">Every contribution, big or small, goes toward a student's education and future.</p>
+      <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+        <a href="donate.html" class="btn btn-primary">Donate now</a>
+        <a href="sponsor.html" class="btn btn-outline">Become a sponsor</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div>
+          <img src="assets/logo.webp" alt="Thuvakkam Education" style="height:44px;width:auto;object-fit:contain;margin-bottom:10px;display:block;" />
+          <div class="footer-brand-name">Thuvakkam Education</div>
+          <div class="footer-brand-body">Supporting education, opportunity, and long-term student empowerment across Tamil Nadu since 2020.</div>
+          <div class="footer-reg">Reg. No: 131/2014 &nbsp;&middot;&nbsp; Exceeding Limits</div>
+        </div>
+        <div>
+          <div class="footer-col-head">Programme</div>
+          <a class="footer-link" href="impact.html">Impact dashboard</a>
+          <a class="footer-link" href="criteria.html">Selection criteria</a>
+          <a class="footer-link" href="support.html">Support provided</a>
+          <a class="footer-link" href="stories.html">Student stories</a>
+        </div>
+        <div>
+          <div class="footer-col-head">Get involved</div>
+          <a class="footer-link" href="apply.html">Apply for SFS</a>
+          <a class="footer-link" href="sponsor.html">Become a sponsor</a>
+          <a class="footer-link" href="donate.html">Make a donation</a>
+        </div>
+        <div>
+          <div class="footer-col-head">Contact</div>
+          <div class="footer-contact-row"><i class="ti ti-mail"></i> info@thuvakkam.org</div>
+          <div class="footer-contact-row"><i class="ti ti-phone"></i> +91 94448 88937</div>
+          <div class="footer-contact-row"><i class="ti ti-map-pin"></i> Chennai, Tamil Nadu</div>
+        </div>
+      </div>
+      <hr class="footer-divider" />
+      <div class="footer-bottom">
+        <span>&copy; 2026 Thuvakkam Education. All rights reserved.</span>
+        <div style="display:flex;gap:20px;">
+          <a href="#">Privacy policy</a>
+          <a href="#">Terms of use</a>
+          <a href="../portal/index.html">Committee portal</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const SUPABASE_URL = 'https://vftexybohuaxngyhwjts.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_vO20BiWyS_VIkhU2DDmw3g_BoGBeCdq';
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    if (new URLSearchParams(window.location.search).get('donated') === 'true') {
+      document.getElementById('thankyou-banner').style.display = 'block';
+    }
+
+    async function loadStudents() {
+      const { data, error } = await sb.rpc('get_public_student_funding');
+
+      const loading = document.getElementById('loading');
+      const grid    = document.getElementById('students-grid');
+      const empty   = document.getElementById('empty');
+      const meta    = document.getElementById('students-meta');
+
+      loading.style.display = 'none';
+
+      if (error || !data || data.length === 0) {
+        empty.style.display = 'block';
+        return;
+      }
+
+      meta.textContent = `${data.length} student${data.length !== 1 ? 's' : ''} currently supported`;
+      grid.style.display = 'grid';
+
+      grid.innerHTML = data.map(s => {
+        const initials = s.initials || s.name.trim().split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+        const funded   = parseFloat(s.total_funded || 0);
+        const fundedLabel = funded > 0
+          ? `<span style="font-size:13px;color:var(--green-dark);font-weight:700;">₹${funded.toLocaleString('en-IN')} raised</span>`
+          : `<span style="font-size:13px;color:var(--grey-400);">Seeking sponsor</span>`;
+
+        return `
+          <div class="card" style="text-align:center;padding:32px 24px;">
+            <div style="width:64px;height:64px;background:var(--yellow);border-radius:50%;
+                        display:flex;align-items:center;justify-content:center;
+                        font-size:22px;font-weight:800;color:var(--green-dark);margin:0 auto 16px;">
+              ${initials}
+            </div>
+            <div style="font-size:17px;font-weight:700;color:var(--black);margin-bottom:4px;">${s.name}</div>
+            <div style="font-size:13px;color:var(--grey-600);margin-bottom:4px;">Class ${s.class}${s.board ? ' · ' + s.board : ''}</div>
+            <div style="font-size:13px;color:var(--grey-600);margin-bottom:16px;">${s.school}${s.district ? ', ' + s.district : ''}</div>
+            <div style="background:var(--green-light);border-radius:var(--radius-md);padding:8px 16px;display:inline-block;">
+              ${fundedLabel}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    loadStudents();
+  </script>
+</body>
+</html>
