@@ -258,8 +258,18 @@
                     </select>
                   </div>
                   <div class="field-group">
+                    <label class="field-label">District <span class="req">*</span></label>
+                    <input class="field-input" name="district" type="text" placeholder="e.g. Chennai, Madurai, Coimbatore" required />
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="field-group">
                     <label class="field-label">Parent's / Guardian contact no. <span class="req">*</span></label>
                     <input class="field-input" name="parent_contact" type="tel" placeholder="+91 XXXXXXXXXX" required />
+                  </div>
+                  <div class="field-group">
+                    <label class="field-label">Student contact no. (if available)</label>
+                    <input class="field-input" name="student_phone_alt" type="tel" placeholder="+91 XXXXXXXXXX" />
                   </div>
                 </div>
                 <div class="form-row">
@@ -279,6 +289,10 @@
             <div class="apply-section">
               <div class="apply-section-title"><i class="ti ti-school"></i> Education details</div>
               <div class="form-fields">
+                <div class="field-group">
+                  <label class="field-label">Current school / college name <span class="req">*</span></label>
+                  <input class="field-input" name="school" type="text" placeholder="Name of the school or college you are currently attending" required />
+                </div>
                 <div class="field-group">
                   <label class="field-label">10th standard school details <span class="req">*</span></label>
                   <textarea class="field-textarea" name="school_10th" placeholder="School name, board (CBSE/State), year of passing, percentage / CGPA" required style="min-height:72px;"></textarea>
@@ -717,6 +731,8 @@
           referrer_phone:      fd.get('referrer_phone').trim()        || null,
           guardian_name:       fd.get('guardian_name').trim()         || null,
           state:               fd.get('state')                        || null,
+          district:            fd.get('district').trim()              || null,
+          school:              fd.get('school').trim()                || null,
           email:               fd.get('email').trim()                 || null,
           student_phone:       fd.get('student_phone').trim()         || null,
           school_10th:         fd.get('school_10th').trim()           || null,
