@@ -54,10 +54,50 @@
     </div>
   </section>
 
-  <!-- FORM -->
-  <section class="section">
+  <!-- CHOOSE HOW TO DONATE -->
+  <section style="background:var(--grey-50); border-bottom:1px solid var(--grey-100); padding:48px 0;">
+    <div class="container">
+      <div style="text-align:center; margin-bottom:32px;">
+        <div style="font-size:13px; font-weight:700; color:var(--grey-400); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px;">Choose how you'd like to help</div>
+        <h2 style="font-size:26px; font-weight:800; color:var(--black); letter-spacing:-0.02em;">Two ways to donate</h2>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; max-width:780px; margin:0 auto;">
+
+        <!-- Option 1: Sponsor a Student -->
+        <div style="background:#fff; border:2px solid var(--green-dark); border-radius:var(--radius-xl); padding:32px 28px;">
+          <div style="width:48px;height:48px;background:var(--green-light);border-radius:var(--radius-lg);display:flex;align-items:center;justify-content:center;margin-bottom:20px;">
+            <i class="ti ti-user-heart" style="font-size:24px;color:var(--green-dark);"></i>
+          </div>
+          <div style="font-size:11px;font-weight:700;color:var(--green-dark);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;">Student Sponsor</div>
+          <div style="font-size:18px;font-weight:800;color:var(--black);margin-bottom:10px;letter-spacing:-0.02em;">Sponsor a specific student</div>
+          <div style="font-size:14px;color:var(--grey-600);line-height:1.7;margin-bottom:24px;">Create an account, get matched to a student, and track their academic progress through the donor portal.</div>
+          <a href="../donor-portal/index.html" class="btn btn-primary" style="display:inline-block;">Login to donor portal</a>
+          <div style="margin-top:12px;font-size:13px;color:var(--grey-400);">New here? <a href="../donor-portal/register.html" style="color:var(--green-dark);font-weight:600;text-decoration:underline;">Create an account →</a></div>
+        </div>
+
+        <!-- Option 2: General Donation -->
+        <div style="background:#fff; border:2px solid var(--grey-200); border-radius:var(--radius-xl); padding:32px 28px;">
+          <div style="width:48px;height:48px;background:var(--yellow-light);border-radius:var(--radius-lg);display:flex;align-items:center;justify-content:center;margin-bottom:20px;">
+            <i class="ti ti-coin" style="font-size:24px;color:var(--yellow-dark);"></i>
+          </div>
+          <div style="font-size:11px;font-weight:700;color:var(--grey-400);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;">General Donation</div>
+          <div style="font-size:18px;font-weight:800;color:var(--black);margin-bottom:10px;letter-spacing:-0.02em;">Donate without signing up</div>
+          <div style="font-size:14px;color:var(--grey-600);line-height:1.7;margin-bottom:24px;">No account needed. Fill in your name, email, and amount — your donation goes to the general scholarship fund.</div>
+          <a href="#general-form" class="btn btn-outline" style="display:inline-block;">Donate now</a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- GENERAL DONATION FORM -->
+  <section class="section" id="general-form">
     <div class="container">
       <div style="max-width:540px; margin:0 auto;">
+        <div style="margin-bottom:28px;">
+          <div style="font-size:13px; font-weight:700; color:var(--grey-400); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:6px;">General Donation</div>
+          <h3 style="font-size:22px; font-weight:800; color:var(--black); letter-spacing:-0.02em;">Fill in your details below</h3>
+        </div>
 
         <!-- Quick amounts -->
         <div style="margin-bottom:28px;">
@@ -94,10 +134,6 @@
             Donate now
           </button>
 
-          <p style="margin-top:16px; font-size:13px; color:var(--grey-400); text-align:center; line-height:1.6;">
-            Want to sponsor a specific student and track their progress?<br/>
-            <a href="../donor-portal/register.html" style="color:var(--green-dark); font-weight:600; text-decoration:underline;">Create a sponsor account →</a>
-          </p>
         </form>
 
       </div>
