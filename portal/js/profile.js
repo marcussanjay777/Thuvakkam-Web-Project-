@@ -592,9 +592,9 @@ async function uploadDoc(studentId, studentName) {
   statusEl.textContent = 'Uploading...';
   statusEl.style.color = '#555';
 
-  // Upload to Supabase Storage (bucket: studen-documents)
+  // Upload to Supabase Storage (bucket: student-documents)
   const filePath = `${studentId}/${type.replace(/\s+/g,'-')}_${Date.now()}.${file.name.split('.').pop()}`;
-  const { error: uploadError } = await sb.storage.from('studen-documents').upload(filePath, file);
+  const { error: uploadError } = await sb.storage.from('student-documents').upload(filePath, file);
 
   if (uploadError) {
     statusEl.textContent = 'Upload failed: ' + uploadError.message;
@@ -603,7 +603,7 @@ async function uploadDoc(studentId, studentName) {
   }
 
   // Get public URL
-  const { data: urlData } = sb.storage.from('studen-documents').getPublicUrl(filePath);
+  const { data: urlData } = sb.storage.from('student-documents').getPublicUrl(filePath);
 
   // Save record to documents table
   await sb.from('documents').insert({

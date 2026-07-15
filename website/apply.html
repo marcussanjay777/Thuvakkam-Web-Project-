@@ -645,9 +645,9 @@
       for (const file of files) {
         const ext  = file.name.split('.').pop();
         const path = `${studentId}/${inputEl.name}_${Date.now()}.${ext}`;
-        const { data, error } = await sb.storage.from('studen-documents').upload(path, file, { upsert: false });
+        const { data, error } = await sb.storage.from('student-documents').upload(path, file, { upsert: false });
         if (error) throw new Error(`Upload failed for ${label}: ${error.message}`);
-        const { data: urlData } = sb.storage.from('studen-documents').getPublicUrl(path);
+        const { data: urlData } = sb.storage.from('student-documents').getPublicUrl(path);
         urls.push(urlData.publicUrl);
       }
       return urls;
