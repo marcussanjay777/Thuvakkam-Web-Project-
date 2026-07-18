@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /portal/
+Disallow: /archive/
+
+Sitemap: https://superb-fox-9a4107.netlify.app/sitemap.xml
