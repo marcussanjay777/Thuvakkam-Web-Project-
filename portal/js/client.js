@@ -14,16 +14,35 @@ async function requireAuth() {
     return null;
   }
 
-  // Fetch profile
+  // Block donor and student accounts from the committee portal
+  const [{ data: donorRow }, { data: studentRow }] = await Promise.all([
+    sb.from('donor_accounts').select('id').eq('auth_user_id', session.user.id).maybeSingle(),
+    sb.from('students').select('id').eq('auth_user_id', session.user.id).maybeSingle(),
+  ]);
+  if (donorRow || studentRow) {
+    await sb.auth.signOut();
+    alert('This account is not authorised for the committee portal.');
+    window.location.href = 'index.html';
+    return null;
+  }
+
+  // Must be a provisioned staff member — a row must already exist in profiles.
+  // (New staff are added by an administrator; accounts are NOT auto-promoted.)
   const { data: profile } = await sb
     .from('profiles')
     .select('full_name, role')
     .eq('id', session.user.id)
-    .single();
+    .maybeSingle();
 
-  // If no profile or name is still the email fallback, ask the user to set their name
-  const needsSetup = !profile || profile.full_name === session.user.email;
-  if (needsSetup) {
+  if (!profile) {
+    await sb.auth.signOut();
+    alert('This account is not authorised for the committee portal. Please ask an administrator to grant you access.');
+    window.location.href = 'index.html';
+    return null;
+  }
+
+  // If the name is still the email fallback, ask them to set a proper name
+  if (profile.full_name === session.user.email) {
     await promptProfileSetup(session.user.id, session.user.email);
     return requireAuth(); // re-run after setup to populate topbar
   }
