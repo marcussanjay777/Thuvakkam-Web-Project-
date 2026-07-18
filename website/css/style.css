@@ -1025,8 +1025,39 @@ footer {
    RESPONSIVE — PUBLIC WEBSITE
    ============================================================ */
 
+/* Hamburger toggle — hidden on desktop, injected by js/nav.js */
+.nav-toggle {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 26px;
+  line-height: 1;
+  color: var(--green-dark);
+  cursor: pointer;
+  padding: 4px 6px;
+}
+
+/* Donate page: two option cards stack on smaller screens */
+.donate-options { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+
 @media (max-width: 900px) {
   .nav-links { display: none; }
+  .nav-toggle { display: block; }
+  .nav-inner { flex-wrap: wrap; }
+  .nav-links.open {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    order: 4;
+    gap: 0;
+    padding: 8px 0 4px;
+  }
+  .nav-links.open .nav-link {
+    width: 100%;
+    padding: 12px 8px;
+    border-radius: 0;
+    border-bottom: 1px solid var(--grey-100);
+  }
   .nav { padding: 0 20px; }
   .container { padding: 0 20px; }
   .section { padding: 48px 0; }
@@ -1035,6 +1066,7 @@ footer {
   .hero-sub { font-size: 14px; }
   .hero-stats { grid-template-columns: repeat(2,1fr); }
   .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+  .donate-options { grid-template-columns: 1fr; }
   .footer-grid { grid-template-columns: 1fr 1fr; gap: 24px; }
   .process-row { grid-template-columns: 1fr; border-radius: var(--radius-lg); }
   .process-step { border-right: none; border-bottom: 1px solid var(--grey-100); }
