@@ -271,7 +271,10 @@ function promptProfileSetup(userId, email) {
       btn.textContent = 'Saving…';
       btn.disabled = true;
 
-      const { error } = await sb.from('profiles').upsert({ id: userId, full_name: name, role });
+      // Update the existing staff row (it already exists — requireAuth guarantees it).
+      // We intentionally do NOT insert here: profiles rows are created only by an
+      // admin, so no one can self-create a staff row and gain access.
+      const { error } = await sb.from('profiles').update({ full_name: name, role }).eq('id', userId);
 
       if (error) {
         errEl.textContent = 'Could not save profile. Please try again.';
