@@ -178,7 +178,8 @@ function renderDocs(data) {
       <div style="display:flex;align-items:center;gap:12px;">
         ${statusBadge(d.status)}
         ${d.file_url
-          ? `<button class="btn btn-outline btn-sm doc-dl" data-idx="${i}"><i class="ti ti-download"></i> Download</button>`
+          ? `<button class="btn btn-outline btn-sm doc-view" data-idx="${i}"><i class="ti ti-eye"></i> View</button>
+             <button class="btn btn-outline btn-sm doc-dl" data-idx="${i}"><i class="ti ti-download"></i> Download</button>`
           : `<button class="btn btn-outline btn-sm" disabled title="No file uploaded"><i class="ti ti-download-off"></i> No file</button>`}
       </div>
     </div>
@@ -191,7 +192,37 @@ function renderDocs(data) {
       if (doc && doc.file_url) triggerDownload(doc.file_url);
     });
   });
+
+  // Wire up the per-row View buttons (open the document in a popup)
+  list.querySelectorAll('.doc-view').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const doc = shownDocs[parseInt(btn.dataset.idx, 10)];
+      if (doc && doc.file_url) openDocModal(doc);
+    });
+  });
 }
+
+// Show an uploaded document (image or PDF) in a popup
+function openDocModal(doc) {
+  const body = document.getElementById('doc-modal-body');
+  document.getElementById('doc-modal-title').textContent = `${doc.student_name} — ${doc.type}`;
+  document.getElementById('doc-modal-open').href = doc.file_url;
+  const clean = doc.file_url.split('?')[0].toLowerCase();
+  if (/\.(png|jpe?g|gif|webp|bmp|svg)$/.test(clean)) {
+    body.innerHTML = `<img src="${doc.file_url}" alt="Uploaded document" style="max-width:100%;max-height:75vh;display:block;margin:0 auto;border-radius:8px;" />`;
+  } else if (/\.pdf$/.test(clean)) {
+    body.innerHTML = `<iframe src="${doc.file_url}" title="Document" style="width:100%;height:75vh;border:none;border-radius:8px;background:#fff;"></iframe>`;
+  } else {
+    body.innerHTML = `<div style="padding:36px;text-align:center;color:#555;">This file type can't be previewed here. Use "Open" above to view it in a new tab.</div>`;
+  }
+  document.getElementById('doc-modal').style.display = 'flex';
+}
+
+function closeDocModal() {
+  document.getElementById('doc-modal').style.display = 'none';
+  document.getElementById('doc-modal-body').innerHTML = '';
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDocModal(); });
 
 function applyDocFilters() {
   const typeFilter   = document.getElementById('filter-type').value;
@@ -225,6 +256,28 @@ async function loadDocuments() {
 
 loadDocuments();
 </script>
+
+<!-- Document preview popup -->
+<div id="doc-modal" class="doc-modal-overlay" style="display:none;" onclick="if(event.target===this)closeDocModal()">
+  <div class="doc-modal-box">
+    <div class="doc-modal-head">
+      <span id="doc-modal-title" class="doc-modal-title"></span>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <a id="doc-modal-open" href="#" target="_blank" rel="noopener" class="btn btn-outline btn-sm" style="color:#fff;border-color:rgba(255,255,255,.6);"><i class="ti ti-external-link"></i> Open</a>
+        <button type="button" class="doc-modal-close" onclick="closeDocModal()" aria-label="Close">&times;</button>
+      </div>
+    </div>
+    <div id="doc-modal-body" class="doc-modal-body"></div>
+  </div>
+</div>
+<style>
+  .doc-modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:1000; display:flex; align-items:center; justify-content:center; padding:24px; }
+  .doc-modal-box { background:#fff; border-radius:14px; width:min(900px,100%); max-height:90vh; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,.3); }
+  .doc-modal-head { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 18px; background:#0E7162; color:#fff; }
+  .doc-modal-title { font-weight:600; font-size:15px; }
+  .doc-modal-close { background:transparent; border:none; color:#fff; font-size:28px; line-height:1; cursor:pointer; padding:0 6px; }
+  .doc-modal-body { padding:16px; overflow:auto; background:#f4f6f6; }
+</style>
 
 </body>
 </html>

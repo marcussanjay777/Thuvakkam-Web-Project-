@@ -251,11 +251,11 @@
       submitBtn.textContent = 'Processing…';
       submitBtn.disabled = true;
 
-      const { error } = await sb.from('general_donations').insert({
-        full_name: name,
-        email,
-        amount,
-        note: note || null,
+      const { error } = await sb.rpc('submit_general_donation', {
+        p_full_name: name,
+        p_email:     email,
+        p_amount:    amount,
+        p_note:      note || null,
       });
 
       if (error) {
