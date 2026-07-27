@@ -352,7 +352,8 @@ async function openProfile(studentId, context) {
                     <span class="badge ${d.status === 'verified' ? 'badge-selected' : d.status === 'incomplete' ? 'badge-rejected' : 'badge-pending'}" style="font-size:11px;">
                       ${d.status.charAt(0).toUpperCase() + d.status.slice(1)}
                     </span>
-                    ${d.file_url ? `<a href="${d.file_url}" target="_blank" style="color:#0E7162;font-size:18px;"><i class="ti ti-download"></i></a>` : ''}
+                    ${d.file_url ? `<a href="#" onclick="viewDocument('${d.file_url}','${d.type}');return false;" title="View" style="color:#0E7162;font-size:18px;cursor:pointer;"><i class="ti ti-eye"></i></a>
+                    <a href="${d.file_url}" target="_blank" title="Download" style="color:#0E7162;font-size:18px;"><i class="ti ti-download"></i></a>` : ''}
                   </div>
                 </div>
               `).join('') : '<div style="padding:16px;text-align:center;color:#9E9E9E;font-size:13px;">No documents uploaded yet.</div>'}
@@ -426,6 +427,49 @@ function closeProfile() {
   if (!overlay) return;
   overlay.classList.remove('open');
   setTimeout(() => overlay.remove(), 280);
+}
+
+// Show an uploaded document (image or PDF) in a popup over the profile panel
+function viewDocument(url, title) {
+  let overlay = document.getElementById('doc-view-overlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'doc-view-overlay';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:99999;display:none;align-items:center;justify-content:center;padding:24px;';
+    overlay.addEventListener('click', e => { if (e.target === overlay) closeDocument(); });
+    overlay.innerHTML =
+      '<div style="background:#fff;border-radius:14px;width:min(900px,100%);max-height:90vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.4);">' +
+        '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;background:#0E7162;color:#fff;">' +
+          '<span id="doc-view-title" style="font-weight:600;font-size:15px;"></span>' +
+          '<div style="display:flex;gap:14px;align-items:center;">' +
+            '<a id="doc-view-open" href="#" target="_blank" rel="noopener" style="color:#fff;font-size:13px;text-decoration:none;"><i class="ti ti-external-link"></i> Open</a>' +
+            '<button type="button" onclick="closeDocument()" aria-label="Close" style="background:transparent;border:none;color:#fff;font-size:26px;line-height:1;cursor:pointer;">&times;</button>' +
+          '</div>' +
+        '</div>' +
+        '<div id="doc-view-body" style="padding:16px;overflow:auto;background:#f4f6f6;"></div>' +
+      '</div>';
+    document.body.appendChild(overlay);
+  }
+  overlay.querySelector('#doc-view-title').textContent = title || 'Document';
+  overlay.querySelector('#doc-view-open').href = url;
+  const body  = overlay.querySelector('#doc-view-body');
+  const clean = url.split('?')[0].toLowerCase();
+  if (/\.(png|jpe?g|gif|webp|bmp|svg)$/.test(clean)) {
+    body.innerHTML = '<img src="' + url + '" alt="Document" style="max-width:100%;max-height:75vh;display:block;margin:0 auto;border-radius:8px;">';
+  } else if (/\.pdf$/.test(clean)) {
+    body.innerHTML = '<iframe src="' + url + '" title="Document" style="width:100%;height:75vh;border:none;border-radius:8px;background:#fff;"></iframe>';
+  } else {
+    body.innerHTML = '<div style="padding:36px;text-align:center;color:#555;">This file type can\'t be previewed here. Use "Open" above to view it in a new tab.</div>';
+  }
+  overlay.style.display = 'flex';
+}
+
+function closeDocument() {
+  const overlay = document.getElementById('doc-view-overlay');
+  if (!overlay) return;
+  overlay.style.display = 'none';
+  const body = overlay.querySelector('#doc-view-body');
+  if (body) body.innerHTML = '';
 }
 
 async function setProfileStatus(id, status) {
