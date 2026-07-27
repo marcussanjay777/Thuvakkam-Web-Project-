@@ -718,7 +718,16 @@
         const fullName  = `${firstName} ${lastName}`;
         const initials  = [firstName, lastName].map(w => w[0]?.toUpperCase()).filter(Boolean).join('');
 
-        const { data: student, error: insertErr } = await sb.from('students').insert({
+        // Generate the student id up front so uploaded files can be filed under it.
+        const studentId = (self.crypto && crypto.randomUUID)
+          ? crypto.randomUUID()
+          : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+              const r = Math.random() * 16 | 0;
+              return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+            });
+
+        const studentPayload = {
+          id:                  studentId,
           name:                fullName,
           initials,
           dob:                 fd.get('dob')                          || null,
@@ -746,17 +755,13 @@
           awards:              fd.get('awards').trim()                || null,
           extra_curricular:    fd.get('extra_curricular').trim()      || null,
           family_about:        fd.get('family_about').trim()          || null,
-          status:              'pending',
-          cycle_year:          2026,
-          applied_on:          new Date().toISOString().slice(0, 10),
-        }).select('id').single();
+        };
 
-        if (insertErr) throw new Error(insertErr.message);
-
-        const studentId = student.id;
         setProgress(25, 'Uploading documents...');
 
-        // Upload all documents
+        // Upload all documents to storage first, then submit everything together
+        // via the submit_application function (which saves the student + document
+        // records in one go, server-side).
         const allDocInputs = form.querySelectorAll('.doc-file-input');
         let uploaded = 0;
         const docRecords = [];
@@ -766,22 +771,20 @@
           const urls = await uploadDoc(studentId, inp);
           for (const url of urls) {
             docRecords.push({
-              student_id:   studentId,
-              student_name: fullName,
-              type:         inp.dataset.label,
-              file_url:     url,
-              status:       'pending',
-              uploaded_at:  new Date().toISOString(),
+              type:     inp.dataset.label,
+              file_url: url,
             });
           }
           uploaded++;
-          setProgress(25 + Math.round((uploaded / allDocInputs.length) * 70), `Uploading ${inp.dataset.label}...`);
+          setProgress(25 + Math.round((uploaded / allDocInputs.length) * 65), `Uploading ${inp.dataset.label}...`);
         }
 
-        if (docRecords.length) {
-          const { error: docErr } = await sb.from('documents').insert(docRecords);
-          if (docErr) console.warn('Document records failed to save:', docErr.message);
-        }
+        setProgress(92, 'Submitting application...');
+        const { error: submitErr } = await sb.rpc('submit_application', {
+          p_student:   studentPayload,
+          p_documents: docRecords,
+        });
+        if (submitErr) throw new Error(submitErr.message);
 
         setProgress(100, 'Done!');
         form.style.display = 'none';
