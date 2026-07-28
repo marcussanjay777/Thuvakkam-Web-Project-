@@ -71,12 +71,40 @@
     'sb_publishable_vO20BiWyS_VIkhU2DDmw3g_BoGBeCdq'
   );
 
-  // Already logged in as donor → go to dashboard
+  // A confirmation link from the signup email lands back here with a live
+  // session — that is the moment the donor becomes real, so create their
+  // donor_accounts row then (never at signup, which is unverified).
   sb.auth.getSession().then(async ({ data: { session } }) => {
     if (!session) return;
-    const { data } = await sb.from('donor_accounts').select('id').eq('auth_user_id', session.user.id).maybeSingle();
-    if (data) window.location.href = 'dashboard.html';
+    const ready = await ensureDonorProfile(session.user);
+    if (ready) window.location.href = 'dashboard.html';
   });
+
+  // Creates the donor_accounts row from the details stashed at signup, if it
+  // isn't there yet. Returns true when the account is usable.
+  async function ensureDonorProfile(user) {
+    const { data: existing } = await sb.from('donor_accounts')
+      .select('id').eq('auth_user_id', user.id).maybeSingle();
+    if (existing) return true;
+
+    const meta = user.user_metadata || {};
+    if (meta.user_type !== 'donor' || !meta.full_name) return false;  // staff/student account
+
+    const { error } = await sb.from('donor_accounts').insert({
+      auth_user_id:   user.id,
+      full_name:      meta.full_name,
+      dob:            meta.dob        || null,
+      occupation:     meta.occupation || null,
+      email:          user.email,
+      email_verified: true,
+    });
+
+    if (error) {
+      showErr('Your email is confirmed but we could not finish setting up your account: ' + error.message);
+      return false;
+    }
+    return true;
+  }
 
   document.getElementById('login-password').addEventListener('keydown', e => {
     if (e.key === 'Enter') doLogin();
@@ -95,20 +123,56 @@
     btn.textContent = 'Signing in...';
 
     const { error } = await sb.auth.signInWithPassword({ email, password });
-    if (error) { showErr('Incorrect email or password.'); btn.disabled = false; btn.textContent = 'Sign in'; return; }
+    if (error) {
+      const unconfirmed = error.code === 'email_not_confirmed'
+        || error.message.toLowerCase().includes('not confirmed');
+      if (unconfirmed) showUnconfirmed(email);
+      else             showErr('Incorrect email or password.');
+      btn.disabled = false; btn.textContent = 'Sign in';
+      return;
+    }
 
-    // Verify it's a donor account
     const { data: { user } } = await sb.auth.getUser();
-    const { data: donor } = await sb.from('donor_accounts').select('id, email_verified').eq('auth_user_id', user.id).maybeSingle();
+    const ready = await ensureDonorProfile(user);
 
-    if (!donor) {
+    if (!ready) {
       await sb.auth.signOut();
-      showErr('No donor account found for this email. Please register first.');
+      if (document.getElementById('login-error').style.display !== 'block')
+        showErr('No donor account found for this email. Please register first.');
       btn.disabled = false; btn.textContent = 'Sign in';
       return;
     }
 
     window.location.href = 'dashboard.html';
+  }
+
+  async function resendConfirmation(email) {
+    const link = document.getElementById('resend-link');
+    link.textContent = 'Sending...';
+
+    const { error } = await sb.auth.resend({ type: 'signup', email });
+
+    link.textContent = error
+      ? (error.message.toLowerCase().includes('rate limit')
+          ? 'Too many emails just now — wait a minute and try again.'
+          : 'Could not resend. Try again shortly.')
+      : 'Confirmation email sent — check your inbox.';
+  }
+
+  function showUnconfirmed(email) {
+    const errEl = document.getElementById('login-error');
+    errEl.innerHTML = '';
+    errEl.appendChild(document.createTextNode(
+      'Please confirm your email before signing in. Check your inbox (and spam folder) for the confirmation link. '
+    ));
+    const link = document.createElement('a');
+    link.id = 'resend-link';
+    link.href = '#';
+    link.textContent = 'Resend it';
+    link.style.cssText = 'color:inherit;font-weight:700;text-decoration:underline;';
+    link.onclick = e => { e.preventDefault(); resendConfirmation(email); };
+    errEl.appendChild(link);
+    errEl.style.display = 'block';
   }
 
   function showErr(msg) {

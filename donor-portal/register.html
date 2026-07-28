@@ -19,7 +19,7 @@
     <div class="dp-auth-left-stats">
       <div class="dp-auth-stat">
         <div class="dp-auth-stat-icon"><i class="ti ti-shield-check"></i></div>
-        <div><div class="dp-auth-stat-val">Verified</div><div class="dp-auth-stat-lbl">OTP-based email verification</div></div>
+        <div><div class="dp-auth-stat-val">Verified</div><div class="dp-auth-stat-lbl">Every account is email-verified</div></div>
       </div>
       <div class="dp-auth-stat">
         <div class="dp-auth-stat-icon"><i class="ti ti-eye"></i></div>
@@ -76,6 +76,29 @@
         <div class="dp-auth-link">Already have an account? <a href="index.html">Sign in</a></div>
       </div>
 
+      <!-- ── STEP 2: Confirm your email ── -->
+      <div id="step-2" style="display:none;flex-direction:column;gap:16px;">
+        <div style="text-align:center;">
+          <div style="width:56px;height:56px;border-radius:50%;background:#E8F5F2;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+            <i class="ti ti-mail-check" style="font-size:28px;color:#0E7162;"></i>
+          </div>
+          <div class="dp-auth-title">Check your email</div>
+          <div class="dp-auth-sub" style="margin-top:10px;line-height:1.6;">
+            We've sent a confirmation link to <strong id="sent-to-email"></strong>.<br/>
+            Click it to activate your donor account.
+          </div>
+        </div>
+
+        <div style="background:#FEF3C7;border:1px solid #FCD34D;border-radius:8px;padding:12px 16px;font-size:13px;color:#92400E;line-height:1.6;">
+          Your account stays locked until the link is clicked. If the email isn't in your inbox, check your spam folder.
+        </div>
+
+        <button class="dp-auth-btn" id="resend-btn" onclick="resendConfirmation()"
+                style="background:#fff;color:#0E7162;border:1px solid #0E7162;">
+          Resend confirmation email
+        </button>
+        <div class="dp-auth-link">Already confirmed? <a href="index.html">Sign in</a></div>
+      </div>
 
     </div>
   </div>
@@ -87,6 +110,8 @@
     'https://vftexybohuaxngyhwjts.supabase.co',
     'sb_publishable_vO20BiWyS_VIkhU2DDmw3g_BoGBeCdq'
   );
+
+  let pendingEmail = '';
 
   // Already logged in as donor → skip to dashboard
   sb.auth.getSession().then(async ({ data: { session } }) => {
@@ -110,40 +135,58 @@
     btn.disabled    = true;
     btn.textContent = 'Creating account...';
 
-    // Create auth user
-    const { data: authData, error: signUpErr } = await sb.auth.signUp({ email, password });
-    if (signUpErr) {
-      const msg = signUpErr.message.toLowerCase();
-      if (msg.includes('already registered') || msg.includes('already been registered')) {
-        const { data: existingDonor } = await sb.from('donor_accounts').select('id').eq('email', email).maybeSingle();
-        showErr(existingDonor
-          ? 'A donor account already exists for this email. Please sign in.'
-          : 'This email is already used by another account. Please use a different email.');
-      } else {
-        showErr('Could not create account: ' + signUpErr.message);
-      }
-      btn.disabled = false; btn.textContent = 'Create account';
-      return;
-    }
-
-    // Save donor profile
-    const { error: insertErr } = await sb.from('donor_accounts').insert({
-      auth_user_id:   authData.user.id,
-      full_name:      name,
-      dob:            dob,
-      occupation:     occupation,
-      email:          email,
-      email_verified: true,
+    // Create the auth user. The donor's details ride along as metadata — the
+    // donor_accounts row is only written once they've confirmed their email
+    // (see ensureDonorProfile in index.html), so an unconfirmed signup can
+    // never become a usable donor account.
+    const { data: authData, error: signUpErr } = await sb.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { full_name: name, dob, occupation, user_type: 'donor' },
+        emailRedirectTo: new URL('index.html', window.location.href).href,
+      },
     });
 
-    if (insertErr) {
-      showErr('Account created but profile save failed: ' + insertErr.message);
+    if (signUpErr) {
+      showErr('Could not create account: ' + signUpErr.message);
       btn.disabled = false; btn.textContent = 'Create account';
       return;
     }
 
-    showSuccess('Account created! Taking you to your dashboard...');
-    setTimeout(() => window.location.href = 'dashboard.html', 1200);
+    // With email confirmation on, signing up with an address that already has
+    // an account succeeds but comes back with no identities attached.
+    if (authData.user && Array.isArray(authData.user.identities) && authData.user.identities.length === 0) {
+      showErr('An account already exists for this email. Please sign in instead.');
+      btn.disabled = false; btn.textContent = 'Create account';
+      return;
+    }
+
+    pendingEmail = email;
+    document.getElementById('sent-to-email').textContent = email;
+    document.getElementById('step-1').style.display = 'none';
+    document.getElementById('step-2').style.display = 'flex';
+  }
+
+  async function resendConfirmation() {
+    const btn = document.getElementById('resend-btn');
+    hideMessages();
+
+    btn.disabled    = true;
+    btn.textContent = 'Sending...';
+
+    const { error } = await sb.auth.resend({ type: 'signup', email: pendingEmail });
+
+    if (error) {
+      showErr(error.message.toLowerCase().includes('rate limit')
+        ? 'Too many emails sent just now. Please wait a minute and try again.'
+        : 'Could not resend: ' + error.message);
+    } else {
+      showSuccess('Confirmation email sent again to ' + pendingEmail);
+    }
+
+    btn.disabled    = false;
+    btn.textContent = 'Resend confirmation email';
   }
 
   function showErr(msg)     { const e = document.getElementById('reg-error');   e.textContent = msg; e.style.display = 'block'; }
