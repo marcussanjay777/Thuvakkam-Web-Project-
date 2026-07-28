@@ -300,6 +300,11 @@ a { text-decoration: none; color: inherit; }
 .sp-login-hint {
   font-size: 12px; color: var(--grey-400); text-align: center; line-height: 1.6;
 }
+.sp-login-success {
+  background: #F0FDF4; border: 1px solid #86EFAC;
+  border-radius: var(--radius-md); padding: 12px 14px;
+  font-size: 13px; color: #166534; display: none;
+}
 
 /* ── RESPONSIVE ─────────────────────────────────────────── */
 @media (max-width: 640px) {
