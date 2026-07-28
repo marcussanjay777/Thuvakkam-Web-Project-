@@ -511,55 +511,50 @@ async function generateStudentCredentials(student) {
     return;
   }
 
-  const chars    = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
-  const password = Array.from({ length: 10 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
-
-  // Use a separate client instance so the committee member's session is not affected
-  const tempSB = supabase.createClient(
-    'https://vftexybohuaxngyhwjts.supabase.co',
-    'sb_publishable_vO20BiWyS_VIkhU2DDmw3g_BoGBeCdq'
-  );
-
-  const { data, error } = await tempSB.auth.signUp({
-    email: student.email,
-    password,
-    options: { data: { student_id: student.id, user_type: 'student' } },
+  const { data, error } = await sb.functions.invoke('create-student-account', {
+    body: { student_id: student.id, student_name: student.name, student_email: student.email },
   });
 
   if (error) {
-    if (error.message.includes('already registered')) {
+    alert('Could not generate login credentials: ' + error.message);
+    closeProfile();
+    return;
+  }
+
+  if (!data.success) {
+    if (data.error === 'already_registered') {
+      closeProfile();
       showCredentialsBanner(student.name, student.email, null, 'Account already exists for this email. Share the original credentials or reset their password.');
     } else {
-      alert('Could not generate login credentials: ' + error.message);
+      alert('Could not generate login credentials: ' + data.error);
       closeProfile();
     }
     return;
   }
 
-  // Link the new auth user back to the student record
-  await sb.from('students').update({
-    auth_user_id:          data.user.id,
-    student_login_email:   student.email,
-    credentials_issued_at: new Date().toISOString(),
-  }).eq('id', student.id);
-
   closeProfile();
-  showCredentialsBanner(student.name, student.email, password);
+  if (data.email_sent) {
+    showCredentialsBanner(student.name, student.email, null, `An acceptance email was sent to ${student.email} with a link for them to set their own password.`);
+  } else {
+    showCredentialsBanner(student.name, student.email, data.action_link, null);
+  }
 }
 
-function showCredentialsBanner(name, email, password, note) {
+let _pendingActionLink = null;
+
+function showCredentialsBanner(name, email, actionLink, note) {
   const existing = document.getElementById('creds-modal');
   if (existing) existing.remove();
+  _pendingActionLink = actionLink || null;
 
-  const credHtml = password ? `
-    <div style="background:#F0FDF4;border:1px solid #86EFAC;border-radius:8px;padding:16px 20px;margin-bottom:16px;font-family:monospace;">
-      <div style="font-size:12px;color:#166534;font-weight:700;margin-bottom:8px;font-family:inherit;">LOGIN CREDENTIALS</div>
-      <div style="font-size:14px;color:#1A1A1A;"><strong>Email:</strong> ${email}</div>
-      <div style="font-size:14px;color:#1A1A1A;margin-top:6px;"><strong>Password:</strong> ${password}</div>
+  const credHtml = actionLink ? `
+    <div style="background:#FEF3C7;border:1px solid #FCD34D;border-radius:8px;padding:16px 20px;margin-bottom:16px;">
+      <div style="font-size:12px;color:#92400E;font-weight:700;margin-bottom:8px;">SET-PASSWORD LINK</div>
+      <div style="font-size:13px;color:#1A1A1A;word-break:break-all;font-family:monospace;">${actionLink}</div>
     </div>
     <p style="font-size:13px;color:#555;line-height:1.6;margin-bottom:16px;">
-      Share these credentials securely with <strong>${name}</strong>. They can log in at the Student Portal.<br/>
-      <span style="color:#DC2626;font-weight:600;">This password will not be shown again.</span>
+      The acceptance email failed to send. Share this link securely with <strong>${name}</strong> so they can set their password.<br/>
+      <span style="color:#DC2626;font-weight:600;">This link is single-use and will expire.</span>
     </p>` : `<p style="font-size:13px;color:#555;margin-bottom:16px;">${note}</p>`;
 
   const modal = document.createElement('div');
@@ -573,14 +568,14 @@ function showCredentialsBanner(name, email, password, note) {
           </div>
           <div>
             <div style="font-size:15px;font-weight:700;color:#fff;">${name} marked as selected</div>
-            <div style="font-size:12px;color:rgba(255,255,255,0.65);">Student portal credentials ${password ? 'generated' : 'note'}</div>
+            <div style="font-size:12px;color:rgba(255,255,255,0.65);">${actionLink ? 'Acceptance email failed — manual link generated' : 'Acceptance email sent'}</div>
           </div>
         </div>
         <div style="padding:24px;">
           ${credHtml}
           <div style="display:flex;gap:10px;">
-            ${password ? `<button onclick="copyCredentials('${email}','${password}')" style="flex:1;padding:10px;border-radius:6px;border:1px solid #D1D5DB;background:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;color:#374151;">
-              <i class="ti ti-copy"></i> Copy credentials
+            ${actionLink ? `<button onclick="copyLink()" style="flex:1;padding:10px;border-radius:6px;border:1px solid #D1D5DB;background:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;color:#374151;">
+              <i class="ti ti-copy"></i> Copy link
             </button>` : ''}
             <button onclick="document.getElementById('creds-modal').remove()" style="flex:1;padding:10px;border-radius:6px;border:none;background:#0E7162;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">
               Done
@@ -592,11 +587,11 @@ function showCredentialsBanner(name, email, password, note) {
   document.body.appendChild(modal);
 }
 
-function copyCredentials(email, password) {
-  navigator.clipboard.writeText(`Student Portal Login\nEmail: ${email}\nPassword: ${password}\nPortal: ${window.location.origin}/student-portal/`);
+function copyLink() {
+  navigator.clipboard.writeText(_pendingActionLink);
   const btn = event.target.closest('button');
   btn.innerHTML = '<i class="ti ti-check"></i> Copied!';
-  setTimeout(() => btn.innerHTML = '<i class="ti ti-copy"></i> Copy credentials', 2000);
+  setTimeout(() => btn.innerHTML = '<i class="ti ti-copy"></i> Copy link', 2000);
 }
 
 async function saveRejectionReason(id) {
