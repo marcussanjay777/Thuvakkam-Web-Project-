@@ -5,7 +5,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-const STUDENT_PORTAL_URL = 'https://superb-fox-9a4107.netlify.app/student-portal'
+const STUDENT_PORTAL_URL = 'https://thuvakkamsfs.netlify.app/student-portal'
 
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {

@@ -8,10 +8,10 @@ A 4-portal web system for Thuvakkam Education's **Sponsor for Success** scholars
 
 | Portal | URL |
 |--------|-----|
-| 🌐 Public Website | https://superb-fox-9a4107.netlify.app/website/ |
-| 🛠️ Admin Portal | https://superb-fox-9a4107.netlify.app/portal/ |
-| 🎓 Student Portal | https://superb-fox-9a4107.netlify.app/student-portal/ |
-| 💛 Donor Portal | https://superb-fox-9a4107.netlify.app/donor-portal/ |
+| 🌐 Public Website | https://thuvakkamsfs.netlify.app/website/ |
+| 🛠️ Admin Portal | https://thuvakkamsfs.netlify.app/portal/ |
+| 🎓 Student Portal | https://thuvakkamsfs.netlify.app/student-portal/ |
+| 💛 Donor Portal | https://thuvakkamsfs.netlify.app/donor-portal/ |
 
 ---
 
