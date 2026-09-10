@@ -16,11 +16,20 @@
     .apply-section-title {
       font-size: 12px; font-weight: 700; color: var(--green-dark);
       text-transform: uppercase; letter-spacing: 0.08em;
+      display: flex; align-items: center; gap: 8px;
+      cursor: pointer; user-select: none; list-style: none;
+    }
+    .apply-section-title::-webkit-details-marker { display: none; }
+    .apply-section-title i { font-size: 16px; }
+    details[open] > .apply-section-title {
       margin-bottom: 20px; padding-bottom: 12px;
       border-bottom: 2px solid var(--green-light);
-      display: flex; align-items: center; gap: 8px;
     }
-    .apply-section-title i { font-size: 16px; }
+    .apply-toggle-arrow { font-size: 16px; color: var(--grey-400); transition: transform 0.2s; flex-shrink: 0; }
+    details[open] > .apply-section-title .apply-toggle-arrow { transform: rotate(180deg); }
+    .section-status { margin-left: auto; font-size: 18px; flex-shrink: 0; }
+    .section-status.status-ok  { color: #16A34A; }
+    .section-status.status-bad { color: #DC2626; }
     .form-row  { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
     .form-row.triple { grid-template-columns: 1fr 1fr 1fr; }
     .form-fields { display: flex; flex-direction: column; gap: 16px; }
@@ -179,8 +188,8 @@
           <form id="sfs-form" onsubmit="submitApp(event)" novalidate>
 
             <!-- REFERRAL -->
-            <div class="apply-section">
-              <div class="apply-section-title"><i class="ti ti-users"></i> Referral details</div>
+            <details class="apply-section" open>
+              <summary class="apply-section-title"><i class="ti ti-users"></i> Referral details <i class="ti ti-circle-x section-status status-bad"></i><i class="ti ti-chevron-down apply-toggle-arrow"></i></summary>
               <div class="form-fields">
                 <div class="form-row">
                   <div class="field-group">
@@ -193,11 +202,11 @@
                   </div>
                 </div>
               </div>
-            </div>
+            </details>
 
             <!-- STUDENT DETAILS -->
-            <div class="apply-section">
-              <div class="apply-section-title"><i class="ti ti-user"></i> Student details</div>
+            <details class="apply-section">
+              <summary class="apply-section-title"><i class="ti ti-user"></i> Student details <i class="ti ti-circle-x section-status status-bad"></i><i class="ti ti-chevron-down apply-toggle-arrow"></i></summary>
               <div class="form-fields">
                 <div class="form-row">
                   <div class="field-group">
@@ -284,11 +293,11 @@
                   </div>
                 </div>
               </div>
-            </div>
+            </details>
 
             <!-- EDUCATION DETAILS -->
-            <div class="apply-section">
-              <div class="apply-section-title"><i class="ti ti-school"></i> Education details</div>
+            <details class="apply-section">
+              <summary class="apply-section-title"><i class="ti ti-school"></i> Education details <i class="ti ti-circle-x section-status status-bad"></i><i class="ti ti-chevron-down apply-toggle-arrow"></i></summary>
               <div class="form-fields">
                 <div class="field-group">
                   <label class="field-label">Current school / college name <span class="req">*</span></label>
@@ -336,22 +345,22 @@
                   <textarea class="field-textarea" name="extra_curricular" placeholder="Sports, cultural, social activities, NCC, NSS, volunteering, etc." required style="min-height:72px;"></textarea>
                 </div>
               </div>
-            </div>
+            </details>
 
             <!-- FAMILY DETAILS -->
-            <div class="apply-section">
-              <div class="apply-section-title"><i class="ti ti-home"></i> Family details</div>
+            <details class="apply-section">
+              <summary class="apply-section-title"><i class="ti ti-home"></i> Family details <i class="ti ti-circle-x section-status status-bad"></i><i class="ti ti-chevron-down apply-toggle-arrow"></i></summary>
               <div class="form-fields">
                 <div class="field-group">
                   <label class="field-label">Tell about your family <span class="req">*</span></label>
                   <textarea class="field-textarea" name="family_about" placeholder="Describe your family background, number of members, any special circumstances, siblings' education status, etc." required style="min-height:130px;"></textarea>
                 </div>
               </div>
-            </div>
+            </details>
 
             <!-- DOCUMENTS -->
-            <div class="apply-section">
-              <div class="apply-section-title"><i class="ti ti-paperclip"></i> Documents required</div>
+            <details class="apply-section">
+              <summary class="apply-section-title"><i class="ti ti-paperclip"></i> Documents required <i class="ti ti-circle-x section-status status-bad"></i><i class="ti ti-chevron-down apply-toggle-arrow"></i></summary>
               <p style="font-size:12px;color:var(--grey-500);margin-bottom:16px;line-height:1.6;">Upload clear scanned copies or photos. Photos are resized automatically to fit — PDFs must be under 2 MB. Accepted formats: PDF, JPG, PNG.</p>
               <div class="doc-list">
 
@@ -486,7 +495,7 @@
                 </div>
 
               </div>
-            </div>
+            </details>
 
             <!-- DECLARATION -->
             <div class="apply-section" style="background:var(--yellow-light);border-color:rgba(245,195,29,0.35);">
@@ -642,6 +651,7 @@
 
       replaceInputFiles(input, processed);
       checkFileSize(input);
+      updateSectionStatuses();
     }
 
     // Resizes + re-encodes a photo on-device (canvas), no upload needed to shrink it.
@@ -704,6 +714,39 @@
       return true;
     }
 
+    // Green tick / red cross on each section header, based on its own required fields.
+    function isSectionComplete(details) {
+      for (const el of details.querySelectorAll('[required]:not([type="radio"])')) {
+        if (!el.value || !el.value.trim()) return false;
+      }
+      const radioNames = new Set(
+        Array.from(details.querySelectorAll('input[type="radio"][required]')).map(r => r.name)
+      );
+      for (const name of radioNames) {
+        if (!details.querySelector(`input[name="${name}"]:checked`)) return false;
+      }
+      for (const inp of details.querySelectorAll('.doc-file-input[data-required="true"]')) {
+        if (!inp.files.length) return false;
+      }
+      return true;
+    }
+
+    function updateSectionStatuses() {
+      document.querySelectorAll('details.apply-section').forEach(details => {
+        const statusEl = details.querySelector('.section-status');
+        if (!statusEl) return;
+        const complete = isSectionComplete(details);
+        statusEl.className = complete
+          ? 'ti ti-circle-check section-status status-ok'
+          : 'ti ti-circle-x section-status status-bad';
+        statusEl.title = complete ? 'Section complete' : 'Section incomplete';
+      });
+    }
+
+    document.getElementById('sfs-form').addEventListener('input', updateSectionStatuses);
+    document.getElementById('sfs-form').addEventListener('change', updateSectionStatuses);
+    updateSectionStatuses();
+
     function setProgress(pct, label) {
       document.getElementById('progress-wrap').style.display = 'block';
       document.getElementById('progress-bar').style.width = pct + '%';
@@ -740,46 +783,46 @@
 
       // Validate required text fields
       const checks = [
-        [fd.get('referred_by')?.trim(),   'Please enter who referred you.'],
-        [fd.get('referrer_phone')?.trim(), 'Please enter the referrer\'s phone number.'],
-        [fd.get('first_name')?.trim(),     'Please enter your first name.'],
-        [fd.get('last_name')?.trim(),      'Please enter your last name.'],
-        [fd.get('dob'),                    'Please enter your date of birth.'],
-        [fd.get('gender'),                 'Please select your gender.'],
-        [fd.get('father_name')?.trim(),    'Please enter your father\'s name.'],
-        [fd.get('mother_name')?.trim(),    'Please enter your mother\'s name.'],
-        [fd.get('guardian_name')?.trim(),  'Please enter your guardian\'s name.'],
-        [fd.get('annual_income'),          'Please enter your family\'s annual income.'],
-        [fd.get('address')?.trim(),        'Please enter your residential address.'],
-        [fd.get('state'),                  'Please select your state.'],
-        [fd.get('parent_contact')?.trim(), 'Please enter your parent\'s / guardian\'s contact number.'],
-        [fd.get('email')?.trim(),          'Please enter your e-mail ID.'],
-        [fd.get('school_10th')?.trim(),    'Please enter your 10th standard school details.'],
-        [fd.get('school_12th')?.trim(),    'Please enter your 12th / Diploma details.'],
-        [fd.get('other_scholarship'),      'Please select whether you have availed any other scholarship.'],
-        [fd.get('awards')?.trim(),         'Please fill in awards / achievements.'],
-        [fd.get('extra_curricular')?.trim(),'Please fill in extra-curricular activities.'],
-        [fd.get('family_about')?.trim(),   'Please tell us about your family.'],
+        ['referred_by',       fd.get('referred_by')?.trim(),   'Please enter who referred you.'],
+        ['referrer_phone',    fd.get('referrer_phone')?.trim(), 'Please enter the referrer\'s phone number.'],
+        ['first_name',        fd.get('first_name')?.trim(),     'Please enter your first name.'],
+        ['last_name',         fd.get('last_name')?.trim(),      'Please enter your last name.'],
+        ['dob',               fd.get('dob'),                    'Please enter your date of birth.'],
+        ['gender',            fd.get('gender'),                 'Please select your gender.'],
+        ['father_name',       fd.get('father_name')?.trim(),    'Please enter your father\'s name.'],
+        ['mother_name',       fd.get('mother_name')?.trim(),    'Please enter your mother\'s name.'],
+        ['guardian_name',     fd.get('guardian_name')?.trim(),  'Please enter your guardian\'s name.'],
+        ['annual_income',     fd.get('annual_income'),          'Please enter your family\'s annual income.'],
+        ['address',           fd.get('address')?.trim(),        'Please enter your residential address.'],
+        ['state',             fd.get('state'),                  'Please select your state.'],
+        ['parent_contact',    fd.get('parent_contact')?.trim(), 'Please enter your parent\'s / guardian\'s contact number.'],
+        ['email',             fd.get('email')?.trim(),          'Please enter your e-mail ID.'],
+        ['school_10th',       fd.get('school_10th')?.trim(),    'Please enter your 10th standard school details.'],
+        ['school_12th',       fd.get('school_12th')?.trim(),    'Please enter your 12th / Diploma details.'],
+        ['other_scholarship', fd.get('other_scholarship'),      'Please select whether you have availed any other scholarship.'],
+        ['awards',            fd.get('awards')?.trim(),         'Please fill in awards / achievements.'],
+        ['extra_curricular',  fd.get('extra_curricular')?.trim(),'Please fill in extra-curricular activities.'],
+        ['family_about',      fd.get('family_about')?.trim(),   'Please tell us about your family.'],
       ];
-      for (const [val, msg] of checks) {
-        if (!val) return showErr(msg);
+      for (const [name, val, msg] of checks) {
+        if (!val) return showErr(msg, name);
       }
       if (!document.getElementById('declaration').checked) return showErr('Please read and accept the declaration.');
 
       // Validate scholarship detail if Yes
       if (fd.get('other_scholarship') === 'Yes' && !fd.get('scholarship_details')?.trim())
-        return showErr('Please explain the scholarship details.');
+        return showErr('Please explain the scholarship details.', 'scholarship_details');
 
       // Validate required doc uploads & file sizes
       const requiredDocs = form.querySelectorAll('.doc-file-input[data-required="true"]');
       for (const inp of requiredDocs) {
-        if (!inp.files.length) return showErr(`Please upload: ${inp.dataset.label}`);
-        if (!checkFileSize(inp)) return showErr(`File too large: ${inp.dataset.label} — max 2 MB.`);
+        if (!inp.files.length) return showErr(`Please upload: ${inp.dataset.label}`, inp.name);
+        if (!checkFileSize(inp)) return showErr(`File too large: ${inp.dataset.label} — max 2 MB.`, inp.name);
       }
       // Validate optional docs if files were chosen
       const optionalDocs = form.querySelectorAll('.doc-file-input[data-required="false"]');
       for (const inp of optionalDocs) {
-        if (inp.files.length && !checkFileSize(inp)) return showErr(`File too large: ${inp.dataset.label} — max 2 MB.`);
+        if (inp.files.length && !checkFileSize(inp)) return showErr(`File too large: ${inp.dataset.label} — max 2 MB.`, inp.name);
       }
 
       try {
@@ -869,7 +912,13 @@
       }
     }
 
-    function showErr(msg) {
+    function showErr(msg, fieldName) {
+      // If the field is inside a collapsed section, open it so the student can see what's wrong.
+      if (fieldName) {
+        const fieldEl = document.querySelector(`[name="${fieldName}"]`);
+        const section = fieldEl && fieldEl.closest('details.apply-section');
+        if (section) section.open = true;
+      }
       const errEl = document.getElementById('form-error');
       const btn   = document.getElementById('submit-btn');
       errEl.textContent = msg;
