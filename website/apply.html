@@ -50,6 +50,31 @@
     .field-input::placeholder { color: var(--grey-300); }
     .field-textarea { resize: vertical; min-height: 88px; }
     .radio-group { display: flex; gap: 20px; flex-wrap: wrap; padding-top: 4px; }
+    .phone-input-group { display: flex; align-items: stretch; }
+    .phone-prefix {
+      display: flex; align-items: center; padding: 0 12px;
+      font-size: 14px; font-weight: 600; color: var(--grey-600);
+      background: var(--grey-50); border: 1px solid var(--grey-200); border-right: none;
+      border-radius: var(--radius-md) 0 0 var(--radius-md); white-space: nowrap;
+    }
+    .phone-input-group .field-input { border-radius: 0 var(--radius-md) var(--radius-md) 0; }
+
+    /* Draft restore banner */
+    .draft-banner {
+      display: none; align-items: center; gap: 12px; flex-wrap: wrap;
+      background: var(--green-light); border: 1px solid rgba(14,113,98,0.25);
+      border-radius: var(--radius-md); padding: 14px 16px; margin-bottom: 20px;
+      font-size: 13px; color: var(--green-dark);
+    }
+    .draft-banner i { font-size: 18px; }
+    .draft-banner-text { flex: 1; min-width: 200px; }
+    .draft-banner-actions { display: flex; gap: 8px; }
+    .draft-btn {
+      border: none; border-radius: var(--radius-md); padding: 8px 14px;
+      font-size: 12px; font-weight: 700; font-family: var(--font); cursor: pointer;
+    }
+    .draft-btn.primary { background: var(--green-dark); color: var(--white); }
+    .draft-btn.secondary { background: var(--white); color: var(--grey-600); border: 1px solid var(--grey-200); }
     .radio-label { display: flex; align-items: center; gap: 7px; font-size: 14px; color: var(--grey-700); cursor: pointer; }
     .radio-label input[type="radio"] { accent-color: var(--green-dark); width: 15px; height: 15px; }
 
@@ -178,6 +203,14 @@
         <!-- FORM -->
         <div>
           <div class="form-error" id="form-error"></div>
+          <div class="draft-banner" id="draft-banner">
+            <i class="ti ti-clock-hour-4"></i>
+            <span class="draft-banner-text" id="draft-banner-text">We found a saved draft from your last visit.</span>
+            <div class="draft-banner-actions">
+              <button type="button" class="draft-btn primary" onclick="applyDraftRestore()">Continue where I left off</button>
+              <button type="button" class="draft-btn secondary" onclick="dismissDraft()">Start fresh</button>
+            </div>
+          </div>
           <div class="form-success" id="form-success">
             <div class="success-icon"><i class="ti ti-circle-check"></i></div>
             <h2 style="font-size:22px;font-weight:800;color:var(--green-dark);letter-spacing:-0.02em;margin-bottom:10px;">Application submitted!</h2>
@@ -198,7 +231,10 @@
                   </div>
                   <div class="field-group">
                     <label class="field-label">Referrer phone no. <span class="req">*</span></label>
-                    <input class="field-input" name="referrer_phone" type="tel" placeholder="+91 XXXXXXXXXX" required />
+                    <div class="phone-input-group">
+                      <span class="phone-prefix">+91</span>
+                      <input class="field-input phone-digits" name="referrer_phone" type="tel" inputmode="numeric" placeholder="98765 43210" required />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -275,11 +311,17 @@
                 <div class="form-row">
                   <div class="field-group">
                     <label class="field-label">Parent's / Guardian contact no. <span class="req">*</span></label>
-                    <input class="field-input" name="parent_contact" type="tel" placeholder="+91 XXXXXXXXXX" required />
+                    <div class="phone-input-group">
+                      <span class="phone-prefix">+91</span>
+                      <input class="field-input phone-digits" name="parent_contact" type="tel" inputmode="numeric" placeholder="98765 43210" required />
+                    </div>
                   </div>
                   <div class="field-group">
                     <label class="field-label">Student contact no. (if available)</label>
-                    <input class="field-input" name="student_phone_alt" type="tel" placeholder="+91 XXXXXXXXXX" />
+                    <div class="phone-input-group">
+                      <span class="phone-prefix">+91</span>
+                      <input class="field-input phone-digits" name="student_phone_alt" type="tel" inputmode="numeric" placeholder="98765 43210" />
+                    </div>
                   </div>
                 </div>
                 <div class="form-row">
@@ -289,7 +331,10 @@
                   </div>
                   <div class="field-group">
                     <label class="field-label">Student contact no. (if available)</label>
-                    <input class="field-input" name="student_phone" type="tel" placeholder="+91 XXXXXXXXXX" />
+                    <div class="phone-input-group">
+                      <span class="phone-prefix">+91</span>
+                      <input class="field-input phone-digits" name="student_phone" type="tel" inputmode="numeric" placeholder="98765 43210" />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -607,6 +652,22 @@
     const IMAGE_COMPRESS_TARGET = 900 * 1024; // shrink photos to roughly this size
     const IMAGE_MAX_DIMENSION = 1920; // longest side, px — plenty for a readable document photo
 
+    // Phone fields only ever hold the 10-digit number — the +91 is a fixed
+    // prefix shown next to the input, not something the student types.
+    document.querySelectorAll('.phone-digits').forEach(inp => {
+      inp.addEventListener('input', () => {
+        let digits = inp.value.replace(/\D/g, '');
+        // If someone pastes a number that already has +91 or a leading 0 on
+        // it, keep the last 10 digits rather than the first 10.
+        if (digits.length > 10) digits = digits.slice(-10);
+        inp.value = digits;
+      });
+    });
+
+    function withCountryCode(digits) {
+      return digits ? `+91 ${digits}` : null;
+    }
+
     function toggleScholarship(radio) {
       const wrap = document.getElementById('scholarship-detail-wrap');
       const detail = document.getElementById('scholarship_details');
@@ -747,6 +808,73 @@
     document.getElementById('sfs-form').addEventListener('change', updateSectionStatuses);
     updateSectionStatuses();
 
+    // --- Save-as-you-go draft, so a student who has to stop partway through
+    // doesn't lose what they already typed. Stored only on this device/browser;
+    // file uploads can't be remembered this way and must be re-attached.
+    const DRAFT_KEY = 'sfs_apply_draft_v1';
+
+    function saveDraft() {
+      const form = document.getElementById('sfs-form');
+      const data = {};
+      for (const el of form.elements) {
+        if (!el.name || el.type === 'file' || el.id === 'declaration') continue;
+        if (el.type === 'radio') { if (el.checked) data[el.name] = el.value; }
+        else data[el.name] = el.value;
+      }
+      try { localStorage.setItem(DRAFT_KEY, JSON.stringify({ data, savedAt: Date.now() })); }
+      catch (e) { /* storage unavailable (e.g. private browsing) — nothing we can do */ }
+    }
+
+    let draftSaveTimer;
+    function scheduleDraftSave() {
+      clearTimeout(draftSaveTimer);
+      draftSaveTimer = setTimeout(saveDraft, 400);
+    }
+
+    function loadDraft() {
+      try {
+        const raw = localStorage.getItem(DRAFT_KEY);
+        return raw ? JSON.parse(raw) : null;
+      } catch (e) { return null; }
+    }
+
+    function clearDraft() {
+      try { localStorage.removeItem(DRAFT_KEY); } catch (e) {}
+    }
+
+    function applyDraftRestore() {
+      const saved = loadDraft();
+      if (!saved) return;
+      const form = document.getElementById('sfs-form');
+      for (const [name, value] of Object.entries(saved.data)) {
+        const matches = form.querySelectorAll(`[name="${name}"]`);
+        if (!matches.length) continue;
+        if (matches[0].type === 'radio') matches.forEach(r => { r.checked = (r.value === value); });
+        else matches[0].value = value;
+      }
+      const scholarshipRadio = form.querySelector('input[name="other_scholarship"]:checked');
+      if (scholarshipRadio) toggleScholarship(scholarshipRadio);
+      document.querySelectorAll('details.apply-section').forEach(d => { d.open = true; });
+      updateSectionStatuses();
+      document.getElementById('draft-banner').style.display = 'none';
+    }
+
+    function dismissDraft() {
+      clearDraft();
+      document.getElementById('draft-banner').style.display = 'none';
+    }
+
+    document.getElementById('sfs-form').addEventListener('input', scheduleDraftSave);
+    document.getElementById('sfs-form').addEventListener('change', scheduleDraftSave);
+
+    (function checkForDraft() {
+      const saved = loadDraft();
+      if (!saved || !Object.keys(saved.data).length) return;
+      const when = new Date(saved.savedAt).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' });
+      document.getElementById('draft-banner-text').textContent = `We found a saved draft from ${when}.`;
+      document.getElementById('draft-banner').style.display = 'flex';
+    })();
+
     function setProgress(pct, label) {
       document.getElementById('progress-wrap').style.display = 'block';
       document.getElementById('progress-bar').style.width = pct + '%';
@@ -807,6 +935,14 @@
       for (const [name, val, msg] of checks) {
         if (!val) return showErr(msg, name);
       }
+
+      // Phone fields hold only digits (the +91 is a fixed prefix) — any filled
+      // one must be exactly 10 digits; the optional ones may be left blank.
+      for (const name of ['referrer_phone', 'parent_contact', 'student_phone_alt', 'student_phone']) {
+        const val = fd.get(name);
+        if (val && val.length !== 10) return showErr('Please enter a valid 10-digit phone number.', name);
+      }
+
       if (!document.getElementById('declaration').checked) return showErr('Please read and accept the declaration.');
 
       // Validate scholarship detail if Yes
@@ -851,15 +987,15 @@
           mother_name:         fd.get('mother_name').trim()           || null,
           annual_income:       fd.get('annual_income') ? parseFloat(fd.get('annual_income')) : null,
           address:             fd.get('address').trim()               || null,
-          phone:               fd.get('parent_contact').trim()        || null,
+          phone:               withCountryCode(fd.get('parent_contact')),
           referred_by:         fd.get('referred_by').trim()           || null,
-          referrer_phone:      fd.get('referrer_phone').trim()        || null,
+          referrer_phone:      withCountryCode(fd.get('referrer_phone')),
           guardian_name:       fd.get('guardian_name').trim()         || null,
           state:               fd.get('state')                        || null,
           district:            fd.get('district').trim()              || null,
           school:              fd.get('school').trim()                || null,
           email:               fd.get('email').trim()                 || null,
-          student_phone:       fd.get('student_phone').trim()         || null,
+          student_phone:       withCountryCode(fd.get('student_phone')),
           school_10th:         fd.get('school_10th').trim()           || null,
           school_12th:         fd.get('school_12th').trim()           || null,
           college_ug:          fd.get('college_ug').trim()            || null,
@@ -902,6 +1038,7 @@
         if (submitErr) throw new Error(submitErr.message);
 
         setProgress(100, 'Done!');
+        clearDraft();
         form.style.display = 'none';
         document.getElementById('form-success').style.display = 'block';
         document.getElementById('app-ref').textContent = 'SFS2026-' + studentId.slice(0, 8).toUpperCase();
