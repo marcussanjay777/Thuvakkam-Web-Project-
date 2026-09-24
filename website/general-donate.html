@@ -8,6 +8,8 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
   <link rel="stylesheet" href="css/style.css" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="https://www.ketto.org/media/sdk/dms-sdk.min.js" type="module"></script>
+  <script src="/ketto-config.js"></script>
 </head>
 <body>
 
@@ -70,6 +72,11 @@
         </div>
 
         <div id="donate-error" style="display:none; background:#FEE2E2; border:1px solid #FCA5A5; border-radius:8px; padding:12px 16px; font-size:14px; color:#991B1B; margin-bottom:20px;"></div>
+        <div id="donate-thanks" style="display:none; background:#D1FAE5; border:1px solid #A7F3D0; border-radius:8px; padding:16px; font-size:14px; color:#065F46; margin-bottom:20px; line-height:1.6;">
+          <strong>Thank you!</strong> If you completed the payment on Ketto, your donation will show up on our student pages once our team confirms and processes it — usually within a day or two.
+        </div>
+
+        <div id="dms-container"></div>
 
         <form id="donate-form">
           <div style="margin-bottom:18px;">
@@ -230,17 +237,19 @@
       });
     });
 
-    document.getElementById('donate-form').addEventListener('submit', async (e) => {
+    let kettoDms = null;
+
+    document.getElementById('donate-form').addEventListener('submit', (e) => {
       e.preventDefault();
 
-      const errEl     = document.getElementById('donate-error');
-      const submitBtn = document.getElementById('submit-btn');
-      errEl.style.display = 'none';
+      const errEl    = document.getElementById('donate-error');
+      const thanksEl = document.getElementById('donate-thanks');
+      errEl.style.display    = 'none';
+      thanksEl.style.display = 'none';
 
       const name   = document.getElementById('f-name').value.trim();
       const email  = document.getElementById('f-email').value.trim();
       const amount = parseFloat(document.getElementById('f-amount').value);
-      const note   = document.getElementById('f-note').value.trim();
 
       if (!name || !email || !amount || amount <= 0) {
         errEl.textContent = 'Please fill in your name, email, and a valid donation amount.';
@@ -248,25 +257,35 @@
         return;
       }
 
-      submitBtn.textContent = 'Processing…';
-      submitBtn.disabled = true;
-
-      const { error } = await sb.rpc('submit_general_donation', {
-        p_full_name: name,
-        p_email:     email,
-        p_amount:    amount,
-        p_note:      note || null,
-      });
-
-      if (error) {
-        errEl.textContent = 'Something went wrong. Please try again.';
+      if (typeof Dms === 'undefined') {
+        errEl.textContent = 'Payment system is still loading — please wait a moment and try again.';
         errEl.style.display = 'block';
-        submitBtn.textContent = 'Donate now';
-        submitBtn.disabled = false;
         return;
       }
 
-      window.location.href = 'funded-students.html?donated=true';
+      if (!kettoDms) {
+        kettoDms = Dms({
+          apiKey: KETTO_API_KEY,
+          onError: (error) => { console.error('Ketto init error:', error); },
+        });
+      }
+
+      kettoDms.acceptDonation({
+        container: '#dms-container',
+        userConfig: {
+          donor_name:  name,
+          donor_email: email,
+        },
+        modalOptions: {
+          closeOnOverlayClick: true,
+          closeOnEsc: true,
+        },
+        widgetConfig: {
+          widgetId: KETTO_WIDGET_ID,
+        },
+      });
+
+      thanksEl.style.display = 'block';
     });
   </script>
 <script src="js/nav.js" defer></script>

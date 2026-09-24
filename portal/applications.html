@@ -183,11 +183,11 @@ function renderTable(data) {
       <td>
         <div class="cell-student">
           <div class="table-avatar">${s.initials || s.name.slice(0,2).toUpperCase()}</div>
-          <span class="cell-name">${s.name}</span>
+          <span class="cell-name">${esc(s.name)}</span>
         </div>
       </td>
-      <td class="cell-muted">${s.school}</td>
-      <td class="cell-muted">${s.district}</td>
+      <td class="cell-muted">${escOr(s.school)}</td>
+      <td class="cell-muted">${escOr(s.district)}</td>
       <td class="cell-muted">${s.class}</td>
       <td class="cell-muted">${fmtDate(s.applied_on)}</td>
       <td>${statusBadge(s.status)}</td>
@@ -213,7 +213,7 @@ function applyFilters() {
   const cls      = document.getElementById('filter-class').value;
 
   const filtered = allStudents.filter(s =>
-    (!search   || s.name.toLowerCase().includes(search) || s.school.toLowerCase().includes(search)) &&
+    (!search   || (s.name || '').toLowerCase().includes(search) || (s.school || '').toLowerCase().includes(search)) &&
     (!status   || s.status   === status)   &&
     (!district || s.district === district) &&
     (!cls      || s.class    === cls)
@@ -252,8 +252,8 @@ function viewStudent(id) {
             ${s.initials || s.name.slice(0,2).toUpperCase()}
           </div>
           <div>
-            <div style="font-size:18px;font-weight:700;color:#fff;">${s.name}</div>
-            <div style="font-size:13px;color:rgba(255,255,255,0.6);margin-top:2px;">${s.school}</div>
+            <div style="font-size:18px;font-weight:700;color:#fff;">${esc(s.name)}</div>
+            <div style="font-size:13px;color:rgba(255,255,255,0.6);margin-top:2px;">${escOr(s.school, '')}</div>
           </div>
           <button onclick="document.getElementById('view-modal').remove()" style="margin-left:auto;background:rgba(255,255,255,0.15);border:none;border-radius:6px;width:32px;height:32px;cursor:pointer;color:#fff;font-size:18px;display:flex;align-items:center;justify-content:center;">
             <i class="ti ti-x"></i>
@@ -382,7 +382,7 @@ async function loadApplications() {
   await requireAuth();
 
   const { data, error } = await sb.from('students')
-    .select('*').eq('cycle_year', 2026)
+    .select('*').eq('cycle_year', SFS_CYCLE_YEAR)
     .order('applied_on', { ascending: false });
 
   if (error) { console.error(error); return; }
@@ -404,6 +404,13 @@ async function loadApplications() {
 
   // Export CSV button
   document.querySelector('[data-action="export-csv"]').addEventListener('click', exportCSV);
+
+  // Arriving from the global topbar search (?q=...) should actually filter, not just show everything
+  const q = new URLSearchParams(window.location.search).get('q');
+  if (q) {
+    document.getElementById('search-input').value = q;
+    applyFilters();
+  }
 }
 
 loadApplications();

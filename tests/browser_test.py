@@ -2,7 +2,7 @@ import os
 from playwright.sync_api import sync_playwright
 
 BASE = "http://localhost:8000"
-SHOTS = os.path.join(os.getcwd(), "test-shots")
+SHOTS = os.path.join(os.getcwd(), "tests", "test-shots")
 os.makedirs(SHOTS, exist_ok=True)
 
 results = []

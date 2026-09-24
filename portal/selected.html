@@ -113,10 +113,10 @@ function renderCards(data) {
       <div class="student-card-banner"></div>
       <div class="student-card-body">
         <div class="student-initials">${s.initials || s.name.slice(0,2).toUpperCase()}</div>
-        <div class="student-name">${s.name}</div>
-        <div class="student-school">${s.school}</div>
+        <div class="student-name">${esc(s.name)}</div>
+        <div class="student-school">${escOr(s.school, '')}</div>
         <div class="student-meta">
-          <div class="student-meta-row"><span class="student-meta-key">District</span><span class="student-meta-val">${s.district}</span></div>
+          <div class="student-meta-row"><span class="student-meta-key">District</span><span class="student-meta-val">${escOr(s.district)}</span></div>
           <div class="student-meta-row"><span class="student-meta-key">Class</span><span class="student-meta-val">${s.class}</span></div>
           <div class="student-meta-row"><span class="student-meta-key">Applied</span><span class="student-meta-val">${fmtDate(s.applied_on)}</span></div>
         </div>
@@ -165,8 +165,8 @@ function viewStudent(id) {
             ${s.initials || s.name.slice(0,2).toUpperCase()}
           </div>
           <div>
-            <div style="font-size:18px;font-weight:700;color:#fff;">${s.name}</div>
-            <div style="font-size:13px;color:rgba(255,255,255,0.6);margin-top:2px;">${s.school}</div>
+            <div style="font-size:18px;font-weight:700;color:#fff;">${esc(s.name)}</div>
+            <div style="font-size:13px;color:rgba(255,255,255,0.6);margin-top:2px;">${escOr(s.school, '')}</div>
           </div>
           <button onclick="document.getElementById('view-modal').remove()" style="margin-left:auto;background:rgba(255,255,255,0.15);border:none;border-radius:6px;width:32px;height:32px;cursor:pointer;color:#fff;font-size:18px;display:flex;align-items:center;justify-content:center;">
             <i class="ti ti-x"></i>
@@ -222,7 +222,7 @@ async function loadSelected() {
   await requireAuth();
 
   const { data } = await sb.from('students').select('*')
-    .eq('cycle_year', 2026).eq('status', 'selected').order('name');
+    .eq('cycle_year', SFS_CYCLE_YEAR).eq('status', 'selected').order('name');
 
   if (!data) return;
   allSelected = data;

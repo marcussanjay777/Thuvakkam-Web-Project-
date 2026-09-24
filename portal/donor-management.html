@@ -248,7 +248,7 @@ function renderDonorList(donors) {
 function filterDonors() {
   const q = document.getElementById('donor-search').value.toLowerCase();
   renderDonorList(allDonors.filter(d =>
-    d.full_name.toLowerCase().includes(q) || d.email.toLowerCase().includes(q)
+    (d.full_name || '').toLowerCase().includes(q) || (d.email || '').toLowerCase().includes(q)
   ));
 }
 
@@ -377,7 +377,7 @@ function renderStudentList(students) {
 function filterStudents() {
   const q = document.getElementById('student-search').value.toLowerCase();
   renderStudentList(allStudents.filter(s =>
-    s.name.toLowerCase().includes(q) || s.school.toLowerCase().includes(q)
+    (s.name || '').toLowerCase().includes(q) || (s.school || '').toLowerCase().includes(q)
   ));
 }
 

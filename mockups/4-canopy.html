@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SFS — Canopy</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{ box-sizing:border-box; margin:0; padding:0; }
+
+  :root{
+    --bg:       #061A16;
+    --bg-2:     #0A2521;
+    --surface:  rgba(255,255,255,.045);
+    --stroke:   rgba(255,255,255,.10);
+    --stroke-2: rgba(255,255,255,.18);
+    --text:     #EAF3F0;
+    --text-soft:#9DB3AD;
+    --text-dim: #6E8781;
+    --green:    #0E7162;
+    --green-mid:#26C699;
+    --glow:     #2FE6AE;
+    --yellow:   #FDDB3A;
+
+    --display:'Syne', 'Trebuchet MS', sans-serif;
+    --body:'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --gutter:clamp(20px,5vw,64px);
+  }
+
+  html{ scroll-behavior:smooth; }
+  body{
+    font-family:var(--body); background:var(--bg); color:var(--text);
+    line-height:1.65; -webkit-font-smoothing:antialiased; overflow-x:hidden;
+  }
+  img{ max-width:100%; }
+  a{ color:inherit; }
+  .wrap{ max-width:1180px; margin:0 auto; padding-inline:var(--gutter); }
+
+  /* ambient mesh */
+  .mesh{ position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
+  .orb{ position:absolute; border-radius:50%; filter:blur(90px); }
+  .o1{ width:620px; height:620px; background:#125F52; opacity:.55; top:-220px; left:-160px; animation:f1 26s ease-in-out infinite; }
+  .o2{ width:520px; height:520px; background:#1C8A6E; opacity:.38; top:18%; right:-190px; animation:f2 31s ease-in-out infinite; }
+  .o3{ width:460px; height:460px; background:#3A7F5C; opacity:.3; bottom:-160px; left:26%; animation:f1 36s ease-in-out infinite reverse; }
+  @keyframes f1{ 0%,100%{ transform:translate(0,0) scale(1);} 50%{ transform:translate(60px,44px) scale(1.14);} }
+  @keyframes f2{ 0%,100%{ transform:translate(0,0) scale(1);} 50%{ transform:translate(-54px,60px) scale(1.09);} }
+
+  .grain{ position:fixed; inset:0; z-index:1; pointer-events:none; opacity:.035;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+
+  body > *:not(.mesh):not(.grain){ position:relative; z-index:2; }
+
+  .notice{ border-bottom:1px solid var(--stroke); font-size:12.5px; padding:10px 0; color:var(--text-soft); }
+  .notice .wrap{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+  .notice a{ color:var(--glow); font-weight:600; text-decoration:none; }
+
+  .nav{ position:sticky; top:0; z-index:60; backdrop-filter:blur(18px); background:rgba(6,26,22,.66); border-bottom:1px solid var(--stroke); }
+  .nav .wrap{ display:flex; align-items:center; gap:26px; height:76px; }
+  .brand{ display:flex; align-items:center; gap:11px; text-decoration:none; }
+  .brand img{ height:36px; object-fit:contain; }
+  .brand b{ font-family:var(--display); font-size:18px; font-weight:700; letter-spacing:-.015em; }
+  .links{ display:flex; gap:26px; margin-left:auto; }
+  .links a{ font-size:14px; font-weight:500; color:var(--text-soft); text-decoration:none; transition:color .25s; }
+  .links a:hover,.links a.on{ color:var(--text); }
+  .btn{ display:inline-flex; align-items:center; justify-content:center; gap:8px;
+        font-family:var(--body); font-size:14.5px; font-weight:700; padding:12px 24px; border-radius:99px;
+        text-decoration:none; border:1px solid transparent; cursor:pointer;
+        transition:transform .25s, box-shadow .3s, background .25s, border-color .25s; }
+  .btn:hover{ transform:translateY(-2px); }
+  .btn-glow{ background:var(--glow); color:#04120F; box-shadow:0 0 0 0 rgba(47,230,174,.5); }
+  .btn-glow:hover{ box-shadow:0 8px 34px rgba(47,230,174,.42); }
+  .btn-ghost{ border-color:var(--stroke-2); color:var(--text); background:rgba(255,255,255,.03); }
+  .btn-ghost:hover{ border-color:var(--glow); background:rgba(47,230,174,.08); }
+  .btn-lg{ font-size:16px; padding:15px 30px; }
+  .burger{ display:none; margin-left:auto; background:none; border:none; font-size:27px; color:var(--text); }
+
+  /* HERO */
+  .hero{ padding-block:clamp(56px,8vw,110px) clamp(40px,5vw,70px); text-align:center; }
+  .tag{ display:inline-flex; align-items:center; gap:9px; border:1px solid var(--stroke-2);
+        background:rgba(255,255,255,.04); border-radius:99px; padding:8px 18px; font-size:12.5px;
+        font-weight:600; color:var(--text-soft); backdrop-filter:blur(8px); }
+  .tag .d{ width:7px; height:7px; border-radius:50%; background:var(--glow); box-shadow:0 0 12px var(--glow); }
+  h1{ margin-top:26px; font-family:var(--display); font-weight:800; font-size:clamp(34px,8.4vw,92px);
+      line-height:1; letter-spacing:-.035em; text-wrap:balance; max-width:14ch; margin-inline:auto;
+      overflow-wrap:break-word; }
+  .grad{ background:linear-gradient(103deg,var(--glow) 6%, var(--yellow) 58%, #8FF0C8 96%);
+         -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .lede{ margin:24px auto 0; max-width:54ch; font-size:clamp(16px,1.9vw,18.5px); color:var(--text-soft); line-height:1.76; }
+  .hero-btns{ margin-top:36px; display:flex; gap:13px; flex-wrap:wrap; justify-content:center; }
+
+  .glassrow{ margin-top:clamp(50px,7vw,86px); display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
+  .glass{ background:var(--surface); border:1px solid var(--stroke); border-radius:20px; padding:28px 24px;
+          backdrop-filter:blur(14px); position:relative; overflow:hidden; transition:border-color .35s, transform .35s, background .35s; }
+  .glass::before{ content:''; position:absolute; inset:0; border-radius:20px; opacity:0;
+                  background:radial-gradient(420px circle at var(--mx,50%) var(--my,50%), rgba(47,230,174,.16), transparent 42%);
+                  transition:opacity .35s; pointer-events:none; }
+  .glass:hover{ border-color:var(--stroke-2); transform:translateY(-4px); background:rgba(255,255,255,.07); }
+  .glass:hover::before{ opacity:1; }
+  .g-n{ font-family:var(--display); font-size:clamp(32px,4.2vw,46px); font-weight:800; line-height:1;
+        color:var(--glow); font-variant-numeric:tabular-nums; letter-spacing:-.02em; }
+  .g-l{ margin-top:10px; font-size:12.5px; font-weight:600; color:var(--text-dim); letter-spacing:.03em; }
+
+  section{ padding-block:clamp(52px,7vw,96px); }
+  .eyebrow{ display:inline-flex; align-items:center; gap:9px; font-size:11.5px; font-weight:700;
+            letter-spacing:.14em; text-transform:uppercase; color:var(--glow); }
+  .eyebrow::before{ content:''; width:24px; height:1px; background:var(--glow); opacity:.6; }
+  h2{ margin-top:16px; font-family:var(--display); font-weight:700; font-size:clamp(28px,4.4vw,48px);
+      line-height:1.07; letter-spacing:-.03em; text-wrap:balance; max-width:19ch; }
+  .sub{ margin-top:16px; max-width:58ch; color:var(--text-soft); font-size:16px; line-height:1.76; }
+
+  .cards{ margin-top:46px; display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+  .card{ background:var(--surface); border:1px solid var(--stroke); border-radius:22px; padding:34px 30px;
+         backdrop-filter:blur(14px); transition:border-color .35s, transform .35s, background .35s; }
+  .card:hover{ border-color:var(--stroke-2); transform:translateY(-5px); background:rgba(255,255,255,.07); }
+  .c-ico{ width:52px; height:52px; border-radius:15px; display:flex; align-items:center; justify-content:center;
+          font-size:23px; background:rgba(47,230,174,.12); color:var(--glow); border:1px solid rgba(47,230,174,.22); margin-bottom:20px; }
+  .card h3{ font-family:var(--display); font-size:21px; font-weight:700; letter-spacing:-.02em; margin-bottom:10px; }
+  .card p{ font-size:15px; color:var(--text-soft); line-height:1.74; }
+
+  /* timeline */
+  .tl{ margin-top:46px; display:grid; grid-template-columns:repeat(5,1fr); gap:0; position:relative; }
+  .tl::before{ content:''; position:absolute; left:0; right:0; top:26px; height:1px; background:var(--stroke); }
+  .tl-fill{ position:absolute; left:0; top:26px; height:1px; background:var(--glow); width:0;
+            box-shadow:0 0 12px var(--glow); transition:width 1.6s cubic-bezier(.22,1,.36,1); }
+  .tls{ position:relative; padding-right:16px; }
+  .tl-dot{ width:15px; height:15px; border-radius:50%; background:var(--bg); border:2px solid var(--stroke-2);
+           position:relative; z-index:2; margin-top:19px; transition:all .45s; }
+  .tls.done .tl-dot{ border-color:var(--glow); background:var(--glow); }
+  .tls.now .tl-dot{ border-color:var(--yellow); background:var(--yellow); box-shadow:0 0 0 6px rgba(253,219,58,.18), 0 0 18px var(--yellow); }
+  .tl-n{ margin-top:22px; font-size:11px; font-weight:700; letter-spacing:.1em; color:var(--text-dim); }
+  .tl-name{ margin-top:8px; font-family:var(--display); font-size:19px; font-weight:700; letter-spacing:-.015em; }
+  .tls.now .tl-name{ color:var(--yellow); }
+  .tl-m{ margin-top:4px; font-size:12.5px; color:var(--text-dim); }
+
+  .quotes{ margin-top:46px; display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+  .q{ background:var(--surface); border:1px solid var(--stroke); border-radius:22px; padding:32px 28px;
+      backdrop-filter:blur(14px); transition:border-color .35s, transform .35s; }
+  .q:hover{ border-color:var(--stroke-2); transform:translateY(-5px); }
+  .q p{ font-family:var(--display); font-size:17.5px; font-weight:600; line-height:1.5; letter-spacing:-.015em; }
+  .q-w{ margin-top:22px; padding-top:18px; border-top:1px solid var(--stroke); display:flex; align-items:center; gap:12px; }
+  .q-a{ width:40px; height:40px; border-radius:50%; background:rgba(47,230,174,.14); color:var(--glow);
+        border:1px solid rgba(47,230,174,.24); display:flex; align-items:center; justify-content:center;
+        font-family:var(--display); font-weight:700; font-size:14px; }
+  .q-n{ font-size:14px; font-weight:700; } .q-m{ font-size:12px; color:var(--text-dim); }
+
+  .cta{ border:1px solid var(--stroke-2); border-radius:30px; padding:clamp(38px,5.4vw,66px);
+        background:linear-gradient(135deg, rgba(47,230,174,.10), rgba(253,219,58,.05) 60%, transparent);
+        backdrop-filter:blur(16px); display:flex; gap:40px; align-items:center; justify-content:space-between; flex-wrap:wrap; }
+  .cta h2{ margin-top:12px; max-width:15ch; }
+  .cta .amt{ color:var(--yellow); }
+  .cta p{ margin-top:14px; max-width:42ch; color:var(--text-soft); font-size:15.5px; line-height:1.74; }
+
+  footer{ padding-block:58px 34px; border-top:1px solid var(--stroke); margin-top:24px; }
+  .f-grid{ display:grid; grid-template-columns:1.7fr 1fr 1fr 1.2fr; gap:clamp(22px,4vw,44px); }
+  .f-brand img{ height:40px; margin-bottom:13px; display:block; }
+  .f-brand p{ font-size:13.5px; color:var(--text-soft); line-height:1.72; max-width:33ch; }
+  .f-reg{ margin-top:13px; font-size:11.5px; color:var(--text-dim); letter-spacing:.05em; }
+  .f-head{ font-family:var(--display); font-size:14px; font-weight:700; letter-spacing:.02em; margin-bottom:13px; }
+  .f-link{ display:block; font-size:13.5px; color:var(--text-soft); text-decoration:none; padding:5px 0; transition:color .2s; }
+  .f-link:hover{ color:var(--glow); }
+  .f-row{ display:flex; gap:9px; align-items:center; font-size:13.5px; color:var(--text-soft); padding:5px 0; }
+  .f-row i{ color:var(--glow); }
+  .f-bot{ margin-top:42px; padding-top:20px; border-top:1px solid var(--stroke); display:flex;
+          justify-content:space-between; gap:16px; flex-wrap:wrap; font-size:12.5px; color:var(--text-dim); }
+  .f-bot a{ text-decoration:none; margin-left:18px; }
+  .f-bot a:hover{ color:var(--glow); }
+
+  .rise{ opacity:0; transform:translateY(22px); transition:opacity .75s cubic-bezier(.22,1,.36,1), transform .75s cubic-bezier(.22,1,.36,1); }
+  .rise.in{ opacity:1; transform:none; }
+  .hero .rise{ opacity:1; transform:none; animation:hr .9s cubic-bezier(.22,1,.36,1) both; }
+  .hero .rise:nth-of-type(1){ animation-delay:.05s; } .hero .rise:nth-of-type(2){ animation-delay:.14s; }
+  .hero .rise:nth-of-type(3){ animation-delay:.23s; } .hero .rise:nth-of-type(4){ animation-delay:.32s; }
+  @keyframes hr{ from{ opacity:0; transform:translateY(22px);} to{ opacity:1; transform:none;} }
+
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{ animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; }
+    .rise{ opacity:1 !important; transform:none !important; }
+  }
+
+  @media (max-width:1040px){
+    .links{ display:none; } .burger{ display:block; } .nav-cta{ display:none; }
+    .glassrow{ grid-template-columns:repeat(2,1fr); }
+    .cards,.quotes{ grid-template-columns:1fr; }
+    .tl{ grid-template-columns:1fr; gap:4px; } .tl::before,.tl-fill{ display:none; }
+    .tls{ display:grid; grid-template-columns:auto 1fr; gap:16px; align-items:center; padding:10px 0; border-bottom:1px solid var(--stroke); }
+    .tl-dot{ margin-top:0; } .tl-n{ margin-top:0; } .tl-name{ margin-top:2px; }
+    .f-grid{ grid-template-columns:1fr 1fr; }
+  }
+  @media (max-width:600px){
+    .glassrow{ grid-template-columns:1fr; } .f-grid{ grid-template-columns:1fr; } .cta{ border-radius:22px; }
+  }
+  .mob{ display:none; } .mob.open{ display:block; background:rgba(6,26,22,.97); border-bottom:1px solid var(--stroke); }
+  .mob a{ display:block; padding:14px var(--gutter); font-size:15px; font-weight:600; text-decoration:none; border-bottom:1px solid var(--stroke); }
+</style>
+</head>
+<body>
+
+<div class="mesh"><div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div></div>
+<div class="grain"></div>
+
+<div class="notice"><div class="wrap"><span>SFS 2026 applications are open.</span><a href="#">Apply before 31 August 2026 →</a></div></div>
+
+<nav class="nav"><div class="wrap">
+  <a class="brand" href="#"><img src="../website/assets/logo.webp" alt="Thuvakkam Education" /><b>Sponsor for Success</b></a>
+  <div class="links"><a class="on" href="#">Home</a><a href="#">Impact</a><a href="#">Selection</a>
+    <a href="#">Support</a><a href="#">Stories</a><a href="#">Our Students</a></div>
+  <button class="burger" onclick="document.getElementById('mob').classList.toggle('open')" aria-label="Menu"><i class="ti ti-menu-2"></i></button>
+  <div class="nav-cta"><a class="btn btn-glow" href="#">Donate</a></div>
+</div></nav>
+<div class="mob" id="mob"><a href="#">Home</a><a href="#">Impact</a><a href="#">Selection</a>
+  <a href="#">Support</a><a href="#">Stories</a><a href="#">Our Students</a><a href="#">Donate</a></div>
+
+<header class="hero wrap">
+  <div class="rise"><span class="tag"><span class="d"></span> SFS 2026 · Tamil Nadu</span></div>
+  <h1 class="rise">Education is the <span class="grad">foundation</span> of everything.</h1>
+  <p class="lede rise">Scholarships, mentoring and long-term monitoring for students across Tamil Nadu — so that finishing school is never decided by what a family can afford.</p>
+  <div class="hero-btns rise">
+    <a class="btn btn-glow btn-lg" href="#">Apply for SFS 2026</a>
+    <a class="btn btn-ghost btn-lg" href="#">Sponsor a student</a>
+  </div>
+  <div class="glassrow">
+    <div class="glass rise"><div class="g-n" data-count="5" data-suffix="+">0</div><div class="g-l">Years running</div></div>
+    <div class="glass rise"><div class="g-n" data-count="100" data-suffix="+">0</div><div class="g-l">Students supported</div></div>
+    <div class="glass rise"><div class="g-n" data-count="20" data-suffix="+">0</div><div class="g-l">Partner schools</div></div>
+    <div class="glass rise"><div class="g-n" data-count="8" data-suffix="+">0</div><div class="g-l">Districts reached</div></div>
+  </div>
+</header>
+
+<section class="wrap">
+  <span class="eyebrow rise">The problem</span>
+  <h2 class="rise">Three pressures end most educations</h2>
+  <p class="sub rise">They appear in nearly every application we read. SFS answers all three together, because solving one alone rarely keeps a student enrolled.</p>
+  <div class="cards">
+    <div class="card rise"><div class="c-ico"><i class="ti ti-book-2"></i></div><h3>Education interrupted</h3>
+      <p>A family move, a long commute, a year taken out to earn. Studies stop quietly and nobody records why.</p></div>
+    <div class="card rise"><div class="c-ico"><i class="ti ti-coin"></i></div><h3>Money runs short</h3>
+      <p>Fees are only the start. Transport, books, exam costs and a device with data push it out of reach.</p></div>
+    <div class="card rise"><div class="c-ico"><i class="ti ti-heart-handshake"></i></div><h3>Nobody to lean on</h3>
+      <p>Money alone does not finish a degree. Mentoring and steady check-ins carry a student through the years after.</p></div>
+  </div>
+</section>
+
+<section class="wrap">
+  <span class="eyebrow rise">Selection</span>
+  <h2 class="rise">Five stages, always in order</h2>
+  <p class="sub rise">The committee decides together — never one person alone.</p>
+  <div class="tl" id="tl">
+    <div class="tl-fill" id="tlfill"></div>
+    <div class="tls done rise"><div class="tl-dot"></div><div class="tl-n">STAGE 01</div><div class="tl-name">Application</div><div class="tl-m">Open until 31 Aug</div></div>
+    <div class="tls done rise"><div class="tl-dot"></div><div class="tl-n">STAGE 02</div><div class="tl-name">Screening</div><div class="tl-m">Eligibility checked</div></div>
+    <div class="tls now rise"><div class="tl-dot"></div><div class="tl-n">STAGE 03</div><div class="tl-name">Verification</div><div class="tl-m">Documents & income</div></div>
+    <div class="tls rise"><div class="tl-dot"></div><div class="tl-n">STAGE 04</div><div class="tl-name">Interview</div><div class="tl-m">Student & family</div></div>
+    <div class="tls rise"><div class="tl-dot"></div><div class="tl-n">STAGE 05</div><div class="tl-name">Selection</div><div class="tl-m">112 places</div></div>
+  </div>
+</section>
+
+<section class="wrap">
+  <span class="eyebrow rise">SFS 2026</span>
+  <h2 class="rise">This cycle in numbers</h2>
+  <div class="glassrow" style="margin-top:42px;">
+    <div class="glass rise"><div class="g-n" data-count="325">0</div><div class="g-l">Applications received</div></div>
+    <div class="glass rise"><div class="g-n" data-count="112">0</div><div class="g-l">Students selected</div></div>
+    <div class="glass rise"><div class="g-n" data-count="67" data-suffix="%">0</div><div class="g-l">Girl students</div></div>
+    <div class="glass rise"><div class="g-n" data-count="85" data-suffix="%">0</div><div class="g-l">First-generation learners</div></div>
+  </div>
+</section>
+
+<section class="wrap">
+  <span class="eyebrow rise">Student voices</span>
+  <h2 class="rise">In their words</h2>
+  <div class="quotes">
+    <div class="q rise"><p>“SFS supported my journey and helped me continue my studies with confidence and hope.”</p>
+      <div class="q-w"><div class="q-a">AK</div><div><div class="q-n">Arun Kumar</div><div class="q-m">Class 12 · Chennai</div></div></div></div>
+    <div class="q rise"><p>“The mentoring helped me understand my strengths. I now plan to pursue engineering.”</p>
+      <div class="q-w"><div class="q-a">ML</div><div><div class="q-n">Meena Lakshmi</div><div class="q-m">Class 11 · Ramanathapuram</div></div></div></div>
+    <div class="q rise"><p>“My family was unsure about letting me study further. SFS convinced them.”</p>
+      <div class="q-w"><div class="q-a">PD</div><div><div class="q-n">Priya Devi</div><div class="q-m">Class 10 · Tirunelveli</div></div></div></div>
+  </div>
+</section>
+
+<section class="wrap">
+  <div class="cta">
+    <div class="rise"><span class="eyebrow">Support a student</span>
+      <h2><span class="amt">₹18,000</span> keeps one student in school for a year.</h2>
+      <p>A Champion sponsorship covers fees, materials and mentoring for a full academic year. You are matched to your student and can follow their progress.</p></div>
+    <div class="rise" style="display:flex;gap:12px;flex-wrap:wrap;">
+      <a class="btn btn-glow btn-lg" href="#">Become a sponsor</a>
+      <a class="btn btn-ghost btn-lg" href="#">See our impact</a></div>
+  </div>
+</section>
+
+<footer class="wrap">
+  <div class="f-grid">
+    <div class="f-brand"><img src="../website/assets/logo.webp" alt="Thuvakkam Education" />
+      <p>Supporting education, opportunity and long-term student empowerment across Tamil Nadu since 2020.</p>
+      <div class="f-reg">Reg. No. 131/2014</div></div>
+    <div><div class="f-head">Programme</div><a class="f-link" href="#">Impact</a><a class="f-link" href="#">Selection criteria</a>
+      <a class="f-link" href="#">Support provided</a><a class="f-link" href="#">Student stories</a></div>
+    <div><div class="f-head">Get involved</div><a class="f-link" href="#">Apply for SFS</a><a class="f-link" href="#">Become a sponsor</a>
+      <a class="f-link" href="#">CSR partnership</a><a class="f-link" href="#">Donate</a></div>
+    <div><div class="f-head">Contact</div>
+      <div class="f-row"><i class="ti ti-mail"></i> info@thuvakkam.org</div>
+      <div class="f-row"><i class="ti ti-phone"></i> +91 94448 88937</div>
+      <div class="f-row"><i class="ti ti-map-pin"></i> Chennai, Tamil Nadu</div></div>
+  </div>
+  <div class="f-bot"><span>© 2026 Thuvakkam Education. All rights reserved.</span>
+    <span><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Committee portal</a></span></div>
+</footer>
+
+<script>
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const io = new IntersectionObserver(es => es.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+  }), { threshold:.14, rootMargin:'0px 0px -40px' });
+  document.querySelectorAll('section .rise, footer .rise').forEach((el,i) => {
+    el.style.transitionDelay = (i % 4) * 80 + 'ms'; io.observe(el);
+  });
+
+  function countUp(el){
+    const t = parseFloat(el.dataset.count), sfx = el.dataset.suffix || '';
+    if (reduce) { el.textContent = t + sfx; return; }
+    const dur = 1600, t0 = performance.now();
+    (function tick(now){
+      const p = Math.min((now - t0)/dur, 1);
+      el.textContent = Math.round(t * (1 - Math.pow(1-p,3))) + sfx;
+      if (p < 1) requestAnimationFrame(tick);
+    })(performance.now());
+  }
+  const cio = new IntersectionObserver(es => es.forEach(e => {
+    if (e.isIntersecting) { countUp(e.target); cio.unobserve(e.target); }
+  }), { threshold:.5 });
+  document.querySelectorAll('[data-count]').forEach(el => cio.observe(el));
+
+  // cursor glow inside glass tiles
+  if (!reduce && matchMedia('(hover:hover)').matches) {
+    document.querySelectorAll('.glass').forEach(el => {
+      el.addEventListener('pointermove', e => {
+        const r = el.getBoundingClientRect();
+        el.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+        el.style.setProperty('--my', (e.clientY - r.top) + 'px');
+      });
+    });
+  }
+
+  const tio = new IntersectionObserver(es => es.forEach(e => {
+    if (e.isIntersecting) {
+      const st = e.target.querySelectorAll('.tls');
+      let last = 0; st.forEach((s,i) => { if (s.classList.contains('done') || s.classList.contains('now')) last = i; });
+      document.getElementById('tlfill').style.width = ((last + .5) / st.length * 100) + '%';
+      tio.unobserve(e.target);
+    }
+  }), { threshold:.3 });
+  tio.observe(document.getElementById('tl'));
+</script>
+</body>
+</html>

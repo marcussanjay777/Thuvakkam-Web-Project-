@@ -313,8 +313,8 @@ function renderQueue(data) {
     <div class="queue-item ${s.id === currentId ? 'active' : ''}" onclick="selectStudent('${s.id}')">
       <div class="queue-item-avatar">${s.initials || s.name.slice(0,2).toUpperCase()}</div>
       <div>
-        <div class="queue-item-name">${s.name}</div>
-        <div class="queue-item-meta">${s.school} &middot; ${s.district}</div>
+        <div class="queue-item-name">${esc(s.name)}</div>
+        <div class="queue-item-meta">${[s.school, s.district].filter(Boolean).map(esc).join(' &middot; ')}</div>
       </div>
     </div>
   `).join('');
@@ -333,8 +333,8 @@ function showPanel(s) {
       <div class="review-panel-hero">
         <div class="review-avatar">${s.initials || s.name.slice(0,2).toUpperCase()}</div>
         <div>
-          <div class="review-name">${s.name}</div>
-          <div class="review-school">${s.school} &middot; Class ${s.class}</div>
+          <div class="review-name">${esc(s.name)}</div>
+          <div class="review-school">${[s.school, s.class ? 'Class ' + s.class : ''].filter(Boolean).map(esc).join(' &middot; ')}</div>
         </div>
         <button onclick="openProfile('${s.id}')" style="margin-left:auto;background:rgba(255,255,255,0.15);border:none;border-radius:6px;padding:8px 14px;cursor:pointer;color:#fff;font-size:12px;font-weight:600;font-family:var(--font);display:flex;align-items:center;gap:6px;">
           <i class="ti ti-external-link"></i> Full profile
@@ -346,7 +346,7 @@ function showPanel(s) {
         <div class="detail-grid">
           <div class="detail-block">
             <div class="detail-block-key">District</div>
-            <div class="detail-block-val">${s.district}</div>
+            <div class="detail-block-val">${escOr(s.district)}</div>
           </div>
           <div class="detail-block">
             <div class="detail-block-key">Class</div>
@@ -459,7 +459,7 @@ async function loadReview() {
   await requireAuth();
 
   const { data, error } = await sb.from('students')
-    .select('*').eq('status', 'pending').eq('cycle_year', 2026)
+    .select('*').eq('status', 'pending').eq('cycle_year', SFS_CYCLE_YEAR)
     .order('applied_on', { ascending: true });
 
   if (error) { console.error(error); return; }

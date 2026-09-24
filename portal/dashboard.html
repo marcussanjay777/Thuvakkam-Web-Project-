@@ -251,7 +251,7 @@ async function loadDashboard() {
 
   const { data: all } = await sb.from('students').select('cycle_year,status');
   if (all) {
-    const cur = all.filter(s => s.cycle_year === 2026);
+    const cur = all.filter(s => s.cycle_year === SFS_CYCLE_YEAR);
     document.getElementById('metric-total').textContent    = cur.length;
     document.getElementById('metric-selected').textContent = cur.filter(s=>s.status==='selected').length;
     document.getElementById('metric-pending').textContent  = cur.filter(s=>s.status==='pending').length;
@@ -264,15 +264,15 @@ async function loadDashboard() {
 
   // Fetch recent 5 applications
   const { data: recent } = await sb.from('students')
-    .select('*').eq('cycle_year', 2026)
+    .select('*').eq('cycle_year', SFS_CYCLE_YEAR)
     .order('applied_on', { ascending: false }).limit(5);
 
   if (recent) {
     document.getElementById('recent-tbody').innerHTML = recent.map(s => `
       <tr>
-        <td><div class="cell-student"><div class="table-avatar">${s.initials || s.name.slice(0,2).toUpperCase()}</div><span class="cell-name">${s.name}</span></div></td>
-        <td class="cell-muted">${s.school}</td>
-        <td class="cell-muted">${s.district}</td>
+        <td><div class="cell-student"><div class="table-avatar">${esc(s.initials || (s.name || '').slice(0,2).toUpperCase())}</div><span class="cell-name">${esc(s.name)}</span></div></td>
+        <td class="cell-muted">${escOr(s.school)}</td>
+        <td class="cell-muted">${escOr(s.district)}</td>
         <td class="cell-muted">${s.class}</td>
         <td>${statusBadge(s.status)}</td>
       </tr>

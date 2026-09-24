@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SFS — Sunrise</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Karla:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{ box-sizing:border-box; margin:0; padding:0; }
+
+  :root{
+    --ink:       #1C2B27;
+    --ink-soft:  #4A5F59;
+    --ink-faint: #859792;
+    --green:     #0E7162;
+    --green-mid: #26C699;
+    --green-pale:#E8F5F2;
+    --green-tint:#F3FAF8;
+    --yellow:    #FDDB3A;
+    --yellow-pale:#FFF6D4;
+    --peach:     #FFE9D9;
+    --paper:     #FFFDF8;
+    --card:      #FFFFFF;
+    --line:      #E7EFEC;
+
+    --display:'Baloo 2', 'Trebuchet MS', sans-serif;
+    --body:'Karla', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --gutter:clamp(20px,5vw,64px);
+    --r:22px;
+  }
+
+  html{ scroll-behavior:smooth; }
+  body{
+    font-family:var(--body); background:var(--paper); color:var(--ink);
+    line-height:1.65; -webkit-font-smoothing:antialiased; overflow-x:hidden;
+  }
+  img{ max-width:100%; }
+  a{ color:inherit; }
+  .wrap{ max-width:1160px; margin:0 auto; padding-inline:var(--gutter); }
+
+  /* NOTICE */
+  .notice{ background:var(--green); color:#fff; font-size:13px; padding:10px 0; text-align:center; }
+  .notice a{ color:var(--yellow); font-weight:700; text-decoration:none; }
+  .notice a:hover{ text-decoration:underline; }
+
+  /* NAV */
+  .nav{ position:sticky; top:0; z-index:60; background:rgba(255,253,248,.88); backdrop-filter:blur(14px); }
+  .nav .wrap{ display:flex; align-items:center; gap:24px; height:80px; }
+  .brand{ display:flex; align-items:center; gap:11px; text-decoration:none; }
+  .brand img{ height:40px; object-fit:contain; }
+  .brand b{ font-family:var(--display); font-size:19px; font-weight:800; letter-spacing:-.01em; }
+  .links{ display:flex; gap:6px; margin-left:auto; }
+  .links a{
+    font-size:14px; font-weight:600; text-decoration:none; color:var(--ink-soft);
+    padding:9px 15px; border-radius:99px; transition:background .25s, color .25s;
+  }
+  .links a:hover{ background:var(--green-pale); color:var(--green); }
+  .links a.on{ background:var(--green-pale); color:var(--green); }
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    font-family:var(--body); font-size:14.5px; font-weight:700;
+    padding:12px 24px; border-radius:99px; text-decoration:none; border:2px solid transparent;
+    cursor:pointer; transition:transform .25s cubic-bezier(.34,1.56,.64,1), box-shadow .25s, background .2s;
+  }
+  .btn:hover{ transform:translateY(-2px); }
+  .btn-green{ background:var(--green); color:#fff; box-shadow:0 6px 18px rgba(14,113,98,.26); }
+  .btn-green:hover{ box-shadow:0 10px 26px rgba(14,113,98,.34); }
+  .btn-ylw{ background:var(--yellow); color:var(--ink); box-shadow:0 6px 18px rgba(253,219,58,.4); }
+  .btn-ylw:hover{ box-shadow:0 10px 26px rgba(253,219,58,.5); }
+  .btn-soft{ background:#fff; color:var(--green); border-color:var(--green-pale); }
+  .btn-soft:hover{ border-color:var(--green-mid); }
+  .btn-lg{ font-size:16px; padding:15px 30px; }
+  .burger{ display:none; margin-left:auto; background:none; border:none; font-size:28px; color:var(--ink); }
+
+  /* HERO */
+  .hero{ position:relative; padding-block:clamp(48px,7vw,92px) clamp(40px,6vw,72px); overflow:hidden; }
+  .blob{ position:absolute; border-radius:50%; filter:blur(52px); opacity:.62; pointer-events:none; z-index:0; }
+  .b1{ width:420px; height:420px; background:var(--yellow); top:-130px; right:-70px; animation:drift1 17s ease-in-out infinite; }
+  .b2{ width:360px; height:360px; background:var(--green-mid); bottom:-150px; left:-100px; animation:drift2 21s ease-in-out infinite; }
+  .b3{ width:280px; height:280px; background:var(--peach); top:180px; left:44%; animation:drift1 25s ease-in-out infinite reverse; }
+  @keyframes drift1{ 0%,100%{ transform:translate(0,0) scale(1);} 50%{ transform:translate(-34px,30px) scale(1.09);} }
+  @keyframes drift2{ 0%,100%{ transform:translate(0,0) scale(1);} 50%{ transform:translate(38px,-26px) scale(1.07);} }
+
+  .hero .wrap{ position:relative; z-index:1; }
+  .pill{
+    display:inline-flex; align-items:center; gap:8px; background:#fff;
+    border:2px solid var(--green-pale); border-radius:99px; padding:8px 18px;
+    font-size:13px; font-weight:700; color:var(--green); box-shadow:0 4px 14px rgba(14,113,98,.07);
+  }
+  .pill .ping{ width:8px; height:8px; border-radius:50%; background:var(--green-mid); position:relative; }
+  .pill .ping::after{ content:''; position:absolute; inset:0; border-radius:50%; background:var(--green-mid); animation:ping 1.9s cubic-bezier(0,0,.2,1) infinite; }
+  @keyframes ping{ 0%{ transform:scale(1); opacity:.7;} 80%,100%{ transform:scale(2.6); opacity:0;} }
+
+  h1{
+    margin-top:24px; font-family:var(--display); font-weight:800;
+    font-size:clamp(40px,7.4vw,82px); line-height:1.04; letter-spacing:-.025em;
+    max-width:15ch; text-wrap:balance;
+  }
+  .hl{ position:relative; display:inline-block; color:var(--green); }
+  .hl svg{ position:absolute; left:0; right:0; bottom:-6px; width:100%; height:14px; overflow:visible; }
+  .hl path{ stroke:var(--yellow); stroke-width:9; fill:none; stroke-linecap:round;
+            stroke-dasharray:420; stroke-dashoffset:420; animation:draw 1.1s .5s cubic-bezier(.65,0,.35,1) forwards; }
+  @keyframes draw{ to{ stroke-dashoffset:0; } }
+
+  .lede{ margin-top:24px; max-width:52ch; font-size:clamp(16px,2vw,18.5px); color:var(--ink-soft); line-height:1.75; }
+  .hero-btns{ margin-top:34px; display:flex; gap:13px; flex-wrap:wrap; }
+
+  .chips{ margin-top:52px; display:flex; gap:12px; flex-wrap:wrap; }
+  .chip{
+    background:#fff; border:2px solid var(--line); border-radius:var(--r);
+    padding:18px 24px; display:flex; align-items:center; gap:14px;
+    transition:transform .3s cubic-bezier(.34,1.56,.64,1), border-color .3s;
+  }
+  .chip:hover{ transform:translateY(-4px); border-color:var(--green-mid); }
+  .chip-n{ font-family:var(--display); font-size:30px; font-weight:800; color:var(--green); line-height:1; font-variant-numeric:tabular-nums; }
+  .chip-l{ font-size:12.5px; font-weight:600; color:var(--ink-faint); line-height:1.35; max-width:11ch; }
+
+  /* SECTIONS */
+  section{ padding-block:clamp(52px,7vw,92px); position:relative; }
+  .eyebrow{
+    display:inline-block; font-size:12px; font-weight:800; letter-spacing:.12em;
+    text-transform:uppercase; color:var(--green-mid); margin-bottom:14px;
+  }
+  h2{ font-family:var(--display); font-weight:800; font-size:clamp(28px,4.4vw,46px);
+      line-height:1.12; letter-spacing:-.02em; text-wrap:balance; max-width:19ch; }
+  .sub{ margin-top:16px; max-width:58ch; color:var(--ink-soft); font-size:16.5px; line-height:1.75; }
+
+  .cards{ margin-top:46px; display:grid; grid-template-columns:repeat(3,1fr); gap:22px; }
+  .card{
+    background:var(--card); border:2px solid var(--line); border-radius:28px; padding:34px 30px;
+    transition:transform .35s cubic-bezier(.34,1.56,.64,1), box-shadow .35s, border-color .35s;
+  }
+  .card:hover{ transform:translateY(-7px); box-shadow:0 18px 42px rgba(28,43,39,.09); border-color:transparent; }
+  .card-ico{
+    width:58px; height:58px; border-radius:20px; display:flex; align-items:center; justify-content:center;
+    font-size:26px; margin-bottom:20px; transition:transform .35s cubic-bezier(.34,1.56,.64,1);
+  }
+  .card:hover .card-ico{ transform:rotate(-8deg) scale(1.08); }
+  .i-green{ background:var(--green-pale); color:var(--green); }
+  .i-ylw{ background:var(--yellow-pale); color:#B08900; }
+  .i-peach{ background:var(--peach); color:#C2603A; }
+  .card h3{ font-family:var(--display); font-size:21px; font-weight:700; margin-bottom:10px; letter-spacing:-.01em; }
+  .card p{ font-size:15px; color:var(--ink-soft); line-height:1.72; }
+
+  /* STATS BAND */
+  .band{ background:linear-gradient(135deg,var(--green) 0%, #0A5F52 58%, #085146 100%); color:#fff; border-radius:40px; overflow:hidden; position:relative; }
+  .band::after{ content:''; position:absolute; width:340px; height:340px; border-radius:50%;
+                background:var(--green-mid); opacity:.2; filter:blur(48px); top:-90px; right:-60px; }
+  .band-in{ position:relative; z-index:1; padding:clamp(40px,6vw,70px) clamp(28px,5vw,64px); }
+  .band h2{ color:#fff; }
+  .band .eyebrow{ color:var(--yellow); }
+  .band .sub{ color:rgba(255,255,255,.8); }
+  .stats{ margin-top:46px; display:grid; grid-template-columns:repeat(4,1fr); gap:26px; }
+  .stat{ background:rgba(255,255,255,.09); border:1.5px solid rgba(255,255,255,.17); border-radius:24px; padding:28px 24px; transition:background .3s, transform .3s; }
+  .stat:hover{ background:rgba(255,255,255,.15); transform:translateY(-4px); }
+  .stat-n{ font-family:var(--display); font-size:clamp(34px,4.6vw,50px); font-weight:800; line-height:1; color:var(--yellow); font-variant-numeric:tabular-nums; }
+  .stat-l{ margin-top:11px; font-size:13.5px; font-weight:600; color:rgba(255,255,255,.82); line-height:1.4; }
+
+  /* JOURNEY */
+  .journey{ margin-top:46px; position:relative; }
+  .jline{ position:absolute; left:26px; top:26px; bottom:26px; width:3px; background:var(--line); border-radius:2px; }
+  .jfill{ position:absolute; left:0; top:0; width:100%; background:var(--green-mid); border-radius:2px; height:0; transition:height 1.5s cubic-bezier(.22,1,.36,1); }
+  .jstep{ display:flex; gap:24px; padding-block:18px; position:relative; }
+  .jdot{
+    width:54px; height:54px; border-radius:50%; background:#fff; border:3px solid var(--line);
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+    font-family:var(--display); font-weight:800; font-size:18px; color:var(--ink-faint);
+    position:relative; z-index:2; transition:all .4s cubic-bezier(.34,1.56,.64,1);
+  }
+  .jstep.done .jdot{ background:var(--green-pale); border-color:var(--green-mid); color:var(--green); }
+  .jstep.now .jdot{ background:var(--green); border-color:var(--green); color:#fff; box-shadow:0 0 0 7px rgba(38,198,153,.2); }
+  .jbody{ padding-top:7px; }
+  .jname{ font-family:var(--display); font-size:19px; font-weight:700; letter-spacing:-.01em; }
+  .jdesc{ font-size:14.5px; color:var(--ink-soft); margin-top:3px; }
+  .jtag{ display:inline-block; margin-left:10px; font-size:10.5px; font-weight:800; letter-spacing:.08em;
+         background:var(--yellow); color:var(--ink); padding:3px 9px; border-radius:99px; vertical-align:2px; }
+
+  /* STORIES */
+  .tales{ margin-top:46px; display:grid; grid-template-columns:repeat(3,1fr); gap:22px; }
+  .tale{
+    background:#fff; border-radius:28px; padding:32px 28px; border:2px solid var(--line);
+    position:relative; transition:transform .35s cubic-bezier(.34,1.56,.64,1), box-shadow .35s;
+  }
+  .tale:hover{ transform:translateY(-7px) rotate(-.5deg); box-shadow:0 18px 42px rgba(28,43,39,.09); }
+  .tale .mark{ font-family:var(--display); font-size:58px; font-weight:800; color:var(--green-pale); line-height:.7; }
+  .tale p{ margin-top:10px; font-size:15.5px; color:var(--ink-soft); line-height:1.72; }
+  .who{ margin-top:22px; padding-top:18px; border-top:2px dashed var(--line); display:flex; align-items:center; gap:12px; }
+  .av{ width:44px; height:44px; border-radius:50%; background:var(--yellow); color:var(--ink);
+       display:flex; align-items:center; justify-content:center; font-family:var(--display); font-weight:800; font-size:15px; }
+  .who b{ font-size:14.5px; display:block; }
+  .who span{ font-size:12.5px; color:var(--ink-faint); }
+
+  /* CTA */
+  .cta{ background:var(--yellow-pale); border-radius:40px; padding:clamp(38px,5.5vw,62px); display:flex;
+        gap:40px; align-items:center; justify-content:space-between; flex-wrap:wrap; border:2px solid #FBEBAE; }
+  .cta h2{ max-width:15ch; }
+  .cta .price{ color:var(--green); }
+  .cta p{ margin-top:14px; max-width:42ch; color:var(--ink-soft); font-size:16px; line-height:1.72; }
+
+  /* FOOTER */
+  footer{ padding-block:60px 34px; }
+  .f-grid{ display:grid; grid-template-columns:1.7fr 1fr 1fr 1.2fr; gap:clamp(22px,4vw,44px); }
+  .f-brand img{ height:44px; margin-bottom:13px; display:block; }
+  .f-brand p{ font-size:14px; color:var(--ink-soft); line-height:1.7; max-width:33ch; }
+  .f-reg{ margin-top:14px; font-size:12px; color:var(--ink-faint); font-weight:600; }
+  .f-head{ font-family:var(--display); font-size:15px; font-weight:800; margin-bottom:13px; }
+  .f-link{ display:block; font-size:14px; color:var(--ink-soft); text-decoration:none; padding:5px 0; transition:color .2s, transform .2s; }
+  .f-link:hover{ color:var(--green); transform:translateX(3px); }
+  .f-row{ display:flex; gap:9px; align-items:center; font-size:14px; color:var(--ink-soft); padding:5px 0; }
+  .f-row i{ color:var(--green-mid); }
+  .f-bot{ margin-top:44px; padding-top:22px; border-top:2px solid var(--line); display:flex;
+          justify-content:space-between; gap:16px; flex-wrap:wrap; font-size:13px; color:var(--ink-faint); }
+  .f-bot a{ text-decoration:none; margin-left:18px; }
+  .f-bot a:hover{ color:var(--green); }
+
+  /* MOTION */
+  .rise{ opacity:0; transform:translateY(24px); transition:opacity .7s cubic-bezier(.22,1,.36,1), transform .7s cubic-bezier(.22,1,.36,1); }
+  .rise.in{ opacity:1; transform:none; }
+  .hero .rise{ opacity:1; transform:none; animation:hr .8s cubic-bezier(.22,1,.36,1) both; }
+  .hero .rise:nth-of-type(1){ animation-delay:.05s; } .hero .rise:nth-of-type(2){ animation-delay:.13s; }
+  .hero .rise:nth-of-type(3){ animation-delay:.21s; } .hero .rise:nth-of-type(4){ animation-delay:.29s; }
+  @keyframes hr{ from{ opacity:0; transform:translateY(24px);} to{ opacity:1; transform:none;} }
+
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{ animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; }
+    .rise{ opacity:1 !important; transform:none !important; }
+    .hl path{ stroke-dashoffset:0 !important; }
+  }
+
+  @media (max-width:1000px){
+    .links{ display:none; } .burger{ display:block; }
+    .nav-cta{ display:none; }
+    .cards,.tales{ grid-template-columns:1fr; }
+    .stats{ grid-template-columns:1fr 1fr; }
+    .f-grid{ grid-template-columns:1fr 1fr; }
+  }
+  @media (max-width:600px){
+    .stats{ grid-template-columns:1fr; }
+    .f-grid{ grid-template-columns:1fr; }
+    .chip{ flex:1 1 100%; }
+    .band,.cta{ border-radius:28px; }
+  }
+  .mob{ display:none; }
+  .mob.open{ display:block; background:#fff; border-bottom:2px solid var(--line); }
+  .mob a{ display:block; padding:14px var(--gutter); font-size:15.5px; font-weight:600; text-decoration:none; border-bottom:1px solid var(--line); }
+</style>
+</head>
+<body>
+
+<div class="notice">SFS 2026 applications are open — <a href="#">apply before 31 August 2026 →</a></div>
+
+<nav class="nav"><div class="wrap">
+  <a class="brand" href="#"><img src="../website/assets/logo.webp" alt="Thuvakkam Education" /><b>Sponsor for Success</b></a>
+  <div class="links">
+    <a class="on" href="#">Home</a><a href="#">Impact</a><a href="#">Selection</a>
+    <a href="#">Support</a><a href="#">Stories</a><a href="#">Our Students</a>
+  </div>
+  <button class="burger" onclick="document.getElementById('mob').classList.toggle('open')" aria-label="Menu"><i class="ti ti-menu-2"></i></button>
+  <div class="nav-cta"><a class="btn btn-green" href="#">Donate</a></div>
+</div></nav>
+<div class="mob" id="mob">
+  <a href="#">Home</a><a href="#">Impact</a><a href="#">Selection</a><a href="#">Support</a>
+  <a href="#">Stories</a><a href="#">Our Students</a><a href="#">Donate</a>
+</div>
+
+<header class="hero">
+  <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+  <div class="wrap">
+    <div class="rise"><span class="pill"><span class="ping"></span> Now accepting applications for 2026</span></div>
+    <h1 class="rise">Every child deserves to
+      <span class="hl">finish<svg viewBox="0 0 200 14" preserveAspectRatio="none"><path d="M4,9 C50,2 150,2 196,7" /></svg></span>
+      what they started.</h1>
+    <p class="lede rise">Scholarships, mentoring and steady support for students across Tamil Nadu — so money is never the reason someone leaves school early.</p>
+    <div class="hero-btns rise">
+      <a class="btn btn-green btn-lg" href="#">Apply for SFS 2026</a>
+      <a class="btn btn-soft btn-lg" href="#">Sponsor a student</a>
+    </div>
+    <div class="chips">
+      <div class="chip rise"><span class="chip-n" data-count="5" data-suffix="+">0</span><span class="chip-l">Years running</span></div>
+      <div class="chip rise"><span class="chip-n" data-count="100" data-suffix="+">0</span><span class="chip-l">Students supported</span></div>
+      <div class="chip rise"><span class="chip-n" data-count="20" data-suffix="+">0</span><span class="chip-l">Partner schools</span></div>
+      <div class="chip rise"><span class="chip-n" data-count="8" data-suffix="+">0</span><span class="chip-l">Districts reached</span></div>
+    </div>
+  </div>
+</header>
+
+<section class="wrap">
+  <span class="eyebrow rise">What we solve</span>
+  <h2 class="rise">Three things stand between a student and their final exam</h2>
+  <p class="sub rise">These come up in almost every application we read. SFS is built to answer all three together, because fixing only one rarely keeps a student in school.</p>
+  <div class="cards">
+    <div class="card rise"><div class="card-ico i-green"><i class="ti ti-book-2"></i></div>
+      <h3>Education interrupted</h3>
+      <p>A family move, a long daily commute, a year taken out to earn. Studies stop quietly, and usually nobody records why.</p></div>
+    <div class="card rise"><div class="card-ico i-ylw"><i class="ti ti-coin"></i></div>
+      <h3>Money runs short</h3>
+      <p>Fees are only the start. Transport, books, exam costs and a phone with data add up past what most families can manage.</p></div>
+    <div class="card rise"><div class="card-ico i-peach"><i class="ti ti-heart-handshake"></i></div>
+      <h3>Nobody to lean on</h3>
+      <p>Money alone doesn't finish a degree. Mentoring and steady check-ins carry a student through the years that follow.</p></div>
+  </div>
+</section>
+
+<section class="wrap">
+  <div class="band"><div class="band-in">
+    <span class="eyebrow rise">SFS 2026</span>
+    <h2 class="rise">This year's numbers</h2>
+    <p class="sub rise">Every application is read by the committee. Here's where the 2026 cycle stands.</p>
+    <div class="stats">
+      <div class="stat rise"><div class="stat-n" data-count="325">0</div><div class="stat-l">Applications received</div></div>
+      <div class="stat rise"><div class="stat-n" data-count="112">0</div><div class="stat-l">Students selected</div></div>
+      <div class="stat rise"><div class="stat-n" data-count="67" data-suffix="%">0</div><div class="stat-l">Girl students</div></div>
+      <div class="stat rise"><div class="stat-n" data-count="85" data-suffix="%">0</div><div class="stat-l">First-generation learners</div></div>
+    </div>
+  </div></div>
+</section>
+
+<section class="wrap">
+  <span class="eyebrow rise">How it works</span>
+  <h2 class="rise">Your application, step by step</h2>
+  <p class="sub rise">Five stages, always in this order. No single person decides — the committee reviews together.</p>
+  <div class="journey" id="journey">
+    <div class="jline"><div class="jfill" id="jfill"></div></div>
+    <div class="jstep done rise"><div class="jdot">1</div><div class="jbody"><div class="jname">Application</div><div class="jdesc">Open until 31 August</div></div></div>
+    <div class="jstep done rise"><div class="jdot">2</div><div class="jbody"><div class="jname">Screening</div><div class="jdesc">We check basic eligibility</div></div></div>
+    <div class="jstep now rise"><div class="jdot">3</div><div class="jbody"><div class="jname">Verification<span class="jtag">HAPPENING NOW</span></div><div class="jdesc">Documents and income confirmed</div></div></div>
+    <div class="jstep rise"><div class="jdot">4</div><div class="jbody"><div class="jname">Interview</div><div class="jdesc">A conversation with student and family</div></div></div>
+    <div class="jstep rise"><div class="jdot">5</div><div class="jbody"><div class="jname">Selection</div><div class="jdesc">Committee makes the final decision</div></div></div>
+  </div>
+  <div style="margin-top:34px;display:flex;gap:13px;flex-wrap:wrap;">
+    <a class="btn btn-green btn-lg" href="#">Start my application</a>
+    <a class="btn btn-soft btn-lg" href="#">Read the criteria</a>
+  </div>
+</section>
+
+<section class="wrap">
+  <span class="eyebrow rise">Student voices</span>
+  <h2 class="rise">What students tell us</h2>
+  <div class="tales">
+    <div class="tale rise"><div class="mark">“</div>
+      <p>SFS supported my educational journey and helped me continue my studies with confidence and hope for the future.</p>
+      <div class="who"><div class="av">AK</div><div><b>Arun Kumar</b><span>Class 12 · Chennai</span></div></div></div>
+    <div class="tale rise"><div class="mark">“</div>
+      <p>The mentoring sessions helped me understand my strengths. I now plan to pursue engineering after school.</p>
+      <div class="who"><div class="av">ML</div><div><b>Meena Lakshmi</b><span>Class 11 · Ramanathapuram</span></div></div></div>
+    <div class="tale rise"><div class="mark">“</div>
+      <p>My family was unsure about letting me study further. SFS convinced them and gave me what I needed.</p>
+      <div class="who"><div class="av">PD</div><div><b>Priya Devi</b><span>Class 10 · Tirunelveli</span></div></div></div>
+  </div>
+</section>
+
+<section class="wrap">
+  <div class="cta">
+    <div class="rise">
+      <span class="eyebrow">Support a student</span>
+      <h2><span class="price">₹18,000</span> keeps one student in school for a year.</h2>
+      <p>A Champion sponsorship covers fees, materials and mentoring for a full academic year. You're matched with your student and can follow how they're doing.</p>
+    </div>
+    <div class="rise" style="display:flex;gap:13px;flex-wrap:wrap;">
+      <a class="btn btn-green btn-lg" href="#">Become a sponsor</a>
+      <a class="btn btn-soft btn-lg" href="#">See our impact</a>
+    </div>
+  </div>
+</section>
+
+<footer class="wrap">
+  <div class="f-grid">
+    <div class="f-brand">
+      <img src="../website/assets/logo.webp" alt="Thuvakkam Education" />
+      <p>Supporting education, opportunity and long-term student empowerment across Tamil Nadu since 2020.</p>
+      <div class="f-reg">Reg. No. 131/2014</div>
+    </div>
+    <div><div class="f-head">Programme</div>
+      <a class="f-link" href="#">Impact</a><a class="f-link" href="#">Selection criteria</a>
+      <a class="f-link" href="#">Support provided</a><a class="f-link" href="#">Student stories</a></div>
+    <div><div class="f-head">Get involved</div>
+      <a class="f-link" href="#">Apply for SFS</a><a class="f-link" href="#">Become a sponsor</a>
+      <a class="f-link" href="#">CSR partnership</a><a class="f-link" href="#">Donate</a></div>
+    <div><div class="f-head">Contact</div>
+      <div class="f-row"><i class="ti ti-mail"></i> info@thuvakkam.org</div>
+      <div class="f-row"><i class="ti ti-phone"></i> +91 94448 88937</div>
+      <div class="f-row"><i class="ti ti-map-pin"></i> Chennai, Tamil Nadu</div></div>
+  </div>
+  <div class="f-bot">
+    <span>© 2026 Thuvakkam Education. All rights reserved.</span>
+    <span><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Committee portal</a></span>
+  </div>
+</footer>
+
+<script>
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const io = new IntersectionObserver(es => es.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+  }), { threshold:.14, rootMargin:'0px 0px -40px' });
+  document.querySelectorAll('section .rise, footer .rise').forEach((el,i) => {
+    el.style.transitionDelay = (i % 4) * 80 + 'ms'; io.observe(el);
+  });
+
+  function countUp(el){
+    const t = parseFloat(el.dataset.count), sfx = el.dataset.suffix || '';
+    if (reduce) { el.textContent = t + sfx; return; }
+    const dur = 1500, t0 = performance.now();
+    (function tick(now){
+      const p = Math.min((now - t0)/dur, 1);
+      el.textContent = Math.round(t * (1 - Math.pow(1-p,3))) + sfx;
+      if (p < 1) requestAnimationFrame(tick);
+    })(performance.now());
+  }
+  const cio = new IntersectionObserver(es => es.forEach(e => {
+    if (e.isIntersecting) { countUp(e.target); cio.unobserve(e.target); }
+  }), { threshold:.5 });
+  document.querySelectorAll('[data-count]').forEach(el => cio.observe(el));
+
+  // progress line fills to the current stage
+  const jio = new IntersectionObserver(es => es.forEach(e => {
+    if (e.isIntersecting) {
+      const steps = e.target.querySelectorAll('.jstep');
+      let last = 0; steps.forEach((s,i) => { if (s.classList.contains('done') || s.classList.contains('now')) last = i; });
+      document.getElementById('jfill').style.height = ((last + .5) / steps.length * 100) + '%';
+      jio.unobserve(e.target);
+    }
+  }), { threshold:.3 });
+  jio.observe(document.getElementById('journey'));
+</script>
+</body>
+</html>

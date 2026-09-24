@@ -20,23 +20,40 @@
 
       <div class="sp-login-body">
         <div class="sp-login-error" id="login-error"></div>
+        <div class="sp-login-success" id="login-success"></div>
 
-        <div class="sp-field-group">
-          <label class="sp-field-label">Email address</label>
-          <input class="sp-field-input" id="login-email" type="email" placeholder="your.email@example.com" autocomplete="email" />
-        </div>
-        <div class="sp-field-group">
-          <label class="sp-field-label">Password</label>
-          <input class="sp-field-input" id="login-password" type="password" placeholder="Enter your password" autocomplete="current-password" />
+        <div class="sp-view" id="login-view">
+          <div class="sp-field-group">
+            <label class="sp-field-label">Email address</label>
+            <input class="sp-field-input" id="login-email" type="email" placeholder="your.email@example.com" autocomplete="email" />
+          </div>
+          <div class="sp-field-group">
+            <label class="sp-field-label">Password</label>
+            <input class="sp-field-input" id="login-password" type="password" placeholder="Enter your password" autocomplete="current-password" />
+          </div>
+
+          <button class="sp-login-btn" id="login-btn" onclick="doLogin()">
+            Sign in
+          </button>
+
+          <a href="#" class="sp-forgot-link" onclick="showForgot(event)">Forgot password?</a>
         </div>
 
-        <button class="sp-login-btn" id="login-btn" onclick="doLogin()">
-          Sign in
-        </button>
+        <div class="sp-view" id="forgot-view" style="display:none;">
+          <p class="sp-forgot-text">Enter the email you sign in with and we'll send you a link to choose a new password.</p>
+          <div class="sp-field-group" id="forgot-fields">
+            <label class="sp-field-label">Email address</label>
+            <input class="sp-field-input" id="forgot-email" type="email" placeholder="your.email@example.com" autocomplete="email" />
+          </div>
+          <button class="sp-login-btn" id="forgot-btn" onclick="sendReset()">
+            Send reset link
+          </button>
+          <a href="#" class="sp-forgot-link" onclick="showLogin(event)">← Back to sign in</a>
+        </div>
 
         <p class="sp-login-hint">
           Credentials are issued by Thuvakkam Education after your scholarship is confirmed.<br/>
-          If you've lost your login details, contact <strong>info@thuvakkam.org</strong>
+          If you can't sign in or reset your password, contact <strong>info@thuvakkam.org</strong>
         </p>
       </div>
 
@@ -58,6 +75,9 @@
     // Allow Enter key to submit
     document.getElementById('login-password').addEventListener('keydown', e => {
       if (e.key === 'Enter') doLogin();
+    });
+    document.getElementById('forgot-email').addEventListener('keydown', e => {
+      if (e.key === 'Enter') sendReset();
     });
 
     async function doLogin() {
@@ -101,6 +121,65 @@
       }
 
       window.location.href = 'profile.html';
+    }
+
+    function showForgot(e) {
+      e.preventDefault();
+      document.getElementById('login-error').style.display   = 'none';
+      document.getElementById('login-success').style.display = 'none';
+      document.getElementById('forgot-email').value = document.getElementById('login-email').value.trim();
+      document.getElementById('login-view').style.display  = 'none';
+      document.getElementById('forgot-view').style.display = 'flex';
+      document.getElementById('forgot-email').focus();
+    }
+
+    function showLogin(e) {
+      e.preventDefault();
+      document.getElementById('login-error').style.display   = 'none';
+      document.getElementById('login-success').style.display = 'none';
+      document.getElementById('forgot-fields').style.display = '';
+      document.getElementById('forgot-btn').style.display    = '';
+      document.getElementById('forgot-view').style.display = 'none';
+      document.getElementById('login-view').style.display  = '';
+    }
+
+    async function sendReset() {
+      const email     = document.getElementById('forgot-email').value.trim();
+      const btn       = document.getElementById('forgot-btn');
+      const errEl     = document.getElementById('login-error');
+      const successEl = document.getElementById('login-success');
+
+      errEl.style.display     = 'none';
+      successEl.style.display = 'none';
+      if (!email) {
+        errEl.textContent   = 'Please enter your email address.';
+        errEl.style.display = 'block';
+        return;
+      }
+
+      btn.disabled    = true;
+      btn.textContent = 'Sending...';
+
+      const { error } = await sb.auth.resetPasswordForEmail(email, {
+        redirectTo: new URL('set-password.html', window.location.href).href
+      });
+
+      btn.disabled    = false;
+      btn.textContent = 'Send reset link';
+
+      if (error) {
+        const tooMany = error.status === 429 || /rate limit|security purposes/i.test(error.message);
+        errEl.textContent = tooMany
+          ? 'Too many emails just now — wait a minute and try again.'
+          : 'Could not send the email. Please try again shortly.';
+        errEl.style.display = 'block';
+        return;
+      }
+
+      document.getElementById('forgot-fields').style.display = 'none';
+      btn.style.display = 'none';
+      successEl.textContent = 'If an account exists for ' + email + ', a reset link is on its way. Check your inbox (and spam folder).';
+      successEl.style.display = 'block';
     }
   </script>
 </body>

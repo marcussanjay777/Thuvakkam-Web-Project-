@@ -152,15 +152,22 @@ async function openProfile(studentId, context) {
   const { data: s, error } = await sb.from('students').select('*').eq('id', studentId).single();
   if (error || !s) { console.error(error); return; }
 
-  // Fetch student documents from Supabase
-  const { data: docs } = await sb.from('documents').select('*').eq('student_name', s.name);
+  // Match documents by ID, not name, so two students who share a name never see each other's files
+  const { data: docs } = await sb.from('documents').select('*').eq('student_id', s.id);
+  window.__profileDocs    = docs || [];
+  window.__profileStudent = s;
 
   const initials = s.initials || s.name.slice(0, 2).toUpperCase();
 
   const val = (v, fallback = 'Not provided') =>
     (v !== null && v !== undefined && v !== '')
-      ? `<span class="pp-field-val">${v}</span>`
+      ? `<span class="pp-field-val">${esc(v)}</span>`
       : `<span class="pp-field-val empty">${fallback}</span>`;
+
+  const longText = (v) =>
+    (v !== null && v !== undefined && v !== '')
+      ? esc(v)
+      : '<span style="color:#C0C0C0;font-style:italic;">Not provided</span>';
 
   const iconMap = {
     'Income Certificate':    'ti-certificate',
@@ -187,10 +194,10 @@ async function openProfile(studentId, context) {
       <!-- HEADER -->
       <div class="pp-header">
         <div class="pp-header-top">
-          <div class="pp-avatar">${initials}</div>
+          <div class="pp-avatar">${esc(initials)}</div>
           <div style="flex:1;">
-            <div class="pp-name">${s.name}</div>
-            <div class="pp-school">${s.school}</div>
+            <div class="pp-name">${esc(s.name)}</div>
+            <div class="pp-school">${escOr(s.school, '')}</div>
             <span style="display:inline-block;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:600;background:${sc.bg};color:${sc.txt};">${statusLabel}</span>
           </div>
           <button class="pp-close" onclick="closeProfile()"><i class="ti ti-x"></i></button>
@@ -211,7 +218,7 @@ async function openProfile(studentId, context) {
           <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#92400E;margin-bottom:10px;display:flex;align-items:center;gap:6px;">
             <i class="ti ti-alert-triangle" style="font-size:14px;"></i> Rejection reason
           </div>
-          <textarea id="pp-rejection-reason" style="width:100%;border:1px solid #FDE68A;border-radius:6px;padding:10px 12px;font-size:13px;font-family:inherit;resize:vertical;min-height:72px;background:#fff;outline:none;box-sizing:border-box;" placeholder="Type the reason this application was rejected...">${s.rejection_reason || ''}</textarea>
+          <textarea id="pp-rejection-reason" style="width:100%;border:1px solid #FDE68A;border-radius:6px;padding:10px 12px;font-size:13px;font-family:inherit;resize:vertical;min-height:72px;background:#fff;outline:none;box-sizing:border-box;" placeholder="Type the reason this application was rejected...">${esc(s.rejection_reason)}</textarea>
           <button onclick="saveRejectionReason('${s.id}')" style="margin-top:8px;padding:7px 16px;background:#92400E;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">Save reason</button>
           <span id="pp-reason-saved" style="font-size:12px;color:#065F46;margin-left:10px;display:none;">Saved!</span>
         </div>` : ''}
@@ -268,7 +275,7 @@ async function openProfile(studentId, context) {
             <div class="pp-section-title">About the family</div>
             <div class="pp-card">
               <div class="pp-field" style="display:block;padding:14px 16px;">
-                <p style="font-size:13px;color:#1A1A1A;line-height:1.7;margin:0;white-space:pre-wrap;">${s.family_about}</p>
+                <p style="font-size:13px;color:#1A1A1A;line-height:1.7;margin:0;white-space:pre-wrap;">${esc(s.family_about)}</p>
               </div>
             </div>
           </div>` : ''}
@@ -281,24 +288,24 @@ async function openProfile(studentId, context) {
             <div class="pp-card">
               <div class="pp-field" style="display:block;padding:14px 16px;border-bottom:1px solid #F4F4F2;">
                 <div style="font-size:11px;color:#9E9E9E;font-weight:600;margin-bottom:4px;">10TH STANDARD</div>
-                <div style="font-size:13px;color:#1A1A1A;white-space:pre-wrap;">${s.school_10th || '<span style="color:#C0C0C0;font-style:italic;">Not provided</span>'}</div>
+                <div style="font-size:13px;color:#1A1A1A;white-space:pre-wrap;">${longText(s.school_10th)}</div>
               </div>
               <div class="pp-field" style="display:block;padding:14px 16px;border-bottom:1px solid #F4F4F2;">
                 <div style="font-size:11px;color:#9E9E9E;font-weight:600;margin-bottom:4px;">12TH / DIPLOMA</div>
-                <div style="font-size:13px;color:#1A1A1A;white-space:pre-wrap;">${s.school_12th || '<span style="color:#C0C0C0;font-style:italic;">Not provided</span>'}</div>
+                <div style="font-size:13px;color:#1A1A1A;white-space:pre-wrap;">${longText(s.school_12th)}</div>
               </div>
               <div class="pp-field" style="display:block;padding:14px 16px;border-bottom:1px solid #F4F4F2;">
                 <div style="font-size:11px;color:#9E9E9E;font-weight:600;margin-bottom:4px;">U.G. COLLEGE</div>
-                <div style="font-size:13px;color:#1A1A1A;white-space:pre-wrap;">${s.college_ug || '<span style="color:#C0C0C0;font-style:italic;">Not provided</span>'}</div>
+                <div style="font-size:13px;color:#1A1A1A;white-space:pre-wrap;">${longText(s.college_ug)}</div>
               </div>
               <div class="pp-field" style="display:block;padding:14px 16px;border-bottom:1px solid #F4F4F2;">
                 <div style="font-size:11px;color:#9E9E9E;font-weight:600;margin-bottom:4px;">P.G. COLLEGE</div>
-                <div style="font-size:13px;color:#1A1A1A;white-space:pre-wrap;">${s.college_pg || '<span style="color:#C0C0C0;font-style:italic;">Not provided</span>'}</div>
+                <div style="font-size:13px;color:#1A1A1A;white-space:pre-wrap;">${longText(s.college_pg)}</div>
               </div>
               ${s.other_education ? `
               <div class="pp-field" style="display:block;padding:14px 16px;">
                 <div style="font-size:11px;color:#9E9E9E;font-weight:600;margin-bottom:4px;">OTHER</div>
-                <div style="font-size:13px;color:#1A1A1A;white-space:pre-wrap;">${s.other_education}</div>
+                <div style="font-size:13px;color:#1A1A1A;white-space:pre-wrap;">${esc(s.other_education)}</div>
               </div>` : ''}
             </div>
           </div>
@@ -308,15 +315,15 @@ async function openProfile(studentId, context) {
               <div class="pp-field"><span class="pp-field-key">Other scholarship</span>${val(s.other_scholarship)}</div>
               ${s.scholarship_details ? `<div class="pp-field" style="display:block;padding:14px 16px;border-bottom:1px solid #F4F4F2;">
                 <div style="font-size:11px;color:#9E9E9E;font-weight:600;margin-bottom:4px;">SCHOLARSHIP DETAILS</div>
-                <div style="font-size:13px;color:#1A1A1A;white-space:pre-wrap;">${s.scholarship_details}</div>
+                <div style="font-size:13px;color:#1A1A1A;white-space:pre-wrap;">${esc(s.scholarship_details)}</div>
               </div>` : ''}
               <div class="pp-field" style="display:block;padding:14px 16px;border-bottom:1px solid #F4F4F2;">
                 <div style="font-size:11px;color:#9E9E9E;font-weight:600;margin-bottom:4px;">AWARDS / ACHIEVEMENTS</div>
-                <div style="font-size:13px;color:#1A1A1A;white-space:pre-wrap;">${s.awards || '<span style="color:#C0C0C0;font-style:italic;">Not provided</span>'}</div>
+                <div style="font-size:13px;color:#1A1A1A;white-space:pre-wrap;">${longText(s.awards)}</div>
               </div>
               <div class="pp-field" style="display:block;padding:14px 16px;">
                 <div style="font-size:11px;color:#9E9E9E;font-weight:600;margin-bottom:4px;">EXTRA-CURRICULAR ACTIVITIES</div>
-                <div style="font-size:13px;color:#1A1A1A;white-space:pre-wrap;">${s.extra_curricular || '<span style="color:#C0C0C0;font-style:italic;">Not provided</span>'}</div>
+                <div style="font-size:13px;color:#1A1A1A;white-space:pre-wrap;">${longText(s.extra_curricular)}</div>
               </div>
             </div>
           </div>
@@ -331,7 +338,7 @@ async function openProfile(studentId, context) {
           <div class="pp-section">
             <div class="pp-section-title">Post-school outcome</div>
             <div class="pp-card">
-              <div class="pp-field"><span class="pp-field-key">Current status</span><span class="pp-field-val" style="color:#0E7162;">${s.outcome}</span></div>
+              <div class="pp-field"><span class="pp-field-key">Current status</span><span class="pp-field-val" style="color:#0E7162;">${esc(s.outcome)}</span></div>
             </div>
           </div>` : ''}
         </div>
@@ -345,15 +352,15 @@ async function openProfile(studentId, context) {
                 <div class="pp-doc-row">
                   <div class="pp-doc-icon"><i class="ti ${iconMap[d.type] || 'ti-file'}"></i></div>
                   <div style="flex:1;">
-                    <div class="pp-doc-name">${d.type}</div>
+                    <div class="pp-doc-name">${esc(d.type)}</div>
                     <div class="pp-doc-date">Uploaded ${fmtDate(d.uploaded_at)}</div>
                   </div>
                   <div style="display:flex;align-items:center;gap:8px;">
                     <span class="badge ${d.status === 'verified' ? 'badge-selected' : d.status === 'incomplete' ? 'badge-rejected' : 'badge-pending'}" style="font-size:11px;">
-                      ${d.status.charAt(0).toUpperCase() + d.status.slice(1)}
+                      ${esc(d.status.charAt(0).toUpperCase() + d.status.slice(1))}
                     </span>
-                    ${d.file_url ? `<a href="#" onclick="viewDocument('${d.file_url}','${d.type}');return false;" title="View" style="color:#0E7162;font-size:18px;cursor:pointer;"><i class="ti ti-eye"></i></a>
-                    <a href="${d.file_url}" target="_blank" title="Download" style="color:#0E7162;font-size:18px;"><i class="ti ti-download"></i></a>` : ''}
+                    ${d.file_url ? `<a href="#" onclick="viewDocumentById('${esc(d.id)}');return false;" title="View" style="color:#0E7162;font-size:18px;cursor:pointer;"><i class="ti ti-eye"></i></a>
+                    <a href="#" onclick="downloadDocumentById('${esc(d.id)}');return false;" title="Download" style="color:#0E7162;font-size:18px;"><i class="ti ti-download"></i></a>` : ''}
                   </div>
                 </div>
               `).join('') : '<div style="padding:16px;text-align:center;color:#9E9E9E;font-size:13px;">No documents uploaded yet.</div>'}
@@ -365,7 +372,7 @@ async function openProfile(studentId, context) {
         <div class="pp-tab-pane" id="tab-notes">
           <div class="pp-section">
             <div class="pp-section-title">Committee notes</div>
-            <textarea class="pp-note-area" id="pp-notes-input" placeholder="Add internal notes about this student...">${s.notes || ''}</textarea>
+            <textarea class="pp-note-area" id="pp-notes-input" placeholder="Add internal notes about this student...">${esc(s.notes)}</textarea>
             <button class="pp-save-note" onclick="saveNotes('${s.id}')">Save notes</button>
           </div>
         </div>
@@ -375,7 +382,7 @@ async function openProfile(studentId, context) {
       <!-- FOOTER ACTIONS -->
       <div class="pp-footer">
         ${context === 'selected' ? `
-        <button class="pp-btn pp-btn-rejected" style="flex:2;" onclick="removeFromSelected('${s.id}', '${s.name}')">
+        <button class="pp-btn pp-btn-rejected" style="flex:2;" onclick="removeFromSelected('${s.id}')">
           <i class="ti ti-user-x" style="margin-right:6px;"></i>Remove from selected
         </button>` : context === 'rejected' ? `
         <button class="pp-btn pp-btn-pending" style="flex:2;" onclick="setProfileStatus('${s.id}', 'pending')">
@@ -410,7 +417,8 @@ async function openProfile(studentId, context) {
   });
 }
 
-async function removeFromSelected(id, name) {
+async function removeFromSelected(id) {
+  const name = (window.__profileStudent && window.__profileStudent.id === id) ? window.__profileStudent.name : 'this student';
   if (!confirm(`Remove ${name} from selected? Their status will be set to "Not shortlisted".`)) return;
   const { error } = await sb.from('students').update({ status: 'rejected' }).eq('id', id);
   if (error) { alert('Could not update status.'); return; }
@@ -429,8 +437,29 @@ function closeProfile() {
   setTimeout(() => overlay.remove(), 280);
 }
 
+function docNote(text) {
+  const div = document.createElement('div');
+  div.style.cssText = 'padding:36px;text-align:center;color:#555;';
+  div.textContent = text;
+  return div;
+}
+
+function findProfileDoc(id) {
+  return (window.__profileDocs || []).find(d => String(d.id) === String(id));
+}
+
+function viewDocumentById(id) {
+  const d = findProfileDoc(id);
+  if (d && d.file_url) viewDocument(d.file_url, d.type);
+}
+
+function downloadDocumentById(id) {
+  const d = findProfileDoc(id);
+  if (d && d.file_url) downloadStoredFile(d.file_url);
+}
+
 // Show an uploaded document (image or PDF) in a popup over the profile panel
-function viewDocument(url, title) {
+async function viewDocument(url, title) {
   let overlay = document.getElementById('doc-view-overlay');
   if (!overlay) {
     overlay = document.createElement('div');
@@ -451,17 +480,32 @@ function viewDocument(url, title) {
     document.body.appendChild(overlay);
   }
   overlay.querySelector('#doc-view-title').textContent = title || 'Document';
-  overlay.querySelector('#doc-view-open').href = url;
-  const body  = overlay.querySelector('#doc-view-body');
+  overlay.querySelector('#doc-view-open').href = '#';
+  const body = overlay.querySelector('#doc-view-body');
+  body.replaceChildren(docNote('Opening securely…'));
+  overlay.style.display = 'flex';
+
+  let signed;
+  try { signed = await signedDocUrl(url); }
+  catch (e) { body.replaceChildren(docNote(e.message)); return; }
+
+  overlay.querySelector('#doc-view-open').href = signed;
   const clean = url.split('?')[0].toLowerCase();
   if (/\.(png|jpe?g|gif|webp|bmp|svg)$/.test(clean)) {
-    body.innerHTML = '<img src="' + url + '" alt="Document" style="max-width:100%;max-height:75vh;display:block;margin:0 auto;border-radius:8px;">';
+    const img = document.createElement('img');
+    img.src = signed;
+    img.alt = 'Document';
+    img.style.cssText = 'max-width:100%;max-height:75vh;display:block;margin:0 auto;border-radius:8px;';
+    body.replaceChildren(img);
   } else if (/\.pdf$/.test(clean)) {
-    body.innerHTML = '<iframe src="' + url + '" title="Document" style="width:100%;height:75vh;border:none;border-radius:8px;background:#fff;"></iframe>';
+    const frame = document.createElement('iframe');
+    frame.src = signed;
+    frame.title = 'Document';
+    frame.style.cssText = 'width:100%;height:75vh;border:none;border-radius:8px;background:#fff;';
+    body.replaceChildren(frame);
   } else {
-    body.innerHTML = '<div style="padding:36px;text-align:center;color:#555;">This file type can\'t be previewed here. Use "Open" above to view it in a new tab.</div>';
+    body.replaceChildren(docNote('This file type can\'t be previewed here. Use "Open" above to view it in a new tab.'));
   }
-  overlay.style.display = 'flex';
 }
 
 function closeDocument() {
@@ -550,12 +594,12 @@ function showCredentialsBanner(name, email, actionLink, note) {
   const credHtml = actionLink ? `
     <div style="background:#FEF3C7;border:1px solid #FCD34D;border-radius:8px;padding:16px 20px;margin-bottom:16px;">
       <div style="font-size:12px;color:#92400E;font-weight:700;margin-bottom:8px;">SET-PASSWORD LINK</div>
-      <div style="font-size:13px;color:#1A1A1A;word-break:break-all;font-family:monospace;">${actionLink}</div>
+      <div style="font-size:13px;color:#1A1A1A;word-break:break-all;font-family:monospace;">${esc(actionLink)}</div>
     </div>
     <p style="font-size:13px;color:#555;line-height:1.6;margin-bottom:16px;">
-      The acceptance email failed to send. Share this link securely with <strong>${name}</strong> so they can set their password.<br/>
+      The acceptance email failed to send. Share this link securely with <strong>${esc(name)}</strong> so they can set their password.<br/>
       <span style="color:#DC2626;font-weight:600;">This link is single-use and will expire.</span>
-    </p>` : `<p style="font-size:13px;color:#555;margin-bottom:16px;">${note}</p>`;
+    </p>` : `<p style="font-size:13px;color:#555;margin-bottom:16px;">${esc(note)}</p>`;
 
   const modal = document.createElement('div');
   modal.id = 'creds-modal';
@@ -567,7 +611,7 @@ function showCredentialsBanner(name, email, actionLink, note) {
             <i class="ti ti-circle-check" style="font-size:20px;color:#0E7162;"></i>
           </div>
           <div>
-            <div style="font-size:15px;font-weight:700;color:#fff;">${name} marked as selected</div>
+            <div style="font-size:15px;font-weight:700;color:#fff;">${esc(name)} marked as selected</div>
             <div style="font-size:12px;color:rgba(255,255,255,0.65);">${actionLink ? 'Acceptance email failed — manual link generated' : 'Acceptance email sent'}</div>
           </div>
         </div>
@@ -668,16 +712,16 @@ async function uploadDoc(studentId, studentName) {
 async function printProfile(id) {
   const { data: s } = await sb.from('students').select('*').eq('id', id).single();
   if (!s) return;
-  const { data: docs } = await sb.from('documents').select('*').eq('student_name', s.name);
+  const { data: docs } = await sb.from('documents').select('*').eq('student_id', s.id);
 
   const statusLabel = { selected:'Selected', pending:'Pending review', rejected:'Not shortlisted' }[s.status] || s.status;
-  const row = (k, v) => `<tr><td style="padding:8px 12px;color:#555;font-size:13px;border-bottom:1px solid #f0f0f0;width:160px;">${k}</td><td style="padding:8px 12px;font-size:13px;font-weight:500;border-bottom:1px solid #f0f0f0;">${v || '<span style="color:#ccc;">Not provided</span>'}</td></tr>`;
+  const row = (k, v) => `<tr><td style="padding:8px 12px;color:#555;font-size:13px;border-bottom:1px solid #f0f0f0;width:160px;">${k}</td><td style="padding:8px 12px;font-size:13px;font-weight:500;border-bottom:1px solid #f0f0f0;">${v ? esc(v) : '<span style="color:#ccc;">Not provided</span>'}</td></tr>`;
 
   const win = window.open('', '_blank');
   win.document.write(`
     <!DOCTYPE html><html><head>
     <meta charset="UTF-8">
-    <title>Student Profile — ${s.name}</title>
+    <title>Student Profile — ${esc(s.name)}</title>
     <style>
       body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; margin: 0; color: #1a1a1a; }
       .header { background: #0E7162; padding: 28px 36px; color: #fff; display: flex; align-items: center; gap: 20px; }
@@ -692,12 +736,12 @@ async function printProfile(id) {
     </style>
     </head><body>
     <div class="header">
-      <div class="avatar">${s.initials || s.name.slice(0,2).toUpperCase()}</div>
+      <div class="avatar">${esc(s.initials || s.name.slice(0,2).toUpperCase())}</div>
       <div>
-        <div class="name">${s.name}</div>
-        <div class="school">${s.school} &middot; ${s.district} &middot; Class ${s.class}</div>
+        <div class="name">${esc(s.name)}</div>
+        <div class="school">${[s.school, s.district, s.class ? 'Class ' + s.class : ''].filter(Boolean).map(esc).join(' &middot; ')}</div>
       </div>
-      <div style="margin-left:auto;"><span class="status-badge">${statusLabel}</span></div>
+      <div style="margin-left:auto;"><span class="status-badge">${esc(statusLabel)}</span></div>
     </div>
     <div class="body">
       <div class="section-title">Personal information</div>
@@ -705,11 +749,11 @@ async function printProfile(id) {
       <div class="section-title">Education</div>
       <table>${row('School',s.school)}${row('Class',s.class)}${row('Board',s.board)}${row('District',s.district)}${row('Previous year %',s.prev_percentage?s.prev_percentage+'%':null)}${row('Attendance',s.attendance?s.attendance+'%':null)}</table>
       <div class="section-title">Family details</div>
-      <table>${row("Father's name",s.father_name)}${row("Mother's name",s.mother_name)}${row('Occupation',s.parent_occupation)}${row('Annual income',s.annual_income?'&#8377;'+Number(s.annual_income).toLocaleString('en-IN'):null)}${row('Siblings',s.siblings)}</table>
+      <table>${row("Father's name",s.father_name)}${row("Mother's name",s.mother_name)}${row('Occupation',s.parent_occupation)}${row('Annual income',s.annual_income?'₹'+Number(s.annual_income).toLocaleString('en-IN'):null)}${row('Siblings',s.siblings)}</table>
       <div class="section-title">Application details</div>
       <table>${row('Cycle year',s.cycle_year)}${row('Applied on',fmtDate(s.applied_on))}${row('Status',statusLabel)}</table>
-      ${docs&&docs.length?`<div class="section-title">Documents</div><table>${docs.map(d=>`<tr><td style="padding:8px 12px;font-size:13px;border-bottom:1px solid #f0f0f0;">${d.type}</td><td style="padding:8px 12px;font-size:13px;border-bottom:1px solid #f0f0f0;color:#555;">${fmtDate(d.uploaded_at)}</td><td style="padding:8px 12px;font-size:13px;border-bottom:1px solid #f0f0f0;font-weight:600;">${d.status}</td></tr>`).join('')}</table>` : ''}
-      ${s.notes?`<div class="section-title">Committee notes</div><p style="font-size:13px;color:#555;line-height:1.7;background:#fafafa;padding:14px;border-radius:6px;">${s.notes}</p>`:''}
+      ${docs&&docs.length?`<div class="section-title">Documents</div><table>${docs.map(d=>`<tr><td style="padding:8px 12px;font-size:13px;border-bottom:1px solid #f0f0f0;">${esc(d.type)}</td><td style="padding:8px 12px;font-size:13px;border-bottom:1px solid #f0f0f0;color:#555;">${fmtDate(d.uploaded_at)}</td><td style="padding:8px 12px;font-size:13px;border-bottom:1px solid #f0f0f0;font-weight:600;">${esc(d.status)}</td></tr>`).join('')}</table>` : ''}
+      ${s.notes?`<div class="section-title">Committee notes</div><p style="font-size:13px;color:#555;line-height:1.7;background:#fafafa;padding:14px;border-radius:6px;">${esc(s.notes)}</p>`:''}
       <div class="footer">Thuvakkam Education &mdash; SFS Portal &mdash; Printed ${new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})}</div>
     </div>
     <script>window.onload=()=>{ window.print(); }<\/script>

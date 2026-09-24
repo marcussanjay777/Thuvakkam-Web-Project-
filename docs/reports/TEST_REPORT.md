@@ -98,13 +98,13 @@ Fix: `portal/fix_admin_access.sql` + guard in `portal/js/client.js`.
 ---
 
 ## How to re-run these tests
-From the project folder, with the site served (`python -m http.server 8000`):
+From the project's main folder (not from inside `tests/`), with the site served (`python -m http.server 8000`):
 ```
-python check_site.py        # pages + links
-python check_backend.py     # backend + data privacy
-python check_crud.py        # create/read/update/delete
-python cross_device.py      # cross-browser + responsive screenshots
-python check_forms.py       # form validation
-python check_mobile.py      # mobile menu + layout
-python browser_test.py      # full login flows + security
+python tests/check_site.py        # pages + links
+python tests/check_backend.py     # backend + data privacy
+python tests/check_crud.py        # create/read/update/delete
+python tests/cross_device.py      # cross-browser + responsive screenshots
+python tests/check_forms.py       # form validation
+python tests/check_mobile.py      # mobile menu + layout
+python tests/browser_test.py      # full login flows + security
 ```

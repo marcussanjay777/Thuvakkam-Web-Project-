@@ -35,30 +35,58 @@
   <!-- RIGHT PANEL -->
   <div class="dp-auth-right">
     <div class="dp-auth-form-card">
-      <div>
-        <div class="dp-auth-title">Welcome back</div>
-        <div class="dp-auth-sub">Sign in to your donor account to view your impact and manage donations.</div>
+
+      <!-- ── SIGN IN ── -->
+      <div class="dp-view" id="login-view">
+        <div>
+          <div class="dp-auth-title">Welcome back</div>
+          <div class="dp-auth-sub">Sign in to your donor account to view your impact and manage donations.</div>
+        </div>
+
+        <div class="dp-auth-error" id="login-error"></div>
+
+        <div class="dp-field-group">
+          <label class="dp-field-label">Email address</label>
+          <input class="dp-field-input" id="login-email" type="email" placeholder="your@email.com" autocomplete="email" />
+        </div>
+        <div class="dp-field-group">
+          <label class="dp-field-label">Password</label>
+          <input class="dp-field-input" id="login-password" type="password" placeholder="Enter your password" autocomplete="current-password" />
+          <a href="#" class="dp-forgot-link" onclick="showForgot(event)">Forgot password?</a>
+        </div>
+
+        <button class="dp-auth-btn" id="login-btn" onclick="doLogin()">Sign in</button>
+
+        <div class="dp-auth-link">
+          New donor? <a href="register.html">Create an account</a>
+        </div>
+        <div class="dp-auth-link" style="margin-top:-10px;">
+          <a href="../website/index.html" style="color:var(--grey-400);">← Back to website</a>
+        </div>
       </div>
 
-      <div class="dp-auth-error" id="login-error"></div>
+      <!-- ── FORGOT PASSWORD ── -->
+      <div class="dp-view" id="forgot-view" style="display:none;">
+        <div>
+          <div class="dp-auth-title">Reset your password</div>
+          <div class="dp-auth-sub">Enter the email you registered with and we'll send you a link to choose a new password.</div>
+        </div>
 
-      <div class="dp-field-group">
-        <label class="dp-field-label">Email address</label>
-        <input class="dp-field-input" id="login-email" type="email" placeholder="your@email.com" autocomplete="email" />
-      </div>
-      <div class="dp-field-group">
-        <label class="dp-field-label">Password</label>
-        <input class="dp-field-input" id="login-password" type="password" placeholder="Enter your password" autocomplete="current-password" />
+        <div class="dp-auth-error"   id="forgot-error"></div>
+        <div class="dp-auth-success" id="forgot-success"></div>
+
+        <div class="dp-field-group" id="forgot-fields">
+          <label class="dp-field-label">Email address</label>
+          <input class="dp-field-input" id="forgot-email" type="email" placeholder="your@email.com" autocomplete="email" />
+        </div>
+
+        <button class="dp-auth-btn" id="forgot-btn" onclick="sendReset()">Send reset link</button>
+
+        <div class="dp-auth-link">
+          <a href="#" onclick="showLogin(event)">← Back to sign in</a>
+        </div>
       </div>
 
-      <button class="dp-auth-btn" id="login-btn" onclick="doLogin()">Sign in</button>
-
-      <div class="dp-auth-link">
-        New donor? <a href="register.html">Create an account</a>
-      </div>
-      <div class="dp-auth-link" style="margin-top:-10px;">
-        <a href="../website/index.html" style="color:var(--grey-400);">← Back to website</a>
-      </div>
     </div>
   </div>
 
@@ -179,6 +207,68 @@
     const errEl = document.getElementById('login-error');
     errEl.textContent = msg;
     errEl.style.display = 'block';
+  }
+
+  function showForgot(e) {
+    e.preventDefault();
+    document.getElementById('login-error').style.display = 'none';
+    document.getElementById('forgot-email').value = document.getElementById('login-email').value.trim();
+    document.getElementById('login-view').style.display  = 'none';
+    document.getElementById('forgot-view').style.display = 'flex';
+    document.getElementById('forgot-email').focus();
+  }
+
+  function showLogin(e) {
+    e.preventDefault();
+    document.getElementById('forgot-error').style.display   = 'none';
+    document.getElementById('forgot-success').style.display = 'none';
+    document.getElementById('forgot-fields').style.display  = '';
+    document.getElementById('forgot-btn').style.display     = '';
+    document.getElementById('forgot-view').style.display = 'none';
+    document.getElementById('login-view').style.display  = '';
+  }
+
+  document.getElementById('forgot-email').addEventListener('keydown', e => {
+    if (e.key === 'Enter') sendReset();
+  });
+
+  async function sendReset() {
+    const email     = document.getElementById('forgot-email').value.trim();
+    const btn       = document.getElementById('forgot-btn');
+    const errEl     = document.getElementById('forgot-error');
+    const successEl = document.getElementById('forgot-success');
+
+    errEl.style.display     = 'none';
+    successEl.style.display = 'none';
+    if (!email) {
+      errEl.textContent   = 'Please enter your email address.';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    btn.disabled    = true;
+    btn.textContent = 'Sending...';
+
+    const { error } = await sb.auth.resetPasswordForEmail(email, {
+      redirectTo: new URL('reset-password.html', window.location.href).href
+    });
+
+    btn.disabled    = false;
+    btn.textContent = 'Send reset link';
+
+    if (error) {
+      const tooMany = error.status === 429 || /rate limit|security purposes/i.test(error.message);
+      errEl.textContent = tooMany
+        ? 'Too many emails just now — wait a minute and try again.'
+        : 'Could not send the email. Please try again shortly.';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    document.getElementById('forgot-fields').style.display = 'none';
+    btn.style.display = 'none';
+    successEl.textContent = 'If an account exists for ' + email + ', a reset link is on its way. Check your inbox (and spam folder).';
+    successEl.style.display = 'block';
   }
 </script>
 </body>

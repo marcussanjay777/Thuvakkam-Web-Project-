@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SFS Photo Plan</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{ box-sizing:border-box; margin:0; padding:0; }
+  :root{
+    --ink:#11201D; --ink-soft:#4A5F59; --ink-faint:#80938C;
+    --line:#E0E8E5; --paper:#FAF9F6; --white:#fff;
+    --green:#0E7162; --green-mid:#26C699; --green-pale:#E8F5F2; --yellow:#FDDB3A;
+    --display:'Fraunces',Georgia,serif; --body:'Archivo',-apple-system,sans-serif;
+    --gutter:clamp(18px,4vw,52px);
+  }
+  body{ font-family:var(--body); background:var(--paper); color:var(--ink); line-height:1.7; -webkit-font-smoothing:antialiased; }
+  a{ color:inherit; }
+  .wrap{ max-width:900px; margin:0 auto; padding-inline:var(--gutter); }
+
+  .back{ padding-block:22px 0; }
+  .back a{ font-size:13.5px; font-weight:600; color:var(--green); text-decoration:none; display:inline-flex; align-items:center; gap:6px; }
+
+  header{ padding-block:26px clamp(28px,4vw,44px); border-bottom:1px solid var(--line); }
+  .kick{ font-size:11.5px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:var(--green); }
+  h1{ margin-top:14px; font-family:var(--display); font-weight:400; font-size:clamp(30px,5vw,50px);
+      line-height:1.06; letter-spacing:-.03em; max-width:18ch; }
+  h1 em{ font-style:italic; color:var(--green); font-weight:600; }
+  .intro{ margin-top:18px; color:var(--ink-soft); font-size:16.5px; line-height:1.8; }
+
+  section{ padding-block:clamp(30px,4vw,48px); border-bottom:1px solid var(--line); }
+  h2{ font-family:var(--display); font-weight:400; font-size:clamp(23px,3.4vw,34px); letter-spacing:-.025em; }
+  h2 em{ font-style:italic; color:var(--green); font-weight:600; }
+  .lead{ margin-top:12px; color:var(--ink-soft); font-size:15.5px; line-height:1.78; }
+
+  .item{ background:var(--white); border:1px solid var(--line); border-radius:12px; padding:22px 24px; margin-top:16px; }
+  .item-h{ display:flex; align-items:flex-start; gap:14px; }
+  .pri{ flex-shrink:0; width:30px; height:30px; border-radius:8px; display:flex; align-items:center;
+        justify-content:center; font-size:13px; font-weight:700; }
+  .p1{ background:var(--green); color:#fff; }
+  .p2{ background:var(--green-pale); color:var(--green); }
+  .p3{ background:#F0F4F2; color:var(--ink-faint); }
+  .item h3{ font-family:var(--display); font-size:21px; font-weight:600; letter-spacing:-.015em; line-height:1.25; }
+  .where{ margin-top:3px; font-size:12.5px; font-weight:600; color:var(--green); }
+  .item p{ margin-top:11px; font-size:15px; color:var(--ink-soft); line-height:1.75; }
+  .ask{ margin-top:13px; background:#FFFBE6; border-left:3px solid var(--yellow); padding:11px 15px;
+        font-size:14px; color:#6B5300; line-height:1.7; border-radius:0 6px 6px 0; }
+  .ask b{ color:#4A3900; }
+
+  ul{ margin-top:12px; padding-left:20px; }
+  li{ margin-bottom:9px; font-size:15.5px; color:var(--ink-soft); line-height:1.75; }
+  li b{ color:var(--ink); }
+
+  .warn{ background:#FEF2F2; border:1px solid #FCA5A5; border-radius:10px; padding:18px 22px; margin-top:18px; }
+  .warn h3{ font-size:16px; font-weight:700; color:#991B1B; margin-bottom:8px; }
+  .warn p, .warn li{ font-size:14.5px; color:#7F2020; line-height:1.72; }
+  .warn ul{ margin-top:8px; }
+
+  .tip{ background:var(--green-pale); border:1px solid #BFE3DA; border-radius:10px; padding:18px 22px; margin-top:18px; }
+  .tip h3{ font-size:16px; font-weight:700; color:var(--green); margin-bottom:8px; }
+  .tip p, .tip li{ font-size:14.5px; color:#14504A; line-height:1.72; }
+  .tip ul{ margin-top:8px; }
+
+  footer{ padding-block:32px 56px; font-size:13.5px; color:var(--ink-faint); }
+</style>
+</head>
+<body>
+
+<div class="back wrap"><a href="index.html"><i class="ti ti-arrow-left"></i> Back to the designs</a></div>
+
+<header class="wrap">
+  <div class="kick">Thuvakkam SFS</div>
+  <h1>Where photos would make the <em>biggest difference</em>.</h1>
+  <p class="intro">Right now the whole site has exactly one image — the logo. Every design I built works without photos, using type, colour and shapes instead. But photographs of real students and real work would lift any of them far more than another round of design would. Here is what to ask for and where each shot would go, most important first.</p>
+</header>
+
+<section class="wrap">
+  <h2>The <em>five</em> that matter most</h2>
+  <p class="lead">If your mentor can only get you a handful, ask for these.</p>
+
+  <div class="item">
+    <div class="item-h"><span class="pri p1">1</span><div>
+      <h3>One wide shot behind the homepage headline</h3>
+      <div class="where">Homepage · top of the page</div></div></div>
+    <p>A single strong photograph behind or beside the main headline changes the whole site in one move. Best subject: a classroom, a group of students at a Thuvakkam event, or a mentoring session — taken from slightly behind or to the side so it feels real rather than posed.</p>
+    <div class="ask"><b>Ask for:</b> one wide landscape photo, taken on a decent phone in daylight, at least 2000 pixels across.</div>
+  </div>
+
+  <div class="item">
+    <div class="item-h"><span class="pri p1">2</span><div>
+      <h3>Real faces on the student stories</h3>
+      <div class="where">Homepage · Stories page</div></div></div>
+    <p>The quote cards currently show two grey initials. A real face beside a real quote is far more convincing to a donor than any amount of design. Head-and-shoulders, outdoors or by a window.</p>
+    <div class="ask"><b>Ask for:</b> 3 to 6 portraits, plus written permission from the student and their parent for each one. See the privacy note below — this is the one to be careful with.</div>
+  </div>
+
+  <div class="item">
+    <div class="item-h"><span class="pri p1">3</span><div>
+      <h3>Photos of the actual support being given</h3>
+      <div class="where">Support page · homepage "what we do" cards</div></div></div>
+    <p>Your three cards describe fees, materials and mentoring in words. Photos of a study-kit handover, a mentoring session and a school visit would prove it instead of claiming it. These are also the easiest to get permission for, since they can be shot from behind or show hands and materials rather than faces.</p>
+    <div class="ask"><b>Ask for:</b> 3 photos — one per type of support. Faces not required.</div>
+  </div>
+
+  <div class="item">
+    <div class="item-h"><span class="pri p1">4</span><div>
+      <h3>The team or committee</h3>
+      <div class="where">About / Impact page</div></div></div>
+    <p>Donors give to people, not organisations. A photo of the committee, even an informal one from a meeting, makes Thuvakkam feel like a real group of people rather than a website. It also helps with the "is this site genuine?" problem Google flagged.</p>
+    <div class="ask"><b>Ask for:</b> one group photo, plus names if you want to caption it.</div>
+  </div>
+
+  <div class="item">
+    <div class="item-h"><span class="pri p1">5</span><div>
+      <h3>Something recognisably Tamil Nadu</h3>
+      <div class="where">Impact page · district section</div></div></div>
+    <p>A school building, a village street, a bus stop, a classroom doorway. It grounds the whole site in a real place and pairs naturally with the "8+ districts reached" figure. No people needed, so no permissions required.</p>
+    <div class="ask"><b>Ask for:</b> 2 or 3 location shots from districts you actually work in.</div>
+  </div>
+</section>
+
+<section class="wrap">
+  <h2>Worth having <em>later</em></h2>
+  <p class="lead">These add polish once the essentials are in place.</p>
+
+  <div class="item">
+    <div class="item-h"><span class="pri p2">6</span><div>
+      <h3>A photo strip along the selection process</h3>
+      <div class="where">Homepage · "how it works"</div></div></div>
+    <p>One small image per stage — a form being filled in, a document check, an interview. Turns an abstract five-step diagram into something that visibly happens.</p>
+  </div>
+
+  <div class="item">
+    <div class="item-h"><span class="pri p2">7</span><div>
+      <h3>Student photos on the "Our Students" page</h3>
+      <div class="where">funded-students.html</div></div></div>
+    <p>Each student card currently shows initials in a circle. A real photo would work, but this page is public and lists who is and isn't funded — so I'd only do this with clear written consent, and I'd suggest first name only.</p>
+  </div>
+
+  <div class="item">
+    <div class="item-h"><span class="pri p2">8</span><div>
+      <h3>Before-and-after or progress shots</h3>
+      <div class="where">Stories · Impact</div></div></div>
+    <p>A student at the start of the programme and again after two years. Powerful for donors, but only works if someone has been photographing consistently — worth starting now even if you can't use it yet.</p>
+  </div>
+
+  <div class="item">
+    <div class="item-h"><span class="pri p3">9</span><div>
+      <h3>Event and handover photos</h3>
+      <div class="where">Impact page gallery</div></div></div>
+    <p>Scholarship handovers, annual gatherings, workshops. A simple grid of these is one of the most convincing things a small charity can show, and it is usually the easiest material to find — check whether anyone already has a folder of event photos.</p>
+  </div>
+
+  <div class="item">
+    <div class="item-h"><span class="pri p3">10</span><div>
+      <h3>A photo in the donor and student portals</h3>
+      <div class="where">Donor dashboard · student portal</div></div></div>
+    <p>A small image at the top of the donor dashboard showing the student they support would make the connection feel real every time they log in. Same for a welcome banner in the student portal.</p>
+  </div>
+
+  <div class="item">
+    <div class="item-h"><span class="pri p3">11</span><div>
+      <h3>A proper picture for social media sharing</h3>
+      <div class="where">All pages · behind the scenes</div></div></div>
+    <p>When someone shares your link on WhatsApp or Facebook, a blank grey box appears. Adding one image tag fixes it and makes every shared link look legitimate — which matters given the "deceptive site" warning you've had. This one is quick and I can do it whenever you like.</p>
+  </div>
+
+  <div class="item">
+    <div class="item-h"><span class="pri p3">12</span><div>
+      <h3>Certificates and registration marks</h3>
+      <div class="where">Footer · donate page</div></div></div>
+    <p>You already have the 12A, 80G and CSR certificates. Small trust badges near the donate button — "80G tax exemption available", "Registered society since 2014" — reassure donors at the exact moment they hesitate. No photography needed.</p>
+  </div>
+</section>
+
+<section class="wrap">
+  <div class="warn">
+    <h3>Before using any photo of a student</h3>
+    <p>These are children, most from low-income families, and the site is public. Getting this wrong would be far worse than having no photos.</p>
+    <ul>
+      <li><b>Written permission</b> from the student and a parent or guardian, for each photo, saying it may be used on the website and in social media.</li>
+      <li><b>First names only</b> on public pages. Never a full name next to a photo, a school name and a district together — that is enough for a stranger to find a child.</li>
+      <li><b>Never</b> put a photo next to financial details like family income, or next to a "rejected" status.</li>
+      <li><b>Keep a record</b> of who consented, so you can remove a photo quickly if a family changes their mind.</li>
+      <li>Ask your mentor whether Thuvakkam already has a consent form. Most registered NGOs do.</li>
+    </ul>
+  </div>
+
+  <div class="tip">
+    <h3>If no photos are available at all</h3>
+    <ul>
+      <li><b>Do not use stock photos of students.</b> Pictures of children who are not real Thuvakkam students, presented as if they were, would mislead donors — and you already have fake-content problems to clean up.</li>
+      <li>Photos of <b>places, buildings, books, classrooms and hands</b> need no permission and still transform a page. Start there.</li>
+      <li>Every design in this folder is built to work with no photos at all, so nothing is blocked. Photos would make them better, not possible.</li>
+      <li>A phone camera in daylight is genuinely fine. Shoot with the light behind you, hold still, and don't zoom.</li>
+    </ul>
+  </div>
+</section>
+
+<footer class="wrap">
+  When photos arrive, send them over and I'll compress and fit them into whichever design you choose. Large files slow the site down, so they'll need resizing first — that part is automatic.
+</footer>
+
+</body>
+</html>

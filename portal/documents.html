@@ -141,23 +141,12 @@ const iconMap = {
 let allDocs   = [];
 let shownDocs = [];
 
-// Force a browser download instead of opening the file inline.
-// Supabase public URLs need a "?download" param to send Content-Disposition.
-function triggerDownload(url) {
-  const dlUrl = url + (url.includes('?') ? '&' : '?') + 'download';
-  const a = document.createElement('a');
-  a.href = dlUrl;
-  a.download = '';
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-}
-
+// Each link is signed at the moment of the click, because signed links expire.
 function downloadAll() {
   const files = shownDocs.filter(d => d.file_url);
   if (!files.length) { alert('No downloadable files in the current view.'); return; }
   // Stagger the downloads so the browser does not block them
-  files.forEach((d, i) => setTimeout(() => triggerDownload(d.file_url), i * 400));
+  files.forEach((d, i) => setTimeout(() => downloadStoredFile(d.file_url), i * 400));
 }
 
 function renderDocs(data) {
@@ -171,7 +160,7 @@ function renderDocs(data) {
       <div class="doc-left">
         <div class="doc-icon"><i class="ti ${iconMap[d.type] || 'ti-file'}"></i></div>
         <div>
-          <div class="doc-name">${d.student_name} &mdash; ${d.type}</div>
+          <div class="doc-name">${esc(d.student_name)} &mdash; ${esc(d.type)}</div>
           <div class="doc-meta">Uploaded ${fmtDate(d.uploaded_at)}</div>
         </div>
       </div>
@@ -189,7 +178,7 @@ function renderDocs(data) {
   list.querySelectorAll('.doc-dl').forEach(btn => {
     btn.addEventListener('click', () => {
       const doc = shownDocs[parseInt(btn.dataset.idx, 10)];
-      if (doc && doc.file_url) triggerDownload(doc.file_url);
+      if (doc && doc.file_url) downloadStoredFile(doc.file_url);
     });
   });
 
@@ -202,20 +191,42 @@ function renderDocs(data) {
   });
 }
 
+function docModalMessage(text) {
+  const div = document.createElement('div');
+  div.style.cssText = 'padding:36px;text-align:center;color:#555;';
+  div.textContent = text;
+  return div;
+}
+
 // Show an uploaded document (image or PDF) in a popup
-function openDocModal(doc) {
+async function openDocModal(doc) {
   const body = document.getElementById('doc-modal-body');
   document.getElementById('doc-modal-title').textContent = `${doc.student_name} — ${doc.type}`;
-  document.getElementById('doc-modal-open').href = doc.file_url;
+  document.getElementById('doc-modal-open').href = '#';
+  body.replaceChildren(docModalMessage('Opening securely…'));
+  document.getElementById('doc-modal').style.display = 'flex';
+
+  let url;
+  try { url = await signedDocUrl(doc.file_url); }
+  catch (e) { body.replaceChildren(docModalMessage(e.message)); return; }
+
+  document.getElementById('doc-modal-open').href = url;
   const clean = doc.file_url.split('?')[0].toLowerCase();
   if (/\.(png|jpe?g|gif|webp|bmp|svg)$/.test(clean)) {
-    body.innerHTML = `<img src="${doc.file_url}" alt="Uploaded document" style="max-width:100%;max-height:75vh;display:block;margin:0 auto;border-radius:8px;" />`;
+    const img = document.createElement('img');
+    img.src = url;
+    img.alt = 'Uploaded document';
+    img.style.cssText = 'max-width:100%;max-height:75vh;display:block;margin:0 auto;border-radius:8px;';
+    body.replaceChildren(img);
   } else if (/\.pdf$/.test(clean)) {
-    body.innerHTML = `<iframe src="${doc.file_url}" title="Document" style="width:100%;height:75vh;border:none;border-radius:8px;background:#fff;"></iframe>`;
+    const frame = document.createElement('iframe');
+    frame.src = url;
+    frame.title = 'Document';
+    frame.style.cssText = 'width:100%;height:75vh;border:none;border-radius:8px;background:#fff;';
+    body.replaceChildren(frame);
   } else {
-    body.innerHTML = `<div style="padding:36px;text-align:center;color:#555;">This file type can't be previewed here. Use "Open" above to view it in a new tab.</div>`;
+    body.replaceChildren(docModalMessage('This file type can\'t be previewed here. Use "Open" above to view it in a new tab.'));
   }
-  document.getElementById('doc-modal').style.display = 'flex';
 }
 
 function closeDocModal() {

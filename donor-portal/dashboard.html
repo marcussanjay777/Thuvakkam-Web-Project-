@@ -6,6 +6,8 @@
   <title>My Donor Dashboard — Thuvakkam SFS</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
   <link rel="stylesheet" href="css/style.css" />
+  <script src="https://www.ketto.org/media/sdk/dms-sdk.min.js" type="module"></script>
+  <script src="/ketto-config.js"></script>
 </head>
 <body>
 
@@ -91,10 +93,19 @@
     <div class="dp-modal-backdrop" onclick="if(event.target===this)closeDonateModal()">
       <div class="dp-modal">
         <div class="dp-modal-head">
-          <div class="dp-modal-title"><i class="ti ti-coin" style="margin-right:8px;"></i>Record a donation</div>
+          <div class="dp-modal-title"><i class="ti ti-coin" style="margin-right:8px;"></i>Make a donation</div>
           <button class="dp-modal-close" onclick="closeDonateModal()"><i class="ti ti-x"></i></button>
         </div>
+        <div id="dms-container"></div>
         <div class="dp-modal-body">
+          <div style="background:#F0FDF4;border:1px solid #A7F3D0;border-radius:var(--radius-md);padding:14px;margin-bottom:16px;">
+            <button class="dp-btn-primary" type="button" id="ketto-pay-btn" onclick="payWithKetto()" style="width:100%;justify-content:center;display:flex;align-items:center;gap:6px;">
+              <i class="ti ti-credit-card"></i> Pay via Ketto
+            </button>
+            <div style="font-size:12px;color:var(--grey-500);margin-top:8px;line-height:1.6;">
+              Step 1: Pay through Ketto's secure checkout. Step 2: once done, fill in what you paid below so we can track it and match you with a student.
+            </div>
+          </div>
           <div class="dp-field-group">
             <label class="dp-field-label">Amount (₹) <span class="req">*</span></label>
             <input class="dp-field-input" id="d-amount" type="number" min="1" placeholder="e.g. 5000" />
@@ -135,6 +146,38 @@
     'https://vftexybohuaxngyhwjts.supabase.co',
     'sb_publishable_vO20BiWyS_VIkhU2DDmw3g_BoGBeCdq'
   );
+
+  // Proof files live in a PRIVATE bucket, so a stored link is swapped for a
+  // short-lived signed link at the moment the donor clicks it.
+  const DOC_LINK_PREFIXES = ['public', 'sign', 'authenticated']
+    .map(kind => `https://vftexybohuaxngyhwjts.supabase.co/storage/v1/object/${kind}/student-documents/`);
+  const proofUpdates = {};
+
+  async function signedProofUrl(fileUrl) {
+    const url    = String(fileUrl || '');
+    const prefix = DOC_LINK_PREFIXES.find(p => url.startsWith(p));
+    if (!prefix) throw new Error('This file link is not valid.');
+    let path;
+    try { path = decodeURIComponent(url.slice(prefix.length).split('?')[0]); }
+    catch (e) { throw new Error('This file link is not valid.'); }
+    const { data, error } = await sb.storage.from('student-documents').createSignedUrl(path, 300);
+    if (error || !data || !data.signedUrl) throw new Error('Could not open this file.');
+    return data.signedUrl;
+  }
+
+  async function openProof(id) {
+    const u = proofUpdates[id];
+    if (!u || !u.proof_url) return;
+    const win = window.open('', '_blank');   // opened first so pop-up blockers allow it
+    try {
+      const link = await signedProofUrl(u.proof_url);
+      if (win) { win.opener = null; win.location.href = link; }
+      else     { window.location.href = link; }
+    } catch (e) {
+      if (win) win.close();
+      alert(e.message);
+    }
+  }
 
   const CAT_COLORS = {
     grade:          { color: '#2563EB', icon: 'ti-book',        label: 'Grade' },
@@ -305,6 +348,7 @@
       const { data: updates } = await sb.from('student_updates')
         .select('*').eq('student_id', s.id)
         .order('record_date', { ascending: false }).limit(20);
+      (updates || []).forEach(u => { proofUpdates[u.id] = u; });
       return renderStudentCard(s, updates || []);
     }));
 
@@ -328,7 +372,7 @@
                 <span>${cat.label}</span>
                 ${u.score ? `<span class="dp-update-score">${esc(u.score)}</span>` : ''}
                 ${u.record_date ? `<span><i class="ti ti-calendar" style="font-size:11px;"></i> ${fmtDate(u.record_date)}</span>` : ''}
-                ${u.proof_url ? `<a href="${u.proof_url}" target="_blank" style="color:var(--green-dark);font-size:12px;font-weight:600;display:inline-flex;align-items:center;gap:3px;"><i class="ti ti-file-check"></i> Proof</a>` : ''}
+                ${u.proof_url ? `<a href="#" onclick="openProof('${esc(u.id)}');return false;" style="color:var(--green-dark);font-size:12px;font-weight:600;display:inline-flex;align-items:center;gap:3px;"><i class="ti ti-file-check"></i> Proof</a>` : ''}
               </div>
               ${u.description ? `<div style="font-size:12px;color:var(--grey-500);margin-top:4px;">${esc(u.description)}</div>` : ''}
             </div>
@@ -427,6 +471,41 @@
   /* ── DONATE MODAL ──────────────────────────────────────── */
   function openDonateModal()  { document.getElementById('donate-modal').style.display = 'block'; }
   function closeDonateModal() { document.getElementById('donate-modal').style.display = 'none'; document.getElementById('donate-err').style.display='none'; }
+
+  let kettoDms = null;
+
+  function payWithKetto() {
+    const errEl = document.getElementById('donate-err');
+    errEl.style.display = 'none';
+
+    if (typeof Dms === 'undefined') {
+      errEl.textContent = 'Payment system is still loading — please wait a moment and try again.';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    if (!kettoDms) {
+      kettoDms = Dms({
+        apiKey: KETTO_API_KEY,
+        onError: (error) => { console.error('Ketto init error:', error); },
+      });
+    }
+
+    kettoDms.acceptDonation({
+      container: '#dms-container',
+      userConfig: {
+        donor_name:  currentDonor.full_name,
+        donor_email: currentDonor.email,
+      },
+      modalOptions: {
+        closeOnOverlayClick: true,
+        closeOnEsc: true,
+      },
+      widgetConfig: {
+        widgetId: KETTO_WIDGET_ID,
+      },
+    });
+  }
 
   async function saveDonation() {
     const amount  = parseFloat(document.getElementById('d-amount').value);

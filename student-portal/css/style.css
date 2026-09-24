@@ -305,6 +305,10 @@ a { text-decoration: none; color: inherit; }
   border-radius: var(--radius-md); padding: 12px 14px;
   font-size: 13px; color: #166534; display: none;
 }
+.sp-view { display: flex; flex-direction: column; gap: 16px; }
+.sp-forgot-link { font-size: 13px; font-weight: 600; color: var(--green-dark); text-align: center; text-decoration: none; }
+.sp-forgot-link:hover { text-decoration: underline; }
+.sp-forgot-text { font-size: 13px; color: var(--grey-600); line-height: 1.6; }
 
 /* ── RESPONSIVE ─────────────────────────────────────────── */
 @media (max-width: 640px) {

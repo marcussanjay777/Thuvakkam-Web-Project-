@@ -106,10 +106,10 @@ function renderCards(data) {
           <div class="student-initials">${s.initials || s.name.slice(0,2).toUpperCase()}</div>
           <span style="font-size:11px;font-weight:600;background:var(--grey-50);border:1px solid var(--grey-100);padding:3px 8px;border-radius:4px;color:var(--grey-600);">SFS ${s.cycle_year}</span>
         </div>
-        <div class="student-name">${s.name}</div>
-        <div class="student-school">${s.school}</div>
+        <div class="student-name">${esc(s.name)}</div>
+        <div class="student-school">${escOr(s.school, '')}</div>
         <div class="student-meta">
-          <div class="student-meta-row"><span class="student-meta-key">District</span><span class="student-meta-val">${s.district}</span></div>
+          <div class="student-meta-row"><span class="student-meta-key">District</span><span class="student-meta-val">${escOr(s.district)}</span></div>
           <div class="student-meta-row"><span class="student-meta-key">Completed</span><span class="student-meta-val">${s.class}</span></div>
           ${s.outcome ? `<div class="student-meta-row" style="flex-direction:column;gap:3px;"><span class="student-meta-key">Current status</span><span class="student-meta-val" style="font-size:11px;color:var(--green-mid);">${s.outcome}</span></div>` : ''}
         </div>
@@ -139,7 +139,7 @@ function exportBeneficiaries() {
 }
 
 async function fetchAndRender(year) {
-  let q = sb.from('students').select('*').lt('cycle_year', 2026).order('cycle_year', { ascending: false });
+  let q = sb.from('students').select('*').lt('cycle_year', SFS_CYCLE_YEAR).order('cycle_year', { ascending: false });
   if (year !== 'all') q = q.eq('cycle_year', parseInt(year));
   const { data } = await q;
   if (data) { currentData = data; renderCards(data); }

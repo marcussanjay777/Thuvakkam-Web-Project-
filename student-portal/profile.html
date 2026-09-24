@@ -100,6 +100,37 @@
       'sb_publishable_vO20BiWyS_VIkhU2DDmw3g_BoGBeCdq'
     );
 
+    // Proof files live in a PRIVATE bucket, so a stored link is swapped for a
+    // short-lived signed link at the moment the student clicks it.
+    const DOC_LINK_PREFIXES = ['public', 'sign', 'authenticated']
+      .map(kind => `https://vftexybohuaxngyhwjts.supabase.co/storage/v1/object/${kind}/student-documents/`);
+
+    async function signedProofUrl(fileUrl) {
+      const url    = String(fileUrl || '');
+      const prefix = DOC_LINK_PREFIXES.find(p => url.startsWith(p));
+      if (!prefix) throw new Error('This file link is not valid.');
+      let path;
+      try { path = decodeURIComponent(url.slice(prefix.length).split('?')[0]); }
+      catch (e) { throw new Error('This file link is not valid.'); }
+      const { data, error } = await sb.storage.from('student-documents').createSignedUrl(path, 300);
+      if (error || !data || !data.signedUrl) throw new Error('Could not open this file.');
+      return data.signedUrl;
+    }
+
+    async function openProof(id) {
+      const u = allUpdates.find(x => x.id === id);
+      if (!u || !u.proof_url) return;
+      const win = window.open('', '_blank');   // opened first so pop-up blockers allow it
+      try {
+        const link = await signedProofUrl(u.proof_url);
+        if (win) { win.opener = null; win.location.href = link; }
+        else     { window.location.href = link; }
+      } catch (e) {
+        if (win) win.close();
+        alert(e.message);
+      }
+    }
+
     let currentStudent = null;
     let allUpdates     = [];
     let activeTab      = 'overview';
@@ -327,7 +358,7 @@
             <div class="sp-entry-meta">
               ${u.score ? `<span class="sp-score-badge">${esc(u.score)}</span>` : ''}
               ${u.record_date ? `<span class="sp-date-lbl"><i class="ti ti-calendar"></i> ${fmtDate(u.record_date)}</span>` : ''}
-              ${u.proof_url ? `<a href="${u.proof_url}" target="_blank" style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:var(--green-dark);text-decoration:none;background:var(--green-light);padding:3px 10px;border-radius:99px;"><i class="ti ti-file-check"></i> View proof</a>` : `<span style="font-size:11px;color:#DC2626;display:inline-flex;align-items:center;gap:4px;"><i class="ti ti-alert-circle"></i> No proof uploaded</span>`}
+              ${u.proof_url ? `<a href="#" onclick="openProof('${esc(u.id)}');return false;" style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:var(--green-dark);text-decoration:none;background:var(--green-light);padding:3px 10px;border-radius:99px;"><i class="ti ti-file-check"></i> View proof</a>` : `<span style="font-size:11px;color:#DC2626;display:inline-flex;align-items:center;gap:4px;"><i class="ti ti-alert-circle"></i> No proof uploaded</span>`}
             </div>
           </div>
           <button class="sp-entry-del" onclick="deleteEntry('${u.id}')" title="Delete">

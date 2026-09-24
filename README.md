@@ -27,15 +27,6 @@ A 4-portal web system for Thuvakkam Education's **Sponsor for Success** scholars
 
 ---
 
-## Admin Portal Credentials
-
-| Field | Value |
-|-------|-------|
-| Email | admin@gmail.com |
-| Password | admin |
-
----
-
 ## Student Portal — Test Account
 
 | Field | Value |

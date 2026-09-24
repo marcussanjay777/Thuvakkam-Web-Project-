@@ -6,6 +6,57 @@ const SUPABASE_KEY = 'sb_publishable_vO20BiWyS_VIkhU2DDmw3g_BoGBeCdq';
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+// The application cycle the portal is currently working on. Update this once
+// per year — every page reads it, so a new cycle only needs this one edit.
+const SFS_CYCLE_YEAR = 2026;
+
+// Escape DB-supplied text before putting it in innerHTML. Applicant names and
+// schools come from the public form, so they are untrusted input.
+function esc(str) {
+  return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Same, but renders a dash for empty values instead of the word "null".
+function escOr(str, fallback = '—') {
+  return (str === null || str === undefined || str === '') ? fallback : esc(str);
+}
+
+// Uploaded documents live in a PRIVATE storage bucket, so a stored link cannot
+// be opened directly. This swaps it for a short-lived (5 minute) signed link.
+// It only accepts links that point at our own bucket, so a hostile value saved
+// through the public form can never become a clickable link or a script.
+const DOC_LINK_PREFIXES = ['public', 'sign', 'authenticated']
+  .map(kind => `${SUPABASE_URL}/storage/v1/object/${kind}/student-documents/`);
+
+async function signedDocUrl(fileUrl, forceDownload = false) {
+  const url    = String(fileUrl || '');
+  const prefix = DOC_LINK_PREFIXES.find(p => url.startsWith(p));
+  if (!prefix) throw new Error('This file link is not valid.');
+  let path;
+  try { path = decodeURIComponent(url.slice(prefix.length).split('?')[0]); }
+  catch (e) { throw new Error('This file link is not valid.'); }
+
+  const { data, error } = await sb.storage.from('student-documents')
+    .createSignedUrl(path, 300, forceDownload ? { download: true } : undefined);
+  if (error || !data || !data.signedUrl) {
+    throw new Error('Could not open this file' + (error && error.message ? ' (' + error.message + ')' : '') + '.');
+  }
+  return data.signedUrl;
+}
+
+async function downloadStoredFile(fileUrl) {
+  try {
+    const a = document.createElement('a');
+    a.href = await signedDocUrl(fileUrl, true);
+    a.download = '';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  } catch (e) {
+    alert(e.message);
+  }
+}
+
 // Redirect to login if no active session, populate topbar, and prompt for name if not set
 async function requireAuth() {
   const { data: { session } } = await sb.auth.getSession();
@@ -168,7 +219,7 @@ function showNotification(s) {
     <div style="flex:1;">
       <div class="notif-title">New application received</div>
       <div class="notif-body">
-        <strong>${s.name}</strong> from ${s.school}, ${s.district} (Class ${s.class}) just applied for SFS 2026.
+        <strong>${esc(s.name)}</strong>${[s.school, s.district].filter(Boolean).map(esc).join(', ') ? ' from ' + [s.school, s.district].filter(Boolean).map(esc).join(', ') : ''} just applied for SFS ${SFS_CYCLE_YEAR}.
       </div>
       <div class="notif-actions">
         <button class="notif-btn-primary" onclick="window.location.href='applications.html'">View applications</button>
@@ -198,7 +249,7 @@ async function updatePendingBadge() {
   const { count } = await sb.from('students')
     .select('id', { count: 'exact', head: true })
     .eq('status', 'pending')
-    .eq('cycle_year', 2026);
+    .eq('cycle_year', SFS_CYCLE_YEAR);
 
   // Remove existing badge
   const existing = appLink.querySelector('#pending-badge');
@@ -296,9 +347,12 @@ async function signOut() {
   window.location.href = 'index.html';
 }
 
-// Global topbar search — redirects to applications with ?q= param
+// Global topbar search — redirects to applications with ?q= param.
+// Scoped to .topbar specifically because applications.html/rejected.html also
+// have their own in-page search box (id="search-input") sharing the same class —
+// without this scope, querySelector would grab the wrong one on those pages.
 function initSearch() {
-  const input = document.querySelector('.search-input');
+  const input = document.querySelector('.topbar .search-input');
   if (!input) return;
   // Pre-fill from URL if coming back from a search
   const params = new URLSearchParams(window.location.search);
