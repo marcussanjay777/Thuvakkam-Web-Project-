@@ -8,10 +8,10 @@ A 4-portal web system for Thuvakkam Education's **Sponsor for Success** scholars
 
 | Portal | URL |
 |--------|-----|
-| 🌐 Public Website | https://thuvakkamsfs.netlify.app/website/ |
-| 🛠️ Admin Portal | https://thuvakkamsfs.netlify.app/portal/ |
-| 🎓 Student Portal | https://thuvakkamsfs.netlify.app/student-portal/ |
-| 💛 Donor Portal | https://thuvakkamsfs.netlify.app/donor-portal/ |
+| 🌐 Public Website | https://thuvakkamsfs.org/website/ |
+| 🛠️ Admin Portal | https://thuvakkamsfs.org/portal/ |
+| 🎓 Student Portal | https://thuvakkamsfs.org/student-portal/ |
+| 💛 Donor Portal | https://thuvakkamsfs.org/donor-portal/ |
 
 ---
 
@@ -27,32 +27,18 @@ A 4-portal web system for Thuvakkam Education's **Sponsor for Success** scholars
 
 ---
 
-## Admin Portal Credentials
+## Admin Portal
 
-| Field | Value |
-|-------|-------|
-| Email | admin@gmail.com |
-| Password | admin |
+Committee login details are shared privately by the project owner. They are
+never kept in this repository, because the repository is public.
 
 ---
 
-## Student Portal — Test Account
+## Student & Donor Portals
 
-| Field | Value |
-|-------|-------|
-| Email | teststudent@sfs.com |
-| Password | Student@123 |
-
-Logs in as **Sanjay Marcus** (test student).
-
----
-
-## Donor Portal — Test Account
-
-| Field | Value |
-|-------|-------|
-| Email | testdonor@sfs.com |
-| Password | Donor@123 |
+Students get their login by email once the committee selects them.
+Donors register themselves on the donor portal. There are no shared
+test accounts.
 
 ---
 

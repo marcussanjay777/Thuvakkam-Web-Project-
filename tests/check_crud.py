@@ -1,4 +1,5 @@
 import json, urllib.request, urllib.error, datetime
+from local_settings import ADMIN_EMAIL, ADMIN_PASSWORD  # private file, not in git
 
 URL = "https://vftexybohuaxngyhwjts.supabase.co"
 KEY = "sb_publishable_vO20BiWyS_VIkhU2DDmw3g_BoGBeCdq"
@@ -21,7 +22,7 @@ def login(email, pw):
     c, r = req("/auth/v1/token?grant_type=password", "POST", {"email": email, "password": pw})
     return r.get("access_token") if isinstance(r, dict) else None
 
-admin = login("admin@gmail.com", "admin")
+admin = login(ADMIN_EMAIL, ADMIN_PASSWORD)
 student = login("teststudent@sfs.com", "Student@123")
 
 print("=" * 55)

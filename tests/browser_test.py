@@ -1,5 +1,6 @@
 import os
 from playwright.sync_api import sync_playwright
+from local_settings import ADMIN_EMAIL, ADMIN_PASSWORD  # private file, not in git
 
 BASE = "http://localhost:8000"
 SHOTS = os.path.join(os.getcwd(), "tests", "test-shots")
@@ -77,7 +78,7 @@ with sync_playwright() as p:
     c.close()
 
     # ---- Admin login (should reach dashboard/portal) ----
-    page, c, url, dlg = do_login("/portal/index.html", "admin@gmail.com", "admin")
+    page, c, url, dlg = do_login("/portal/index.html", ADMIN_EMAIL, ADMIN_PASSWORD)
     ok = "index.html" not in url
     if ok:
         page.wait_for_timeout(1500)
@@ -87,7 +88,8 @@ with sync_playwright() as p:
 
     # ---- SECURITY: donor must NOT get into the admin portal ----
     page, c, url, dlg = do_login("/portal/index.html", "testdonor@sfs.com", "Donor@123")
-    blocked = ("index.html" in url) and (dlg is not None and "not authorised" in dlg.lower())
+    on_login = url.split("?")[0].split("#")[0].endswith(("/portal/", "/portal/index.html"))
+    blocked = on_login and (dlg is not None and "not authorised" in dlg.lower())
     log("donor BLOCKED from admin portal", blocked,
         ("alert: " + (dlg or "none")) if dlg else "no block")
     c.close()

@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Team — Thuvakkam SFS Portal</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="js/client.js"></script>
+  <style>
+    .tm-tag { display: inline-block; border-radius: 99px; padding: 2px 8px; font-size: 11px; font-weight: 700; margin-left: 6px; vertical-align: middle; }
+    .tm-tag-you  { background: var(--green-light); color: var(--green-dark); }
+    .tm-tag-main { background: #FEF3C7; color: #92400E; }
+    .tm-actions { display: flex; gap: 8px; justify-content: flex-end; }
+    .tm-btn { background: var(--white); border: 1px solid var(--grey-200); border-radius: var(--radius-sm); padding: 6px 10px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: var(--font); color: var(--grey-600); display: inline-flex; align-items: center; gap: 5px; }
+    .tm-btn:hover { border-color: var(--green-mid); color: var(--green-dark); }
+    .tm-btn-danger:hover { border-color: #FCA5A5; color: #991B1B; background: #FEF2F2; }
+    .tm-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .tm-modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.45); display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 20px; }
+    .tm-modal { background: var(--white); border-radius: var(--radius-lg); width: 100%; max-width: 460px; box-shadow: 0 8px 40px rgba(0,0,0,0.18); overflow: hidden; }
+    .tm-modal-head { background: var(--green-dark); padding: 18px 24px; display: flex; align-items: center; justify-content: space-between; }
+    .tm-modal-title { font-size: 15px; font-weight: 700; color: #fff; }
+    .tm-modal-close { background: rgba(255,255,255,0.15); border: none; border-radius: 6px; width: 30px; height: 30px; cursor: pointer; color: #fff; font-size: 17px; display: flex; align-items: center; justify-content: center; }
+    .tm-modal-body { padding: 18px 20px; display: flex; flex-direction: column; gap: 14px; }
+    .tm-label { display: block; font-size: 12px; font-weight: 600; color: var(--grey-600); margin-bottom: 6px; }
+    .tm-input { width: 100%; border: 1px solid var(--grey-200); border-radius: var(--radius-md); padding: 9px 12px; font-size: 13px; font-family: var(--font); outline: none; background: var(--white); }
+    .tm-input:focus { border-color: var(--green-mid); }
+    .tm-note { font-size: 12px; color: var(--grey-600); line-height: 1.5; background: var(--grey-50); border-radius: var(--radius-md); padding: 10px 12px; }
+    .tm-err { font-size: 12px; color: #991B1B; display: none; }
+    .tm-modal-foot { padding: 14px 16px; border-top: 1px solid var(--grey-100); display: flex; gap: 10px; justify-content: flex-end; }
+    .tm-btn-primary { padding: 10px 20px; border-radius: var(--radius-sm); border: none; background: var(--green-dark); color: #fff; font-size: 13px; font-weight: 700; cursor: pointer; font-family: var(--font); }
+    .tm-btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+    .tm-btn-outline { padding: 10px 20px; border-radius: var(--radius-sm); border: 1px solid var(--grey-200); background: var(--white); font-size: 13px; font-weight: 600; cursor: pointer; font-family: var(--font); color: var(--grey-600); }
+
+    .tm-banner { display: none; border-radius: var(--radius-md); padding: 12px 16px; font-size: 13px; margin-bottom: 20px; line-height: 1.5; word-break: break-word; }
+    .tm-banner-ok   { background: #D1FAE5; border: 1px solid #A7F3D0; color: #065F46; }
+    .tm-banner-warn { background: #FFFBEB; border: 1px solid #FDE68A; color: #92400E; }
+    .tm-banner-err  { background: #FEE2E2; border: 1px solid #FCA5A5; color: #991B1B; }
+  </style>
+</head>
+<body>
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-accent"></div>
+      <div class="topbar-brand">
+        Thuvakkam Education
+        <span>Sponsor for Success &mdash; Internal Portal</span>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <input class="search-input" type="text" placeholder="Search students, schools..." />
+      <div class="topbar-divider"></div>
+      <div class="user-pill">
+        <div class="user-avatar">RK</div>
+        <div class="user-info">
+          <div class="user-name">Ramesh Kumar</div>
+          <div class="user-role">Committee Member</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="nav-section-label">Main</div>
+    <a class="nav-item" href="dashboard.html">
+      <i class="ti ti-layout-dashboard"></i> Overview
+    </a>
+    <a class="nav-item" href="applications.html">
+      <i class="ti ti-file-text"></i> Applications
+    </a>
+    <a class="nav-item" href="selected.html">
+      <i class="ti ti-user-check"></i> Selected Students
+    </a>
+    <a class="nav-item" href="rejected.html"><i class="ti ti-user-x"></i> Rejected</a>
+    <a class="nav-item" href="previous.html">
+      <i class="ti ti-clock-history"></i> Previous Beneficiaries
+    </a>
+
+    <div class="nav-section-label">Reports</div>
+    <a class="nav-item" href="donor-management.html">
+      <i class="ti ti-heart-handshake"></i> Donor Management
+    </a>
+    <a class="nav-item" href="donors.html">
+      <i class="ti ti-chart-bar"></i> Donor Transparency
+    </a>
+    <a class="nav-item" href="general-donations.html">
+      <i class="ti ti-cash"></i> General Donations
+    </a>
+    <a class="nav-item" href="documents.html">
+      <i class="ti ti-folder"></i> Documents
+    </a>
+
+    <div class="nav-section-label">Settings</div>
+    <a class="nav-item active" href="team.html">
+      <i class="ti ti-users-group"></i> Team
+    </a>
+
+    <div class="sidebar-footer">
+      <a class="nav-item" href="#" onclick="signOut()"><i class="ti ti-logout"></i> Sign out</a>
+    </div>
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="main">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Team</div>
+        <div class="page-subtitle">Everyone who can sign in to this committee portal</div>
+      </div>
+      <button onclick="openAddModal()" style="display:flex;align-items:center;gap:6px;padding:8px 16px;background:var(--green-dark);color:#fff;border:none;border-radius:var(--radius-md);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">
+        <i class="ti ti-user-plus"></i> Add admin
+      </button>
+    </div>
+
+    <div class="tm-banner" id="banner"></div>
+
+    <div style="background:#FFFBEB;border:1px solid #FDE68A;border-radius:var(--radius-md);padding:12px 16px;font-size:13px;color:#92400E;margin-bottom:20px;display:flex;gap:8px;align-items:flex-start;">
+      <i class="ti ti-info-circle" style="flex-shrink:0;margin-top:1px;"></i>
+      <span>Everyone listed here can see <strong>every applicant's personal details and documents</strong>. Only add people who need that. The role is just a label &mdash; everyone has the same access.</span>
+    </div>
+
+    <div class="card" style="margin-top:0;">
+      <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;">
+        <div class="card-title">Portal access</div>
+        <div id="result-count" style="font-size:13px;color:var(--grey-400);"></div>
+      </div>
+      <div class="card-body" style="padding:0;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Last signed in</th>
+              <th style="text-align:right;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="team-tbody">
+            <tr><td colspan="5" style="text-align:center;padding:40px;color:var(--grey-400);">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- ADD ADMIN MODAL -->
+  <div id="add-modal" style="display:none;">
+    <div class="tm-modal-backdrop" onclick="if(event.target===this)closeAddModal()">
+      <div class="tm-modal">
+        <div class="tm-modal-head">
+          <div class="tm-modal-title"><i class="ti ti-user-plus" style="margin-right:8px;"></i>Add admin</div>
+          <button class="tm-modal-close" onclick="closeAddModal()"><i class="ti ti-x"></i></button>
+        </div>
+        <div class="tm-modal-body">
+          <div>
+            <label class="tm-label" for="add-name">Full name *</label>
+            <input class="tm-input" type="text" id="add-name" placeholder="e.g. Priya Raman" />
+          </div>
+          <div>
+            <label class="tm-label" for="add-email">Email *</label>
+            <input class="tm-input" type="email" id="add-email" placeholder="name@example.com" />
+          </div>
+          <div>
+            <label class="tm-label" for="add-role">Role</label>
+            <select class="tm-input" id="add-role">
+              <option value="Committee Member">Committee Member</option>
+              <option value="Administrator">Administrator</option>
+              <option value="Volunteer">Volunteer</option>
+            </select>
+          </div>
+          <div class="tm-note"><i class="ti ti-mail" style="margin-right:4px;"></i>They'll get an email with a link to set their own password. You don't need to make one up or send it.</div>
+          <div class="tm-err" id="add-err"></div>
+        </div>
+        <div class="tm-modal-foot">
+          <button class="tm-btn-outline" onclick="closeAddModal()">Cancel</button>
+          <button class="tm-btn-primary" id="add-btn" onclick="addAdmin()">Add &amp; send email</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let team = [];
+
+    // All Team actions go through the manage-staff Edge Function: creating
+    // logins and reading other staff emails needs a key that must never be in
+    // the browser, so it only lives there.
+    async function callStaff(body) {
+      const { data, error } = await sb.functions.invoke('manage-staff', { body });
+      if (error) {
+        let msg = error.message || 'Request failed';
+        try { const j = await error.context.json(); if (j && j.error) msg = j.error; } catch (e) {}
+        return { success: false, error: msg };
+      }
+      return data || { success: false, error: 'No response' };
+    }
+
+    function showBanner(kind, html) {
+      const el = document.getElementById('banner');
+      el.className = 'tm-banner tm-banner-' + kind;
+      el.innerHTML = html;
+      el.style.display = 'block';
+      el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function fmtWhen(iso) {
+      if (!iso) return '<span style="color:var(--grey-400);">Never</span>';
+      return new Date(iso).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    }
+
+    async function loadTeam() {
+      const tbody = document.getElementById('team-tbody');
+      const res = await callStaff({ action: 'list' });
+      if (!res.success) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--grey-400);">Could not load the team: ${esc(res.error)}</td></tr>`;
+        return;
+      }
+      team = res.staff || [];
+      document.getElementById('result-count').textContent = `${team.length} ${team.length === 1 ? 'person' : 'people'}`;
+      renderTeam();
+    }
+
+    function renderTeam() {
+      const tbody = document.getElementById('team-tbody');
+      if (!team.length) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--grey-400);">No one yet.</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = team.map(p => {
+        const tags = (p.is_you ? '<span class="tm-tag tm-tag-you">You</span>' : '')
+                   + (p.is_protected ? '<span class="tm-tag tm-tag-main">Main admin</span>' : '');
+        const canRemove = !p.is_you && !p.is_protected;
+        return `
+          <tr>
+            <td style="font-weight:600;">${escOr(p.full_name)}${tags}</td>
+            <td style="color:var(--grey-600);">${escOr(p.email)}</td>
+            <td>${escOr(p.role)}</td>
+            <td style="color:var(--grey-600);font-size:12px;">${fmtWhen(p.last_sign_in_at)}</td>
+            <td>
+              <div class="tm-actions">
+                <button class="tm-btn" data-id="${esc(p.id)}" data-act="reset" title="Email them a link to set a new password">
+                  <i class="ti ti-key"></i> Send password reset
+                </button>
+                ${canRemove ? `<button class="tm-btn tm-btn-danger" data-id="${esc(p.id)}" data-act="remove"><i class="ti ti-user-minus"></i> Remove</button>` : ''}
+              </div>
+            </td>
+          </tr>`;
+      }).join('');
+    }
+
+    // One click handler for the row buttons (no ids inside inline onclick strings)
+    document.getElementById('team-tbody').addEventListener('click', e => {
+      const btn = e.target.closest('button[data-act]');
+      if (!btn) return;
+      const person = team.find(p => p.id === btn.dataset.id);
+      if (!person) return;
+      if (btn.dataset.act === 'reset')  sendReset(person, btn);
+      if (btn.dataset.act === 'remove') removeAdmin(person, btn);
+    });
+
+    function linkFallback(link) {
+      // The email didn't go out, so show the link to share privately instead.
+      return `<div style="margin-top:8px;">The email could not be sent. Copy this one-time link and send it to them privately:</div>
+              <input class="tm-input" readonly value="${esc(link)}" onclick="this.select()" style="margin-top:6px;font-size:12px;" />`;
+    }
+
+    async function sendReset(person, btn) {
+      if (!confirm(`Email ${person.email} a link to set a new password?`)) return;
+      btn.disabled = true;
+      const res = await callStaff({ action: 'reset', user_id: person.id });
+      btn.disabled = false;
+      if (!res.success) { showBanner('err', 'Could not send the reset link: ' + esc(res.error)); return; }
+      if (res.email_sent) showBanner('ok', `Password reset link sent to <strong>${esc(person.email)}</strong>.`);
+      else showBanner('warn', `Reset link created for <strong>${esc(person.email)}</strong>.` + linkFallback(res.action_link));
+    }
+
+    async function removeAdmin(person, btn) {
+      if (!confirm(`Remove ${person.full_name || person.email}'s access to the committee portal?\n\nThey will no longer be able to sign in here. You can add them back later.`)) return;
+      btn.disabled = true;
+      const res = await callStaff({ action: 'remove', user_id: person.id });
+      if (!res.success) { btn.disabled = false; showBanner('err', 'Could not remove access: ' + esc(res.error)); return; }
+      showBanner('ok', `<strong>${esc(person.full_name || person.email)}</strong> no longer has access.`);
+      loadTeam();
+    }
+
+    /* ── ADD ADMIN ───────────────────────────────────────────── */
+    function openAddModal() {
+      document.getElementById('add-name').value  = '';
+      document.getElementById('add-email').value = '';
+      document.getElementById('add-role').value  = 'Committee Member';
+      document.getElementById('add-err').style.display = 'none';
+      document.getElementById('add-modal').style.display = 'block';
+      document.getElementById('add-name').focus();
+    }
+
+    function closeAddModal() {
+      document.getElementById('add-modal').style.display = 'none';
+    }
+
+    async function addAdmin() {
+      const fullName = document.getElementById('add-name').value.trim();
+      const email    = document.getElementById('add-email').value.trim();
+      const role     = document.getElementById('add-role').value;
+      const errEl    = document.getElementById('add-err');
+      const btn      = document.getElementById('add-btn');
+
+      errEl.style.display = 'none';
+      if (!fullName) { errEl.textContent = 'Please enter their full name.'; errEl.style.display = 'block'; return; }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { errEl.textContent = 'Please enter a valid email address.'; errEl.style.display = 'block'; return; }
+
+      btn.disabled = true; btn.textContent = 'Adding...';
+      const res = await callStaff({ action: 'add', email, full_name: fullName, role });
+      btn.disabled = false; btn.innerHTML = 'Add &amp; send email';
+
+      if (!res.success) { errEl.textContent = res.error; errEl.style.display = 'block'; return; }
+
+      closeAddModal();
+      if (res.email_sent) {
+        showBanner('ok', `<strong>${esc(fullName)}</strong> has been added. We've emailed <strong>${esc(email)}</strong> a link to set their password.`);
+      } else {
+        showBanner('warn', `<strong>${esc(fullName)}</strong> has been added.` + linkFallback(res.action_link));
+      }
+      loadTeam();
+    }
+
+    document.getElementById('add-email').addEventListener('keydown', e => { if (e.key === 'Enter') addAdmin(); });
+
+    requireAuth().then(session => {
+      if (!session) return;
+      if (!isOwner(session)) {
+        document.querySelector('.page-header button').remove();
+        document.getElementById('team-tbody').innerHTML =
+          `<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--grey-400);">Only the main admin can manage the team.</td></tr>`;
+        return;
+      }
+      loadTeam();
+    });
+  </script>
+</body>
+</html>

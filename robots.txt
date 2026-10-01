@@ -3,4 +3,4 @@ Allow: /
 Disallow: /portal/
 Disallow: /archive/
 
-Sitemap: https://thuvakkamsfs.netlify.app/sitemap.xml
+Sitemap: https://thuvakkamsfs.org/sitemap.xml

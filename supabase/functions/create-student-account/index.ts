@@ -5,7 +5,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-const STUDENT_PORTAL_URL = 'https://thuvakkamsfs.netlify.app/student-portal'
+const STUDENT_PORTAL_URL = 'https://thuvakkamsfs.org/student-portal'
 
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -100,7 +100,7 @@ Deno.serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'Thuvakkam SFS <onboarding@resend.dev>',
+        from: 'Thuvakkam SFS <no-reply@thuvakkamsfs.org>',
         to: student_email,
         subject: "You've been accepted — Thuvakkam SFS Scholarship",
         html: acceptanceEmailHtml(student_name || 'Student', student_email, actionLink),

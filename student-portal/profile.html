@@ -188,14 +188,14 @@
     /* ── AUTH GUARD ─────────────────────────────────────── */
     async function init() {
       const { data: { session } } = await sb.auth.getSession();
-      if (!session) { window.location.href = 'index.html'; return; }
+      if (!session) { window.location.href = './'; return; }
 
       const { data: student, error } = await sb.from('students')
         .select('*').eq('auth_user_id', session.user.id).maybeSingle();
 
       if (!student || error) {
         await sb.auth.signOut();
-        window.location.href = 'index.html';
+        window.location.href = './';
         return;
       }
 
@@ -524,7 +524,7 @@
     /* ── LOGOUT ─────────────────────────────────────────── */
     async function doLogout() {
       await sb.auth.signOut();
-      window.location.href = 'index.html';
+      window.location.href = './';
     }
 
     /* ── UTILS ──────────────────────────────────────────── */

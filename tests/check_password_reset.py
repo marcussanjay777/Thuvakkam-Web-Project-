@@ -243,7 +243,7 @@ with sync_playwright() as pw:
         ("Choose a New Password",), "Save new password", "Password updated", "#submit-btn",
     )
     password_page_flow(
-        browser, "donor", "/donor-portal/reset-password.html", "**/donor-portal/index.html",
+        browser, "donor", "/donor-portal/reset-password.html", "**/donor-portal/",
         "#reset-error", "#reset-success", "#reset-fields",
         None, "Save new password", "Password updated", "#submit-btn",
     )

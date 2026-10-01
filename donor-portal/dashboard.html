@@ -195,12 +195,12 @@
 
   async function init() {
     const { data: { session } } = await sb.auth.getSession();
-    if (!session) { window.location.href = 'index.html'; return; }
+    if (!session) { window.location.href = './'; return; }
 
     const { data: donor } = await sb.from('donor_accounts')
       .select('*').eq('auth_user_id', session.user.id).maybeSingle();
 
-    if (!donor) { await sb.auth.signOut(); window.location.href = 'index.html'; return; }
+    if (!donor) { await sb.auth.signOut(); window.location.href = './'; return; }
     currentDonor = donor;
 
     await Promise.all([loadDonations(), loadMatches()]);
@@ -542,7 +542,7 @@
     btn.disabled = false; btn.innerHTML = '<i class="ti ti-check"></i> Save donation';
   }
 
-  async function doLogout() { await sb.auth.signOut(); window.location.href = 'index.html'; }
+  async function doLogout() { await sb.auth.signOut(); window.location.href = './'; }
 
   function fmtDate(d) {
     if (!d) return '';

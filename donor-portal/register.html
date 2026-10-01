@@ -73,7 +73,7 @@
         <button class="dp-auth-btn" id="step1-btn" onclick="submitStep1()">
           Create account
         </button>
-        <div class="dp-auth-link">Already have an account? <a href="index.html">Sign in</a></div>
+        <div class="dp-auth-link">Already have an account? <a href="./">Sign in</a></div>
       </div>
 
       <!-- ── STEP 2: Confirm your email ── -->
@@ -97,7 +97,7 @@
                 style="background:#fff;color:#0E7162;border:1px solid #0E7162;">
           Resend confirmation email
         </button>
-        <div class="dp-auth-link">Already confirmed? <a href="index.html">Sign in</a></div>
+        <div class="dp-auth-link">Already confirmed? <a href="./">Sign in</a></div>
       </div>
 
     </div>
@@ -144,7 +144,7 @@
       password,
       options: {
         data: { full_name: name, dob, occupation, user_type: 'donor' },
-        emailRedirectTo: new URL('index.html', window.location.href).href,
+        emailRedirectTo: new URL('./', window.location.href).href,
       },
     });
 

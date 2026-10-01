@@ -15,6 +15,7 @@ import urllib.request
 import uuid
 
 from playwright.sync_api import sync_playwright
+from local_settings import ADMIN_EMAIL, ADMIN_PASSWORD  # private file, not in git
 
 BASE = "http://localhost:8000"
 SUPA = "https://vftexybohuaxngyhwjts.supabase.co"
@@ -132,7 +133,7 @@ with sync_playwright() as pw:
     browser = pw.chromium.launch()
 
     # ── ADMIN ────────────────────────────────────────────────────────────────
-    ctx, page, errors = login(browser, "/portal/index.html", "admin@gmail.com", "admin")
+    ctx, page, errors = login(browser, "/portal/index.html", ADMIN_EMAIL, ADMIN_PASSWORD)
     page.goto(BASE + "/portal/documents.html", wait_until="networkidle", timeout=25000)
     page.wait_for_timeout(2500)
     check("admin: documents page has no script errors", not errors, errors)
@@ -169,7 +170,7 @@ with sync_playwright() as pw:
     ctx.close()
 
     # ── ADMIN PROFILE PANEL vs hostile applicant data ────────────────────────
-    ctx, page, errors = login(browser, "/portal/index.html", "admin@gmail.com", "admin")
+    ctx, page, errors = login(browser, "/portal/index.html", ADMIN_EMAIL, ADMIN_PASSWORD)
     page.goto(BASE + "/portal/applications.html", wait_until="networkidle", timeout=25000)
     page.wait_for_timeout(2000)
     mock_hostile_records(page)
@@ -225,7 +226,7 @@ with sync_playwright() as pw:
         f_anon = "zz-probe-anon/%s.png" % run
         fixtures = [f_doc, f_other, f_sanjay]
 
-        actx, apage, _ = login(browser, "/portal/documents.html", "admin@gmail.com", "admin")
+        actx, apage, _ = login(browser, "/portal/documents.html", ADMIN_EMAIL, ADMIN_PASSWORD)
         apage.goto(BASE + "/portal/documents.html", wait_until="networkidle", timeout=25000)
         apage.wait_for_timeout(1500)
         for f in fixtures:

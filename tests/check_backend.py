@@ -1,4 +1,5 @@
 import json, urllib.request, urllib.error
+from local_settings import ADMIN_EMAIL, ADMIN_PASSWORD  # private file, not in git
 
 URL = "https://vftexybohuaxngyhwjts.supabase.co"
 KEY = "sb_publishable_vO20BiWyS_VIkhU2DDmw3g_BoGBeCdq"
@@ -38,7 +39,7 @@ print("2. Anon blocked from reading students table:",
       "PASS (returns empty)" if blocked else "FAIL - got: %s" % str(res)[:80])
 
 # 3. Logins
-admin_t   = login("admin@gmail.com", "admin")
+admin_t   = login(ADMIN_EMAIL, ADMIN_PASSWORD)
 student_t = login("teststudent@sfs.com", "Student@123")
 donor_t   = login("testdonor@sfs.com", "Donor@123")
 print("3. Admin login:  ", "PASS" if admin_t else "FAIL")

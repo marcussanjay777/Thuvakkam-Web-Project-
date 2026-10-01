@@ -167,11 +167,11 @@
 
   <nav class="nav">
     <div class="nav-inner">
-      <a href="index.html" class="nav-brand">
+      <a href="./" class="nav-brand">
         <img src="assets/logo.webp" alt="Thuvakkam Education" style="height:38px;width:auto;object-fit:contain;" />
       </a>
       <div class="nav-links">
-        <a class="nav-link"        href="index.html">Home</a>
+        <a class="nav-link"        href="./">Home</a>
         <a class="nav-link"        href="impact.html">Impact</a>
         <a class="nav-link"        href="criteria.html">Selection</a>
         <a class="nav-link"        href="support.html">Support</a>
@@ -183,7 +183,7 @@
       <div class="nav-actions">
         <a href="#apply-form" class="btn-nav-outline">Apply now</a>
         <a href="donate.html" class="btn-nav-primary">Donate</a>
-        <a href="../student-portal/index.html" class="btn-nav-outline" style="border-color:var(--yellow);color:var(--yellow);">Student Portal</a>
+        <a href="../student-portal/" class="btn-nav-outline" style="border-color:var(--yellow);color:var(--yellow);">Student Portal</a>
       </div>
     </div>
   </nav>
@@ -317,10 +317,10 @@
                     </div>
                   </div>
                   <div class="field-group">
-                    <label class="field-label">Student contact no. (if available)</label>
+                    <label class="field-label">Student mobile no. (if available)</label>
                     <div class="phone-input-group">
                       <span class="phone-prefix">+91</span>
-                      <input class="field-input phone-digits" name="student_phone_alt" type="tel" inputmode="numeric" placeholder="98765 43210" />
+                      <input class="field-input phone-digits" name="student_phone" type="tel" inputmode="numeric" placeholder="98765 43210" />
                     </div>
                   </div>
                 </div>
@@ -330,10 +330,10 @@
                     <input class="field-input" name="email" type="email" placeholder="student@example.com" required />
                   </div>
                   <div class="field-group">
-                    <label class="field-label">Student contact no. (if available)</label>
+                    <label class="field-label">Alternate mobile no. (if available)</label>
                     <div class="phone-input-group">
                       <span class="phone-prefix">+91</span>
-                      <input class="field-input phone-digits" name="student_phone" type="tel" inputmode="numeric" placeholder="98765 43210" />
+                      <input class="field-input phone-digits" name="alternate_phone" type="tel" inputmode="numeric" placeholder="98765 43210" />
                     </div>
                   </div>
                 </div>
@@ -635,7 +635,7 @@
         <div style="display:flex;gap:20px;">
           <a href="#">Privacy policy</a>
           <a href="#">Terms of use</a>
-          <a href="../portal/index.html">Committee portal</a>
+          <a href="../portal/">Committee portal</a>
         </div>
       </div>
     </div>
@@ -940,7 +940,7 @@
 
       // Phone fields hold only digits (the +91 is a fixed prefix) — any filled
       // one must be exactly 10 digits; the optional ones may be left blank.
-      for (const name of ['referrer_phone', 'parent_contact', 'student_phone_alt', 'student_phone']) {
+      for (const name of ['referrer_phone', 'parent_contact', 'student_phone', 'alternate_phone']) {
         const val = fd.get(name);
         if (val && val.length !== 10) return showErr('Please enter a valid 10-digit phone number.', name);
       }
@@ -998,6 +998,7 @@
           school:              fd.get('school').trim()                || null,
           email:               fd.get('email').trim()                 || null,
           student_phone:       withCountryCode(fd.get('student_phone')),
+          alternate_phone:     withCountryCode(fd.get('alternate_phone')),
           school_10th:         fd.get('school_10th').trim()           || null,
           school_12th:         fd.get('school_12th').trim()           || null,
           college_ug:          fd.get('college_ug').trim()            || null,

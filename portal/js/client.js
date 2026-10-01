@@ -10,6 +10,14 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 // per year — every page reads it, so a new cycle only needs this one edit.
 const SFS_CYCLE_YEAR = 2026;
 
+// The owner login — the only account that can add or remove admins (Team page).
+// The real check is in the manage-staff Edge Function; this just hides the link.
+const SFS_OWNER_EMAIL = 'marcus.sanjay777@gmail.com';
+
+function isOwner(session) {
+  return !!session && (session.user.email || '').toLowerCase() === SFS_OWNER_EMAIL;
+}
+
 // Escape DB-supplied text before putting it in innerHTML. Applicant names and
 // schools come from the public form, so they are untrusted input.
 function esc(str) {
@@ -61,7 +69,7 @@ async function downloadStoredFile(fileUrl) {
 async function requireAuth() {
   const { data: { session } } = await sb.auth.getSession();
   if (!session) {
-    window.location.href = 'index.html';
+    window.location.href = './';
     return null;
   }
 
@@ -73,7 +81,7 @@ async function requireAuth() {
   if (donorRow || studentRow) {
     await sb.auth.signOut();
     alert('This account is not authorised for the committee portal.');
-    window.location.href = 'index.html';
+    window.location.href = './';
     return null;
   }
 
@@ -88,7 +96,7 @@ async function requireAuth() {
   if (!profile) {
     await sb.auth.signOut();
     alert('This account is not authorised for the committee portal. Please ask an administrator to grant you access.');
-    window.location.href = 'index.html';
+    window.location.href = './';
     return null;
   }
 
@@ -109,6 +117,14 @@ async function requireAuth() {
   if (nameEl)   nameEl.textContent   = fullName;
   if (roleEl)   roleEl.textContent   = role;
   if (avatarEl) avatarEl.textContent = initials;
+
+  if (!isOwner(session)) {
+    document.querySelectorAll('a[href="team.html"]').forEach(link => {
+      const label = link.previousElementSibling;
+      if (label && label.classList.contains('nav-section-label') && label.textContent.trim() === 'Settings') label.remove();
+      link.remove();
+    });
+  }
 
   initSearch();
   initRealtime();
@@ -344,7 +360,7 @@ function promptProfileSetup(userId, email) {
 // Sign out
 async function signOut() {
   await sb.auth.signOut();
-  window.location.href = 'index.html';
+  window.location.href = './';
 }
 
 // Global topbar search — redirects to applications with ?q= param.

@@ -234,6 +234,7 @@ async function openProfile(studentId, context) {
               <div class="pp-field"><span class="pp-field-key">Aadhaar number</span>${val(s.aadhaar)}</div>
               <div class="pp-field"><span class="pp-field-key">Email</span>${val(s.email)}</div>
               <div class="pp-field"><span class="pp-field-key">Student phone</span>${val(s.student_phone)}</div>
+              <div class="pp-field"><span class="pp-field-key">Alternate phone</span>${val(s.alternate_phone)}</div>
               <div class="pp-field"><span class="pp-field-key">Parent / Guardian phone</span>${val(s.phone)}</div>
               <div class="pp-field"><span class="pp-field-key">Address</span>${val(s.address)}</div>
               <div class="pp-field"><span class="pp-field-key">State</span>${val(s.state)}</div>
