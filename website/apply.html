@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Apply for the SFS 2026 scholarship by Thuvakkam Education. Complete the application form for financial support, mentoring and educational guidance." />
-  <title>Apply for SFS 2026 — Thuvakkam Education</title>
+  <meta name="description" content="Apply for the SFS 2026–27 scholarship by Thuvakkam Education. Complete the application form for financial support, mentoring and educational guidance." />
+  <title>Apply for SFS 2026–27 — Thuvakkam Education</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
   <link rel="stylesheet" href="css/style.css" />
   <style>
@@ -30,6 +30,11 @@
     .section-status { margin-left: auto; font-size: 18px; flex-shrink: 0; }
     .section-status.status-ok  { color: #16A34A; }
     .section-status.status-bad { color: #DC2626; }
+    /* Education blocks (built by js/apply-education.js) */
+    [hidden] { display: none !important; }
+    .edu-block { display: flex; flex-direction: column; gap: 14px; background: var(--grey-50); border: 1px solid var(--grey-100); border-radius: var(--radius-md); padding: 16px; margin-bottom: 14px; }
+    .edu-block-title { font-size: 13px; font-weight: 700; color: var(--green-dark); }
+    .edu-tag, .marks-note { font-weight: 500; color: var(--grey-400); font-size: 12px; }
     .form-row  { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
     .form-row.triple { grid-template-columns: 1fr 1fr 1fr; }
     .form-fields { display: flex; flex-direction: column; gap: 16px; }
@@ -162,7 +167,7 @@
 <body>
 
   <div class="topnotice">
-    SFS 2026 applications close on 31 August 2026. &nbsp;<a href="#apply-form">Apply now</a>
+    SFS 2026–27 applications are now open. &nbsp;<a href="#apply-form">Apply now</a>
   </div>
 
   <nav class="nav">
@@ -172,7 +177,6 @@
       </a>
       <div class="nav-links">
         <a class="nav-link"        href="./">Home</a>
-        <a class="nav-link"        href="impact.html">Impact</a>
         <a class="nav-link"        href="criteria.html">Selection</a>
         <a class="nav-link"        href="support.html">Support</a>
         <a class="nav-link"        href="stories.html">Stories</a>
@@ -190,9 +194,9 @@
 
   <div class="page-hero">
     <div class="page-hero-inner">
-      <div class="section-label-light" style="margin-bottom:8px;">Applications open</div>
-      <div class="page-hero-title">Apply for SFS 2026</div>
-      <div class="page-hero-sub">Fill in the form below. All submissions are reviewed by the committee within 45 days.</div>
+      <div class="section-label-light" style="margin-bottom:8px;">Applications open &middot; Academic year 2026–2027</div>
+      <div class="page-hero-title">Apply for SFS 2026–27</div>
+      <div class="page-hero-sub">Fill in the form below. All submissions are reviewed by the committee.</div>
     </div>
   </div>
 
@@ -214,7 +218,7 @@
           <div class="form-success" id="form-success">
             <div class="success-icon"><i class="ti ti-circle-check"></i></div>
             <h2 style="font-size:22px;font-weight:800;color:var(--green-dark);letter-spacing:-0.02em;margin-bottom:10px;">Application submitted!</h2>
-            <p style="font-size:14px;color:var(--grey-600);line-height:1.7;max-width:420px;margin:0 auto 20px;">Thank you for applying to SFS 2026. The committee will review your application and contact you within 45 days of the deadline.</p>
+            <p style="font-size:14px;color:var(--grey-600);line-height:1.7;max-width:420px;margin:0 auto 20px;">Thank you for applying to SFS 2026–27. The committee will review your application and contact you with the next steps.</p>
             <p style="font-size:13px;color:var(--grey-400);">Your reference number: <strong id="app-ref" style="color:var(--green-dark);"></strong></p>
           </div>
 
@@ -298,14 +302,13 @@
                     <label class="field-label">State <span class="req">*</span></label>
                     <select class="field-select" name="state" required>
                       <option value="">Select state</option>
-                      <option>Tamil Nadu</option><option>Andhra Pradesh</option><option>Karnataka</option>
-                      <option>Kerala</option><option>Telangana</option><option>Maharashtra</option>
-                      <option>Other</option>
                     </select>
                   </div>
                   <div class="field-group">
                     <label class="field-label">District <span class="req">*</span></label>
-                    <input class="field-input" name="district" type="text" placeholder="e.g. Chennai, Madurai, Coimbatore" required />
+                    <select class="field-select" name="district" required disabled>
+                      <option value="">Select state first</option>
+                    </select>
                   </div>
                 </div>
                 <div class="form-row">
@@ -345,29 +348,21 @@
               <summary class="apply-section-title"><i class="ti ti-school"></i> Education details <i class="ti ti-circle-x section-status status-bad"></i><i class="ti ti-chevron-down apply-toggle-arrow"></i></summary>
               <div class="form-fields">
                 <div class="field-group">
-                  <label class="field-label">Current school / college name <span class="req">*</span></label>
-                  <input class="field-input" name="school" type="text" placeholder="Name of the school or college you are currently attending" required />
+                  <label class="field-label">Current school / college / institution name <span class="req">*</span></label>
+                  <input class="field-input" name="school" type="text" placeholder="Name of the school, college or institution you are currently attending" required />
                 </div>
                 <div class="field-group">
-                  <label class="field-label">10th standard school details <span class="req">*</span></label>
-                  <textarea class="field-textarea" name="school_10th" placeholder="School name, board (CBSE/State), year of passing, percentage / CGPA" required style="min-height:72px;"></textarea>
+                  <label class="field-label">Current level of study <span class="req">*</span></label>
+                  <select class="field-select" name="current_level" required>
+                    <option value="">Select your current level</option>
+                    <option>9th / 10th standard</option>
+                    <option>11th / 12th / Diploma / ITI</option>
+                    <option>UG (Bachelor's degree)</option>
+                    <option>PG (Master's degree)</option>
+                    <option>Other course</option>
+                  </select>
                 </div>
-                <div class="field-group">
-                  <label class="field-label">12th / Diploma school / institute details <span class="req">*</span></label>
-                  <textarea class="field-textarea" name="school_12th" placeholder="School / institute name, board, year of passing (or currently studying), percentage / CGPA" required style="min-height:72px;"></textarea>
-                </div>
-                <div class="field-group">
-                  <label class="field-label">U.G. college details</label>
-                  <textarea class="field-textarea" name="college_ug" placeholder="College name, course, year of joining, current semester (if applicable)" style="min-height:72px;"></textarea>
-                </div>
-                <div class="field-group">
-                  <label class="field-label">P.G. college details</label>
-                  <textarea class="field-textarea" name="college_pg" placeholder="College name, course, year of joining, current semester (if applicable)" style="min-height:72px;"></textarea>
-                </div>
-                <div class="field-group">
-                  <label class="field-label">If others (mention here)</label>
-                  <textarea class="field-textarea" name="other_education" placeholder="Any other educational qualification or course not mentioned above" style="min-height:64px;"></textarea>
-                </div>
+                <div id="edu-blocks"></div>
 
                 <div class="field-group">
                   <label class="field-label">Any other scholarship availed? <span class="req">*</span></label>
@@ -422,8 +417,8 @@
                 <div class="doc-row">
                   <div class="doc-num">2</div>
                   <div class="doc-info">
-                    <div class="doc-name">School / College ID card <span class="req">*</span></div>
-                    <input class="doc-file-input" type="file" name="doc_id_card" accept=".pdf,.jpg,.jpeg,.png" data-label="College ID Card" data-required="true" />
+                    <div class="doc-name">School / College / Institution ID card <span class="req">*</span></div>
+                    <input class="doc-file-input" type="file" name="doc_id_card" accept=".pdf,.jpg,.jpeg,.png" data-label="School / College / Institution ID Card" data-required="true" />
                     <div class="doc-hint">Upload 1 file (PDF, JPG or PNG).</div>
                     <div class="doc-status" id="status_doc_id_card"></div>
                   </div>
@@ -432,7 +427,7 @@
                 <div class="doc-row">
                   <div class="doc-num">3</div>
                   <div class="doc-info">
-                    <div class="doc-name">School / College admission proof <span class="req">*</span></div>
+                    <div class="doc-name">School / College / Institution admission proof <span class="req">*</span></div>
                     <input class="doc-file-input" type="file" name="doc_admission_proof" accept=".pdf,.jpg,.jpeg,.png" data-label="Admission Proof" data-required="true" />
                     <div class="doc-hint">Upload 1 file (PDF, JPG or PNG).</div>
                     <div class="doc-status" id="status_doc_admission_proof"></div>
@@ -572,10 +567,10 @@
 
           <div style="background:var(--white);border:1px solid var(--grey-100);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-sm);">
             <div style="background:var(--green-dark);padding:13px 16px;font-size:11px;font-weight:700;color:var(--white);text-transform:uppercase;letter-spacing:0.08em;">Key dates</div>
-            <div class="timeline-row"><span style="color:var(--grey-600);">Applications open</span><strong>01 Jun 2026</strong></div>
-            <div class="timeline-row hl"><span style="color:var(--grey-600);font-weight:600;">Deadline</span><strong style="color:var(--green-dark);">31 Aug 2026</strong></div>
-            <div class="timeline-row"><span style="color:var(--grey-600);">Shortlist</span><strong>30 Sep 2026</strong></div>
-            <div class="timeline-row"><span style="color:var(--grey-600);">Scholarships begin</span><strong>Nov 2026</strong></div>
+            <div class="timeline-row"><span style="color:var(--grey-600);">Applications open</span><strong>11 Oct 2026</strong></div>
+            <div class="timeline-row hl"><span style="color:var(--grey-600);font-weight:600;">Deadline</span><strong style="color:var(--green-dark);">To be announced</strong></div>
+            <div class="timeline-row"><span style="color:var(--grey-600);">Shortlist</span><strong>To be announced</strong></div>
+            <div class="timeline-row"><span style="color:var(--grey-600);">Scholarships begin</span><strong>To be announced</strong></div>
           </div>
 
           <div style="background:var(--white);border:1px solid var(--grey-100);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-sm);">
@@ -584,7 +579,7 @@
               <div class="checklist-item"><i class="ti ti-circle-check"></i> Income certificate (Tahsildar)</div>
               <div class="checklist-item"><i class="ti ti-circle-check"></i> Aadhaar card (student + parent)</div>
               <div class="checklist-item"><i class="ti ti-circle-check"></i> Latest marksheets (all semesters)</div>
-              <div class="checklist-item"><i class="ti ti-circle-check"></i> School / College bonafide certificate</div>
+              <div class="checklist-item"><i class="ti ti-circle-check"></i> School / College / Institution bonafide certificate</div>
               <div class="checklist-item"><i class="ti ti-circle-check"></i> Bank statement (last 6 months)</div>
               <div class="checklist-item"><i class="ti ti-circle-check"></i> Ration card & LPG bill (if available)</div>
             </div>
@@ -612,7 +607,6 @@
         </div>
         <div>
           <div class="footer-col-head">Programme</div>
-          <a class="footer-link" href="impact.html">Impact dashboard</a>
           <a class="footer-link" href="criteria.html">Selection criteria</a>
           <a class="footer-link" href="support.html">Support provided</a>
           <a class="footer-link" href="stories.html">Student stories</a>
@@ -642,6 +636,8 @@
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="js/india-locations.js"></script>
+  <script src="js/apply-education.js"></script>
   <script>
     const sb = supabase.createClient(
       'https://vftexybohuaxngyhwjts.supabase.co',
@@ -777,7 +773,7 @@
 
     // Green tick / red cross on each section header, based on its own required fields.
     function isSectionComplete(details) {
-      for (const el of details.querySelectorAll('[required]:not([type="radio"])')) {
+      for (const el of details.querySelectorAll('[required]:not([type="radio"]):not(:disabled)')) {
         if (!el.value || !el.value.trim()) return false;
       }
       const radioNames = new Set(
@@ -851,7 +847,9 @@
         if (!matches.length) continue;
         if (matches[0].type === 'radio') matches.forEach(r => { r.checked = (r.value === value); });
         else matches[0].value = value;
+        if (name === 'state' && window.syncDistricts) window.syncDistricts(matches[0]);
       }
+      if (window.syncEducation) window.syncEducation();
       const scholarshipRadio = form.querySelector('input[name="other_scholarship"]:checked');
       if (scholarshipRadio) toggleScholarship(scholarshipRadio);
       document.querySelectorAll('details.apply-section').forEach(d => { d.open = true; });
@@ -923,12 +921,10 @@
         ['annual_income',     fd.get('annual_income'),          'Please enter your family\'s annual income.'],
         ['address',           fd.get('address')?.trim(),        'Please enter your residential address.'],
         ['state',             fd.get('state'),                  'Please select your state.'],
-        ['district',          fd.get('district')?.trim(),       'Please enter your district.'],
+        ['district',          fd.get('district')?.trim(),       'Please select your district.'],
         ['parent_contact',    fd.get('parent_contact')?.trim(), 'Please enter your parent\'s / guardian\'s contact number.'],
         ['email',             fd.get('email')?.trim(),          'Please enter your e-mail ID.'],
-        ['school',            fd.get('school')?.trim(),         'Please enter your current school / college name.'],
-        ['school_10th',       fd.get('school_10th')?.trim(),    'Please enter your 10th standard school details.'],
-        ['school_12th',       fd.get('school_12th')?.trim(),    'Please enter your 12th / Diploma details.'],
+        ['school',            fd.get('school')?.trim(),         'Please enter your current school / college / institution name.'],
         ['other_scholarship', fd.get('other_scholarship'),      'Please select whether you have availed any other scholarship.'],
         ['awards',            fd.get('awards')?.trim(),         'Please fill in awards / achievements.'],
         ['extra_curricular',  fd.get('extra_curricular')?.trim(),'Please fill in extra-curricular activities.'],
@@ -937,6 +933,10 @@
       for (const [name, val, msg] of checks) {
         if (!val) return showErr(msg, name);
       }
+
+      // Education details (level-based dropdown fields)
+      const eduProblem = window.eduValidate(form);
+      if (eduProblem) return showErr(eduProblem.msg, eduProblem.name);
 
       // Phone fields hold only digits (the +91 is a fixed prefix) — any filled
       // one must be exactly 10 digits; the optional ones may be left blank.
@@ -999,11 +999,7 @@
           email:               fd.get('email').trim()                 || null,
           student_phone:       withCountryCode(fd.get('student_phone')),
           alternate_phone:     withCountryCode(fd.get('alternate_phone')),
-          school_10th:         fd.get('school_10th').trim()           || null,
-          school_12th:         fd.get('school_12th').trim()           || null,
-          college_ug:          fd.get('college_ug').trim()            || null,
-          college_pg:          fd.get('college_pg').trim()            || null,
-          other_education:     fd.get('other_education').trim()       || null,
+          ...window.eduCompose(form),
           other_scholarship:   fd.get('other_scholarship')            || null,
           scholarship_details: fd.get('scholarship_details')?.trim()  || null,
           awards:              fd.get('awards').trim()                || null,

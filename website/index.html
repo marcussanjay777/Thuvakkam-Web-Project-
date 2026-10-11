@@ -7,12 +7,36 @@
   <title>Sponsor for Success — Thuvakkam Education</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
   <link rel="stylesheet" href="css/style.css" />
+  <!-- Welcome screen: shown once per visit -->
+  <script>try { if (!sessionStorage.getItem('sfsWelcomeSeen')) document.documentElement.classList.add('welcome-on'); } catch (e) {}</script>
+  <link rel="stylesheet" href="css/welcome.css" />
 </head>
 <body>
 
+  <!-- WELCOME SCREEN (red carpet) -->
+  <div id="welcome" role="dialog" aria-label="Welcome to Thuvakkam Sponsor for Success">
+    <div class="w-stage">
+      <div class="w-glow"></div>
+      <div class="w-logo"><img src="assets/logo.webp" alt="Thuvakkam Education" /></div>
+      <div class="w-text">
+        <div class="w-title">Welcome to Thuvakkam<br>Sponsor for Success</div>
+        <p class="w-sub">Let&rsquo;s Build Brighter Futures Together</p>
+      </div>
+      <div class="w-carpet-glow">
+        <div class="w-carpet-wrap">
+          <div class="w-carpet-edge"></div>
+          <div class="w-carpet"></div>
+        </div>
+      </div>
+    </div>
+    <div class="w-curtain l"></div>
+    <div class="w-curtain r"></div>
+    <button type="button" class="w-skip">Skip</button>
+  </div>
+
   <!-- TOP NOTICE -->
   <div class="topnotice">
-    SFS 2026 applications are now open. &nbsp;<a href="apply.html">Apply before 31 August 2026</a>
+    SFS 2026–27 applications are now open. &nbsp;<a href="apply.html">Apply now</a>
   </div>
 
   <!-- NAV -->
@@ -23,7 +47,6 @@
       </a>
       <div class="nav-links">
         <a class="nav-link active"  href="./">Home</a>
-        <a class="nav-link"         href="impact.html">Impact</a>
         <a class="nav-link"         href="criteria.html">Selection</a>
         <a class="nav-link"         href="support.html">Support</a>
         <a class="nav-link"         href="stories.html">Stories</a>
@@ -45,25 +68,25 @@
       <img src="assets/logo.webp" alt="Thuvakkam Education" style="height:64px;width:auto;object-fit:contain;margin-bottom:24px;display:block;" />
       <div class="hero-eyebrow">
         <i class="ti ti-star-filled" style="font-size:12px;"></i>
-        Sponsor for Success &nbsp;&middot;&nbsp; SFS 2026
+        Sponsor for Success &nbsp;&middot;&nbsp; Academic year 2026–2027
       </div>
       <h1 class="hero-title">Education is the<br><em>foundation</em><br>of everything.</h1>
       <p class="hero-sub">Supporting students across Tamil Nadu through scholarships, mentorship, emotional guidance, and long-term monitoring since 2020.</p>
       <div class="hero-btns">
-        <a href="apply.html" class="btn btn-yellow">Apply for SFS 2026</a>
+        <a href="apply.html" class="btn btn-yellow">Apply for SFS 2026–27</a>
         <a href="sponsor.html" class="btn btn-outline-white">Become a sponsor</a>
-        <a href="impact.html" class="btn btn-outline-white">View our impact</a>
       </div>
     </div>
-    <div class="hero-stats">
+    <div class="hero-stats" style="grid-template-columns:repeat(2,1fr);">
       <div class="hero-stat">
-        <div class="hero-stat-val">5+</div>
+        <div class="hero-stat-val">10+</div>
         <div class="hero-stat-label">Years of support</div>
       </div>
       <div class="hero-stat">
-        <div class="hero-stat-val">100+</div>
+        <div class="hero-stat-val">225+</div>
         <div class="hero-stat-label">Students supported</div>
       </div>
+      <!-- HIDDEN FOR NOW: Partner schools and Districts reached (remove these comment markers to show again)
       <div class="hero-stat">
         <div class="hero-stat-val">20+</div>
         <div class="hero-stat-label">Partner schools</div>
@@ -72,6 +95,7 @@
         <div class="hero-stat-val">8+</div>
         <div class="hero-stat-label">Districts reached</div>
       </div>
+      -->
     </div>
   </section>
 
@@ -108,7 +132,8 @@
     </div>
   </section>
 
-  <!-- NUMBERS STRIP -->
+  <!-- HIDDEN FOR NOW: numbers strip (remove the comment markers to show again)
+  NUMBERS STRIP
   <section class="section-sm" style="background:var(--cream);">
     <div class="container">
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:32px;text-align:center;">
@@ -131,6 +156,7 @@
       </div>
     </div>
   </section>
+  -->
 
   <!-- HOW IT WORKS -->
   <section class="section">
@@ -164,7 +190,7 @@
 
       <div style="margin-top:48px;display:flex;gap:20px;justify-content:flex-start;flex-wrap:wrap;">
         <a href="criteria.html" class="btn btn-outline btn-sm">View full selection criteria</a>
-        <a href="apply.html" class="btn btn-primary btn-sm">Apply for SFS 2026</a>
+        <a href="apply.html" class="btn btn-primary btn-sm">Apply for SFS 2026–27</a>
       </div>
     </div>
   </section>
@@ -217,7 +243,6 @@
         </div>
         <div style="display:flex;gap:12px;flex-shrink:0;flex-wrap:wrap;">
           <a href="sponsor.html" class="btn btn-primary">Become a sponsor</a>
-          <a href="impact.html" class="btn btn-outline">See our impact</a>
         </div>
       </div>
     </div>
@@ -235,7 +260,6 @@
         </div>
         <div>
           <div class="footer-col-head">Programme</div>
-          <a class="footer-link" href="impact.html">Impact dashboard</a>
           <a class="footer-link" href="criteria.html">Selection criteria</a>
           <a class="footer-link" href="support.html">Support provided</a>
           <a class="footer-link" href="stories.html">Student stories</a>
@@ -298,5 +322,6 @@ document.querySelectorAll('.card, .section-title, .section-sub, .section-label, 
 });
 </script>
 <script src="js/nav.js" defer></script>
+<script src="js/welcome.js"></script>
 </body>
 </html>

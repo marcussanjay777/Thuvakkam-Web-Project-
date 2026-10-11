@@ -1,0 +1,152 @@
+/* Red-carpet welcome screen (home page only).
+   Hidden unless <html> has the "welcome-on" class (set by the small script in index.html). */
+
+#welcome { display: none; }
+html.welcome-on #welcome { display: block; position: fixed; inset: 0; z-index: 99999; overflow: hidden; }
+html.welcome-on body { overflow: hidden; }
+
+/* ---------- Stage ---------- */
+.w-stage {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 50% 28%, rgba(255, 196, 90, .22), transparent 70%),
+    radial-gradient(ellipse at 50% 30%, #7a1020 0%, #3a0610 48%, #140208 100%);
+}
+#welcome.closed .w-stage { visibility: hidden; }
+
+.w-glow {
+  position: absolute; left: 50%; top: 20%; width: min(70vw, 520px); height: min(70vw, 520px);
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, rgba(255, 214, 120, .55), rgba(255, 190, 70, .12) 45%, transparent 70%);
+  opacity: 0; animation: wFade 1.2s .1s forwards, wPulse 2.4s 1.3s ease-in-out infinite;
+}
+
+.w-logo {
+  position: absolute; left: 50%; top: 5%; transform: translateX(-50%);
+  width: clamp(76px, 12vh, 120px); aspect-ratio: 1;
+  display: grid; place-items: center;
+  background: #fffaf0; border-radius: 50%;
+  border: 3px solid #e8c25a;
+  box-shadow: 0 0 0 4px rgba(232, 194, 90, .25), 0 0 38px 8px rgba(255, 200, 80, .55);
+  opacity: 0; animation: wLogo 1.2s .1s cubic-bezier(.22, .61, .36, 1) forwards;
+}
+.w-logo img { width: 72%; height: auto; object-fit: contain; }
+
+.w-text {
+  position: absolute; left: 0; right: 0; top: calc(5% + clamp(76px, 12vh, 120px) + 3vh);
+  text-align: center; padding: 0 20px;
+}
+.w-title {
+  will-change: transform, opacity;
+  margin: 0; font-family: Georgia, 'Times New Roman', serif; font-weight: 700;
+  font-size: clamp(22px, 4.4vw, 46px); line-height: 1.2; letter-spacing: .01em;
+  background: linear-gradient(180deg, #fff3c4 0%, #f2cc66 50%, #c8962c 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  text-shadow: none;
+  opacity: 0; transform: translateY(14px); animation: wRise 1.1s 1.8s cubic-bezier(.22, .61, .36, 1) forwards;
+}
+.w-sub {
+  will-change: transform, opacity;
+  margin: 12px 0 0; font-family: Georgia, 'Times New Roman', serif; font-style: italic;
+  font-size: clamp(14px, 2.2vw, 22px); color: #f6dfa4; letter-spacing: .04em;
+  text-shadow: 0 0 12px rgba(255, 200, 80, .5);
+  opacity: 0; transform: translateY(10px); animation: wRise 1.1s 2.6s cubic-bezier(.22, .61, .36, 1) forwards;
+}
+
+/* ---------- Carpet ---------- */
+.w-carpet-glow::before {
+  content: ''; position: absolute; left: 15%; right: 15%; top: -4%; bottom: 0;
+  background: radial-gradient(ellipse at 50% 40%, rgba(255, 190, 70, .35), transparent 70%);
+  opacity: 0; animation: wFade 1.6s .5s ease forwards;
+}
+.w-carpet-glow {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 46%;
+}
+.w-carpet-wrap {
+  position: absolute; inset: 0;
+  clip-path: inset(100% 0 0 0);
+  will-change: clip-path;
+  animation: wUnroll 1.9s .3s cubic-bezier(.33, .1, .25, 1) forwards;
+}
+.w-carpet-edge, .w-carpet { position: absolute; inset: 0; }
+.w-carpet-edge {
+  clip-path: polygon(41% 0, 59% 0, 102% 100%, -2% 100%);
+  background: linear-gradient(#f2d37a, #b8892a);
+}
+.w-carpet {
+  clip-path: polygon(42.2% 0, 57.8% 0, 97% 100%, 3% 100%);
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, .3), transparent 20%, transparent 80%, rgba(0, 0, 0, .3)),
+    repeating-linear-gradient(to bottom, rgba(255, 255, 255, .05) 0 2px, transparent 2px 16px),
+    linear-gradient(to bottom, #9c1428 0%, #c41e36 55%, #8f0f20 100%);
+}
+.w-carpet::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(115deg, transparent 35%, rgba(255, 230, 160, .22) 50%, transparent 65%);
+  background-size: 250% 100%; background-position: 130% 0;
+  animation: wSheen 2s 2s ease forwards;
+}
+
+/* ---------- Rope posts (built by JS) ---------- */
+.w-ropes { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.w-post, .w-rope { opacity: 0; animation: wFade .9s ease forwards; }
+
+/* ---------- Sparkles ---------- */
+.w-spark {
+  position: absolute; width: var(--s, 10px); height: var(--s, 10px); pointer-events: none;
+  background: radial-gradient(circle, #fffbe6 0%, #ffd766 45%, #e8a92a 100%);
+  clip-path: polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%);
+  opacity: 0; animation: wTwinkle 2s var(--d, 0s) ease-in-out infinite;
+}
+.w-spark.burst {
+  z-index: 8; animation: wBurst var(--t, 1.1s) var(--d, 0s) ease-out forwards;
+}
+
+/* ---------- Curtains ---------- */
+.w-curtain {
+  position: absolute; top: 0; bottom: 0; width: 50.5%; z-index: 5;
+  transition: transform .8s cubic-bezier(.45, 0, .2, 1);
+  will-change: transform;
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, .45), transparent 14%, transparent 86%, rgba(0, 0, 0, .35)),
+    repeating-linear-gradient(90deg, #6b0d19 0, #a3162a 22px, #6b0d19 44px);
+}
+.w-curtain.l { left: 0;  transform: translateX(-101%); border-right: 4px solid #e8c25a; box-shadow: 0 0 26px 4px rgba(255, 200, 80, .55); }
+.w-curtain.r { right: 0; transform: translateX(101%);  border-left: 4px solid #e8c25a;  box-shadow: 0 0 26px 4px rgba(255, 200, 80, .55); }
+#welcome.closing .w-curtain { transform: none; }
+#welcome.opening { pointer-events: none; }
+#welcome.opening .w-curtain { transition-duration: 1.2s; transition-timing-function: cubic-bezier(.6, 0, .2, 1); }
+#welcome.opening .w-curtain.l { transform: translateX(-101%); }
+#welcome.opening .w-curtain.r { transform: translateX(101%); }
+
+/* ---------- Skip ---------- */
+.w-skip {
+  position: absolute; top: 14px; right: 14px; z-index: 10;
+  font: 600 13px/1 -apple-system, 'Segoe UI', Roboto, Arial, sans-serif; letter-spacing: .04em;
+  color: #f6dfa4; background: rgba(20, 2, 8, .55); border: 1px solid rgba(232, 194, 90, .6);
+  border-radius: 999px; padding: 9px 16px; cursor: pointer;
+}
+.w-skip:hover, .w-skip:focus-visible { background: rgba(232, 194, 90, .25); color: #fff; outline: none; }
+
+/* Gentle fade-out used by Skip and by reduced-motion visitors */
+#welcome.leaving { opacity: 0; transition: opacity .45s ease; pointer-events: none; }
+
+/* ---------- Animations ---------- */
+@keyframes wFade    { to { opacity: 1; } }
+@keyframes wPulse   { 50% { transform: translate(-50%, -50%) scale(1.12); } }
+@keyframes wLogo    { from { opacity: 0; transform: translateX(-50%) scale(.6); } to { opacity: 1; transform: translateX(-50%) scale(1); } }
+@keyframes wRise    { to { opacity: 1; transform: none; } }
+@keyframes wUnroll  { to { clip-path: inset(0 0 0 0); } }
+@keyframes wSheen   { to { background-position: -30% 0; } }
+@keyframes wTwinkle { 0%, 100% { opacity: 0; transform: scale(.3); } 50% { opacity: .95; transform: scale(1); } }
+@keyframes wBurst {
+  0%   { opacity: 0; transform: translate(0, 0) scale(.2); }
+  25%  { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--dx, 0), var(--dy, 0)) scale(1.1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .w-glow, .w-logo, .w-title, .w-sub, .w-carpet-wrap, .w-post, .w-rope { animation-duration: .01s; animation-delay: 0s; }
+  .w-spark { display: none; }
+  .w-carpet::after { animation: none; }
+}
