@@ -322,9 +322,17 @@ async function openProfile(studentId, context) {
                 <div style="font-size:11px;color:#9E9E9E;font-weight:600;margin-bottom:4px;">AWARDS / ACHIEVEMENTS</div>
                 <div style="font-size:13px;color:#1A1A1A;white-space:pre-wrap;">${longText(s.awards)}</div>
               </div>
-              <div class="pp-field" style="display:block;padding:14px 16px;">
+              <div class="pp-field" style="display:block;padding:14px 16px;border-bottom:1px solid #F4F4F2;">
                 <div style="font-size:11px;color:#9E9E9E;font-weight:600;margin-bottom:4px;">EXTRA-CURRICULAR ACTIVITIES</div>
                 <div style="font-size:13px;color:#1A1A1A;white-space:pre-wrap;">${longText(s.extra_curricular)}</div>
+              </div>
+              <div class="pp-field" style="display:block;padding:14px 16px;border-bottom:1px solid #F4F4F2;">
+                <div style="font-size:11px;color:#9E9E9E;font-weight:600;margin-bottom:4px;">BIGGEST AIM AND FUTURE PLAN</div>
+                <div style="font-size:13px;color:#1A1A1A;white-space:pre-wrap;">${longText(s.future_aim)}</div>
+              </div>
+              <div class="pp-field" style="display:block;padding:14px 16px;">
+                <div style="font-size:11px;color:#9E9E9E;font-weight:600;margin-bottom:4px;">WHY SHOULD WE GIVE THIS SCHOLARSHIP</div>
+                <div style="font-size:13px;color:#1A1A1A;white-space:pre-wrap;">${longText(s.why_scholarship)}</div>
               </div>
             </div>
           </div>

@@ -20,6 +20,13 @@
 
   // Which blocks to show for each level; the last one listed is the student's current level.
   var LEVELS = {
+    '2nd standard':                 ['junior'],
+    '3rd standard':                 ['junior'],
+    '4th standard':                 ['junior'],
+    '5th standard':                 ['junior'],
+    '6th standard':                 ['junior'],
+    '7th standard':                 ['junior'],
+    '8th standard':                 ['junior'],
     '9th / 10th standard':          ['tenth'],
     '11th / 12th / Diploma / ITI':  ['tenth', 'hs'],
     'UG (Bachelor\'s degree)':      ['tenth', 'hs', 'ug'],
@@ -50,6 +57,9 @@
   function row(a, b) { return '<div class="form-row">' + a + b + '</div>'; }
 
   var BLOCKS = {
+    junior: { title: 'School details (2nd to 8th standard)', html:
+      sel('edu_junior_board', 'Board', BOARDS, true) +
+      marks('edu_junior') },
     tenth: { title: '10th standard', html:
       txt('edu_tenth_name', 'School name', 'Name of your 10th standard school', true) +
       row(sel('edu_tenth_board', 'Board', BOARDS, true),
@@ -129,8 +139,44 @@
     m.placeholder = t.value === 'CGPA' ? 'e.g. 8.5' : 'e.g. 85';
   });
 
-  levelSel.addEventListener('change', sync);
-  sync();
+  // ---- Documents that depend on the level ----
+  // report = latest report card (school levels), m10 = 10th marksheet (11th and above),
+  // m12 = 12th / Diploma marksheet (UG, PG, Other), degree = degree marksheets (UG, PG;
+  // not needed in the 1st year of UG because no semester is finished yet).
+  var docRows = document.querySelectorAll('[data-doc-for]');
+  function syncDocs() {
+    var list = LEVELS[levelSel.value] || [];
+    var ugStatus = document.querySelector('select[name="edu_ug_status"]');
+    var need = {
+      report: list.length === 1,
+      m10:    list.indexOf('hs') !== -1,
+      m12:    list.length >= 3,
+      degree: list.indexOf('ug') !== -1 && !(list.indexOf('pg') === -1 && ugStatus && ugStatus.value === '1st year')
+    };
+    docRows.forEach(function (row) {
+      var on = !!need[row.getAttribute('data-doc-for')];
+      var inp = row.querySelector('.doc-file-input');
+      row.hidden = !on;
+      inp.setAttribute('data-required', on ? 'true' : 'false');
+      if (!on) {
+        inp.value = '';
+        var st = row.querySelector('.doc-status');
+        if (st) { st.textContent = ''; st.className = 'doc-status'; }
+      }
+    });
+    // Renumber every visible document row 1, 2, 3...
+    var i = 0;
+    document.querySelectorAll('.doc-list .doc-row').forEach(function (row) {
+      if (!row.hidden) row.querySelector('.doc-num').textContent = ++i;
+    });
+  }
+
+  function syncAll() { sync(); syncDocs(); }
+  levelSel.addEventListener('change', syncAll);
+  host.addEventListener('change', function (e) {
+    if (e.target.name === 'edu_ug_status') syncDocs();
+  });
+  syncAll();
 
   // ---- Reading the answers back ----
   function val(form, name) {
@@ -197,11 +243,12 @@
     ]);
     out.other_education = line([
       ['Current level', levelSel.value],
+      ['Board', val(form, 'edu_junior_board')], ['Marks', marksText(form, 'edu_junior')],
       ['Course', val(form, 'edu_other_course')], ['Year of joining', val(form, 'edu_other_joined')]
     ]);
     return out;
   };
 
   // Called by the page after it restores a saved draft
-  window.syncEducation = sync;
+  window.syncEducation = syncAll;
 })();

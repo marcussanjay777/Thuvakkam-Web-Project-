@@ -167,7 +167,7 @@
 <body>
 
   <div class="topnotice">
-    SFS 2026–27 applications are now open. &nbsp;<a href="#apply-form">Apply now</a>
+    SFS 2026–27 applications are now open. This cycle is for girl students / women only. &nbsp;<a href="#apply-form">Apply now</a>
   </div>
 
   <nav class="nav">
@@ -196,7 +196,7 @@
     <div class="page-hero-inner">
       <div class="section-label-light" style="margin-bottom:8px;">Applications open &middot; Academic year 2026–2027</div>
       <div class="page-hero-title">Apply for SFS 2026–27</div>
-      <div class="page-hero-sub">Fill in the form below. All submissions are reviewed by the committee.</div>
+      <div class="page-hero-sub">This cycle of the scholarship is only for girl students / women. Fill in the form below. All submissions are reviewed by the committee.</div>
     </div>
   </div>
 
@@ -266,10 +266,9 @@
                   <div class="field-group">
                     <label class="field-label">Gender <span class="req">*</span></label>
                     <div class="radio-group">
-                      <label class="radio-label"><input type="radio" name="gender" value="Male" required /> Male</label>
-                      <label class="radio-label"><input type="radio" name="gender" value="Female" /> Female</label>
-                      <label class="radio-label"><input type="radio" name="gender" value="Other" /> Other</label>
+                      <label class="radio-label"><input type="radio" name="gender" value="Female" checked required /> Female</label>
                     </div>
+                    <div style="font-size:12px;color:var(--grey-600);margin-top:4px;">This scholarship is for female students only.</div>
                   </div>
                 </div>
                 <div class="form-row">
@@ -301,14 +300,19 @@
                   <div class="field-group">
                     <label class="field-label">State <span class="req">*</span></label>
                     <select class="field-select" name="state" required>
-                      <option value="">Select state</option>
+                      <option value="Tamil Nadu" selected>Tamil Nadu</option>
                     </select>
                   </div>
                   <div class="field-group">
                     <label class="field-label">District <span class="req">*</span></label>
-                    <select class="field-select" name="district" required disabled>
-                      <option value="">Select state first</option>
+                    <select class="field-select" name="district" required>
+                      <option value="">Select district</option>
+                      <option>Chennai</option>
+                      <option>Chengalpattu</option>
+                      <option>Kanchipuram</option>
+                      <option>Thiruvallur</option>
                     </select>
+                    <div style="font-size:12px;color:var(--grey-600);margin-top:4px;">Open only to students from Chennai, Chengalpattu, Kanchipuram and Thiruvallur districts.</div>
                   </div>
                 </div>
                 <div class="form-row">
@@ -355,6 +359,13 @@
                   <label class="field-label">Current level of study <span class="req">*</span></label>
                   <select class="field-select" name="current_level" required>
                     <option value="">Select your current level</option>
+                    <option>2nd standard</option>
+                    <option>3rd standard</option>
+                    <option>4th standard</option>
+                    <option>5th standard</option>
+                    <option>6th standard</option>
+                    <option>7th standard</option>
+                    <option>8th standard</option>
                     <option>9th / 10th standard</option>
                     <option>11th / 12th / Diploma / ITI</option>
                     <option>UG (Bachelor's degree)</option>
@@ -383,6 +394,14 @@
                 <div class="field-group">
                   <label class="field-label">Extra-curricular activities <span class="req">*</span></label>
                   <textarea class="field-textarea" name="extra_curricular" placeholder="Sports, cultural, social activities, NCC, NSS, volunteering, etc." required style="min-height:72px;"></textarea>
+                </div>
+                <div class="field-group">
+                  <label class="field-label">What is your biggest aim and future plan? <span class="req">*</span></label>
+                  <textarea class="field-textarea" name="future_aim" placeholder="What do you want to become, and how do you plan to reach it?" required style="min-height:100px;"></textarea>
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Why should we give you this scholarship? <span class="req">*</span></label>
+                  <textarea class="field-textarea" name="why_scholarship" placeholder="Tell us why you need this support and how it will help you." required style="min-height:100px;"></textarea>
                 </div>
               </div>
             </details>
@@ -434,31 +453,41 @@
                   </div>
                 </div>
 
-                <div class="doc-row">
+                <div class="doc-row" data-doc-for="report" hidden>
+                  <div class="doc-num">4</div>
+                  <div class="doc-info">
+                    <div class="doc-name">Latest report card (last completed class) <span class="req">*</span></div>
+                    <input class="doc-file-input" type="file" name="doc_report_card" accept=".pdf,.jpg,.jpeg,.png" data-label="Latest Report Card" data-required="false" />
+                    <div class="doc-hint">Upload 1 file (PDF, JPG or PNG).</div>
+                    <div class="doc-status" id="status_doc_report_card"></div>
+                  </div>
+                </div>
+
+                <div class="doc-row" data-doc-for="m10" hidden>
                   <div class="doc-num">4</div>
                   <div class="doc-info">
                     <div class="doc-name">10th mark sheet <span class="req">*</span></div>
-                    <input class="doc-file-input" type="file" name="doc_marksheet_10" accept=".pdf,.jpg,.jpeg,.png" data-label="10th Marksheet" data-required="true" />
+                    <input class="doc-file-input" type="file" name="doc_marksheet_10" accept=".pdf,.jpg,.jpeg,.png" data-label="10th Marksheet" data-required="false" />
                     <div class="doc-hint">Upload 1 file (PDF, JPG or PNG).</div>
                     <div class="doc-status" id="status_doc_marksheet_10"></div>
                   </div>
                 </div>
 
-                <div class="doc-row">
+                <div class="doc-row" data-doc-for="m12" hidden>
                   <div class="doc-num">5</div>
                   <div class="doc-info">
                     <div class="doc-name">12th / Diploma marksheet <span class="req">*</span></div>
-                    <input class="doc-file-input" type="file" name="doc_marksheet_12" accept=".pdf,.jpg,.jpeg,.png" data-label="12th/Diploma Marksheet" data-required="true" />
+                    <input class="doc-file-input" type="file" name="doc_marksheet_12" accept=".pdf,.jpg,.jpeg,.png" data-label="12th/Diploma Marksheet" data-required="false" />
                     <div class="doc-hint">Upload 1 file (PDF, JPG or PNG).</div>
                     <div class="doc-status" id="status_doc_marksheet_12"></div>
                   </div>
                 </div>
 
-                <div class="doc-row">
+                <div class="doc-row" data-doc-for="degree" hidden>
                   <div class="doc-num">6</div>
                   <div class="doc-info">
                     <div class="doc-name">All degree marksheets (till last semester) <span class="req">*</span></div>
-                    <input class="doc-file-input" type="file" name="doc_degree_marksheets" accept=".pdf,.jpg,.jpeg,.png" data-label="Degree Marksheets" data-required="true" multiple />
+                    <input class="doc-file-input" type="file" name="doc_degree_marksheets" accept=".pdf,.jpg,.jpeg,.png" data-label="Degree Marksheets" data-required="false" multiple />
                     <div class="doc-hint">Upload up to 10 files (PDF, JPG or PNG).</div>
                     <div class="doc-status" id="status_doc_degree_marksheets"></div>
                   </div>
@@ -636,7 +665,6 @@
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-  <script src="js/india-locations.js"></script>
   <script src="js/apply-education.js"></script>
   <script>
     const sb = supabase.createClient(
@@ -928,6 +956,8 @@
         ['other_scholarship', fd.get('other_scholarship'),      'Please select whether you have availed any other scholarship.'],
         ['awards',            fd.get('awards')?.trim(),         'Please fill in awards / achievements.'],
         ['extra_curricular',  fd.get('extra_curricular')?.trim(),'Please fill in extra-curricular activities.'],
+        ['future_aim',        fd.get('future_aim')?.trim(),     'Please tell us your biggest aim and future plan.'],
+        ['why_scholarship',   fd.get('why_scholarship')?.trim(),'Please tell us why we should give you the scholarship.'],
         ['family_about',      fd.get('family_about')?.trim(),   'Please tell us about your family.'],
       ];
       for (const [name, val, msg] of checks) {
@@ -1004,6 +1034,8 @@
           scholarship_details: fd.get('scholarship_details')?.trim()  || null,
           awards:              fd.get('awards').trim()                || null,
           extra_curricular:    fd.get('extra_curricular').trim()      || null,
+          future_aim:          fd.get('future_aim').trim()            || null,
+          why_scholarship:     fd.get('why_scholarship').trim()       || null,
           family_about:        fd.get('family_about').trim()          || null,
         };
 
