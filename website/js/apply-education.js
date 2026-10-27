@@ -20,12 +20,6 @@
 
   // Which blocks to show for each level; the last one listed is the student's current level.
   var LEVELS = {
-    '2nd standard':                 ['junior'],
-    '3rd standard':                 ['junior'],
-    '4th standard':                 ['junior'],
-    '5th standard':                 ['junior'],
-    '6th standard':                 ['junior'],
-    '7th standard':                 ['junior'],
     '8th standard':                 ['junior'],
     '9th / 10th standard':          ['tenth'],
     '11th / 12th / Diploma / ITI':  ['tenth', 'hs'],
@@ -57,7 +51,7 @@
   function row(a, b) { return '<div class="form-row">' + a + b + '</div>'; }
 
   var BLOCKS = {
-    junior: { title: 'School details (2nd to 8th standard)', html:
+    junior: { title: 'School details (8th standard)', html:
       sel('edu_junior_board', 'Board', BOARDS, true) +
       marks('edu_junior') },
     tenth: { title: '10th standard', html:

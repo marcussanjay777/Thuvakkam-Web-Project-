@@ -1078,6 +1078,7 @@ footer {
   .donate-options { grid-template-columns: 1fr; }
   .footer-grid { grid-template-columns: 1fr 1fr; gap: 24px; }
   .process-row { grid-template-columns: 1fr; border-radius: var(--radius-lg); }
+  .process-desc { grid-template-columns: 1fr !important; }
   .process-step { border-right: none; border-bottom: 1px solid var(--grey-100); }
   .process-step:last-child { border-bottom: none; }
   .pill-grid { grid-template-columns: 1fr; }
