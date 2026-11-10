@@ -1,12 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Student Login — Thuvakkam SFS</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
   <link rel="stylesheet" href="css/style.css" />
+
+  <!-- Google Analytics -->
+  <script src="/website/js/google-analytics.js"></script>
+  <!-- Website Favicon -->
+  <link rel="icon" type="image/webp" href="/website/assets/logo-round.webp">
+
 </head>
+
 <body>
 
   <div class="sp-login-wrap">
@@ -15,7 +23,7 @@
       <div class="sp-login-head">
         <img src="../website/assets/logo.webp" alt="Thuvakkam Education" />
         <div class="sp-login-head-title">Student Portal</div>
-        <div class="sp-login-head-sub">Sign in with the credentials provided<br/>by your SFS coordinator</div>
+        <div class="sp-login-head-sub">Sign in with the credentials provided<br />by your SFS coordinator</div>
       </div>
 
       <div class="sp-login-body">
@@ -25,11 +33,13 @@
         <div class="sp-view" id="login-view">
           <div class="sp-field-group">
             <label class="sp-field-label">Email address</label>
-            <input class="sp-field-input" id="login-email" type="email" placeholder="your.email@example.com" autocomplete="email" />
+            <input class="sp-field-input" id="login-email" type="email" placeholder="your.email@example.com"
+              autocomplete="email" />
           </div>
           <div class="sp-field-group">
             <label class="sp-field-label">Password</label>
-            <input class="sp-field-input" id="login-password" type="password" placeholder="Enter your password" autocomplete="current-password" />
+            <input class="sp-field-input" id="login-password" type="password" placeholder="Enter your password"
+              autocomplete="current-password" />
           </div>
 
           <button class="sp-login-btn" id="login-btn" onclick="doLogin()">
@@ -40,10 +50,12 @@
         </div>
 
         <div class="sp-view" id="forgot-view" style="display:none;">
-          <p class="sp-forgot-text">Enter the email you sign in with and we'll send you a link to choose a new password.</p>
+          <p class="sp-forgot-text">Enter the email you sign in with and we'll send you a link to choose a new password.
+          </p>
           <div class="sp-field-group" id="forgot-fields">
             <label class="sp-field-label">Email address</label>
-            <input class="sp-field-input" id="forgot-email" type="email" placeholder="your.email@example.com" autocomplete="email" />
+            <input class="sp-field-input" id="forgot-email" type="email" placeholder="your.email@example.com"
+              autocomplete="email" />
           </div>
           <button class="sp-login-btn" id="forgot-btn" onclick="sendReset()">
             Send reset link
@@ -52,7 +64,7 @@
         </div>
 
         <p class="sp-login-hint">
-          Credentials are issued by Thuvakkam Education after your scholarship is confirmed.<br/>
+          Credentials are issued by Thuvakkam Education after your scholarship is confirmed.<br />
           If you can't sign in or reset your password, contact <strong>info@thuvakkam.org</strong>
         </p>
       </div>
@@ -81,27 +93,27 @@
     });
 
     async function doLogin() {
-      const email    = document.getElementById('login-email').value.trim();
+      const email = document.getElementById('login-email').value.trim();
       const password = document.getElementById('login-password').value;
-      const btn      = document.getElementById('login-btn');
-      const errEl    = document.getElementById('login-error');
+      const btn = document.getElementById('login-btn');
+      const errEl = document.getElementById('login-error');
 
       errEl.style.display = 'none';
       if (!email || !password) {
-        errEl.textContent  = 'Please enter your email and password.';
+        errEl.textContent = 'Please enter your email and password.';
         errEl.style.display = 'block';
         return;
       }
 
-      btn.disabled    = true;
+      btn.disabled = true;
       btn.textContent = 'Signing in...';
 
       const { error } = await sb.auth.signInWithPassword({ email, password });
 
       if (error) {
-        errEl.textContent   = 'Incorrect email or password. Please check and try again.';
+        errEl.textContent = 'Incorrect email or password. Please check and try again.';
         errEl.style.display = 'block';
-        btn.disabled    = false;
+        btn.disabled = false;
         btn.textContent = 'Sign in';
         return;
       }
@@ -113,9 +125,9 @@
 
       if (!student) {
         await sb.auth.signOut();
-        errEl.textContent   = 'This account is not linked to a student profile. Please contact your coordinator.';
+        errEl.textContent = 'This account is not linked to a student profile. Please contact your coordinator.';
         errEl.style.display = 'block';
-        btn.disabled    = false;
+        btn.disabled = false;
         btn.textContent = 'Sign in';
         return;
       }
@@ -125,46 +137,46 @@
 
     function showForgot(e) {
       e.preventDefault();
-      document.getElementById('login-error').style.display   = 'none';
+      document.getElementById('login-error').style.display = 'none';
       document.getElementById('login-success').style.display = 'none';
       document.getElementById('forgot-email').value = document.getElementById('login-email').value.trim();
-      document.getElementById('login-view').style.display  = 'none';
+      document.getElementById('login-view').style.display = 'none';
       document.getElementById('forgot-view').style.display = 'flex';
       document.getElementById('forgot-email').focus();
     }
 
     function showLogin(e) {
       e.preventDefault();
-      document.getElementById('login-error').style.display   = 'none';
+      document.getElementById('login-error').style.display = 'none';
       document.getElementById('login-success').style.display = 'none';
       document.getElementById('forgot-fields').style.display = '';
-      document.getElementById('forgot-btn').style.display    = '';
+      document.getElementById('forgot-btn').style.display = '';
       document.getElementById('forgot-view').style.display = 'none';
-      document.getElementById('login-view').style.display  = '';
+      document.getElementById('login-view').style.display = '';
     }
 
     async function sendReset() {
-      const email     = document.getElementById('forgot-email').value.trim();
-      const btn       = document.getElementById('forgot-btn');
-      const errEl     = document.getElementById('login-error');
+      const email = document.getElementById('forgot-email').value.trim();
+      const btn = document.getElementById('forgot-btn');
+      const errEl = document.getElementById('login-error');
       const successEl = document.getElementById('login-success');
 
-      errEl.style.display     = 'none';
+      errEl.style.display = 'none';
       successEl.style.display = 'none';
       if (!email) {
-        errEl.textContent   = 'Please enter your email address.';
+        errEl.textContent = 'Please enter your email address.';
         errEl.style.display = 'block';
         return;
       }
 
-      btn.disabled    = true;
+      btn.disabled = true;
       btn.textContent = 'Sending...';
 
       const { error } = await sb.auth.resetPasswordForEmail(email, {
         redirectTo: new URL('set-password.html', window.location.href).href
       });
 
-      btn.disabled    = false;
+      btn.disabled = false;
       btn.textContent = 'Send reset link';
 
       if (error) {
@@ -183,4 +195,5 @@
     }
   </script>
 </body>
+
 </html>
