@@ -14,5 +14,5 @@
     window.gtag = gtag;
 
     gtag('js', new Date());
-    gtag('config', 'G-XXXXXXXXXX');
+    gtag('config', 'GTM-M4XJLRM3');
 })();
